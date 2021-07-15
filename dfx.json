@@ -1,20 +1,15 @@
 {
   "canisters": {
-    "axon": {
-      "main": "src/axon/main.mo",
+    "Axon": {
+      "main": "src/Axon/Axon.mo",
       "type": "motoko"
     },
-    "axon_assets": {
-      "dependencies": [
-        "axon"
-      ],
+    "frontend": {
+      "dependencies": ["Axon"],
       "frontend": {
-        "entrypoint": "src/axon_assets/src/index.html"
+        "entrypoint": "src/frontend/src/index.html"
       },
-      "source": [
-        "src/axon_assets/assets",
-        "dist/axon_assets/"
-      ],
+      "source": ["src/frontend/assets", "dist/frontend/"],
       "type": "assets"
     }
   },

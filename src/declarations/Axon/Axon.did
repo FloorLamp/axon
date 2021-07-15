@@ -1,0 +1,200 @@
+type Split = record {amount_e8s: nat64;};
+type Spawn = record {new_controller: opt principal;};
+type SetDissolveTimestamp = record {dissolve_timestamp_seconds: nat64;};
+type SetDefaultFollowees = record {
+                             default_followees: vec record {
+                                                      int32;
+                                                      Followees;
+                                                    };};
+type RewardToNeuron = record {dissolve_delay_seconds: nat64;};
+type RewardToAccount = record {to_account: opt AccountIdentifier;};
+type RewardNodeProvider = 
+ record {
+   amount_e8s: nat64;
+   node_provider: opt NodeProvider;
+   reward_mode: opt RewardMode;
+ };
+type RewardMode = 
+ variant {
+   RewardToAccount: RewardToAccount;
+   RewardToNeuron: RewardToNeuron;
+ };
+type Result = 
+ variant {
+   err: Error;
+   ok;
+ };
+type RemoveHotKey = record {hot_key_to_remove: opt principal;};
+type RegisterVote = 
+ record {
+   proposal: opt NeuronId;
+   vote: int32;
+ };
+type Proposal = 
+ record {
+   action: opt Action;
+   summary: text;
+   url: text;
+ };
+type Operation = 
+ variant {
+   AddHotKey: AddHotKey;
+   IncreaseDissolveDelay: IncreaseDissolveDelay;
+   RemoveHotKey: RemoveHotKey;
+   SetDissolveTimestamp: SetDissolveTimestamp;
+   StartDissolving: record {};
+   StopDissolving: record {};
+ };
+type NodeProvider = record {id: opt principal;};
+type NeuronStakeTransfer = 
+ record {
+   block_height: nat64;
+   from: opt principal;
+   from_subaccount: vec nat8;
+   memo: nat64;
+   neuron_stake_e8s: nat64;
+   to_subaccount: vec nat8;
+   transfer_timestamp: nat64;
+ };
+type NeuronResult = 
+ variant {
+   Err: GovernanceError;
+   Ok: Neuron;
+ };
+type NeuronId = record {id: nat64;};
+type Neuron = 
+ record {
+   account: vec nat8;
+   aging_since_timestamp_seconds: nat64;
+   cached_neuron_stake_e8s: nat64;
+   controller: opt principal;
+   created_timestamp_seconds: nat64;
+   dissolve_state: opt DissolveState;
+   followees: vec record {
+                    int32;
+                    Followees;
+                  };
+   hot_keys: vec principal;
+   id: opt NeuronId;
+   kyc_verified: bool;
+   maturity_e8s_equivalent: nat64;
+   neuron_fees_e8s: nat64;
+   not_for_profit: bool;
+   recent_ballots: vec BallotInfo;
+   transfer: opt NeuronStakeTransfer;
+ };
+type NetworkEconomics = 
+ record {
+   max_proposals_to_keep_per_topic: nat32;
+   maximum_node_provider_rewards_e8s: nat64;
+   minimum_icp_xdr_rate: nat64;
+   neuron_management_fee_per_proposal_e8s: nat64;
+   neuron_minimum_stake_e8s: nat64;
+   neuron_spawn_dissolve_delay_seconds: nat64;
+   reject_cost_e8s: nat64;
+   transaction_fee_e8s: nat64;
+ };
+type Motion = record {motion_text: text;};
+type ManageOperator = 
+ record {
+   action: variant {
+             Add;
+             Remove;
+           };
+   "principal": principal;
+ };
+type ManageNeuron = 
+ record {
+   command: opt Command;
+   id: opt NeuronId;
+ };
+type IncreaseDissolveDelay = record {
+                               additional_dissolve_delay_seconds: nat32;};
+type GovernanceError = 
+ record {
+   error_message: text;
+   error_type: int32;
+ };
+type Followees = record {followees: vec NeuronId;};
+type Follow = 
+ record {
+   followees: vec NeuronId;
+   topic: int32;
+ };
+type ExecuteNnsFunction = 
+ record {
+   nns_function: int32;
+   payload: vec nat8;
+ };
+type Error = 
+ variant {
+   GovernanceError: GovernanceError;
+   NotFound;
+   Other: text;
+   Unauthorized;
+ };
+type DissolveState = 
+ variant {
+   DissolveDelaySeconds: nat64;
+   WhenDissolvedTimestampSeconds: nat64;
+ };
+type DisburseToNeuron = 
+ record {
+   amount_e8s: nat64;
+   dissolve_delay_seconds: nat64;
+   kyc_verified: bool;
+   new_controller: opt principal;
+   nonce: nat64;
+ };
+type Disburse = 
+ record {
+   amount: opt Amount;
+   to_account: opt AccountIdentifier;
+ };
+type Configure = record {operation: opt Operation;};
+type Command = 
+ variant {
+   Configure: Configure;
+   Disburse: Disburse;
+   DisburseToNeuron: DisburseToNeuron;
+   Follow: Follow;
+   MakeProposal: Proposal;
+   RegisterVote: RegisterVote;
+   Spawn: Spawn;
+   Split: Split;
+ };
+type Change = 
+ variant {
+   ToAdd: NodeProvider;
+   ToRemove: NodeProvider;
+ };
+type BallotInfo = 
+ record {
+   proposal_id: opt NeuronId;
+   vote: int32;
+ };
+type Axon = 
+ service {
+   getOperators: () -> (vec principal) query;
+   manage: (ManageNeuron) -> (Result);
+   manageOperator: (ManageOperator) -> (Result);
+   neurons: () -> (vec opt NeuronResult);
+   registerNeuron: (nat64) -> (NeuronResult);
+ };
+type ApproveGenesisKyc = record {principals: vec principal;};
+type Amount = record {e8s: nat64;};
+type AddOrRemoveNodeProvider = record {change: opt Change;};
+type AddHotKey = record {new_hot_key: opt principal;};
+type Action = 
+ variant {
+   AddOrRemoveNodeProvider: AddOrRemoveNodeProvider;
+   ApproveGenesisKyc: ApproveGenesisKyc;
+   ExecuteNnsFunction: ExecuteNnsFunction;
+   ManageNetworkEconomics: NetworkEconomics;
+   ManageNeuron: ManageNeuron;
+   Motion: Motion;
+   RewardNodeProvider: RewardNodeProvider;
+   SetDefaultFollowees: SetDefaultFollowees;
+ };
+type AccountIdentifier = record {hash: vec nat8;};
+service : (principal) -> Axon

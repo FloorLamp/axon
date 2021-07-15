@@ -33,12 +33,7 @@ function initCanisterIds() {
 initCanisterIds();
 
 const isDevelopment = process.env.NODE_ENV !== "production";
-const asset_entry = path.join(
-  "src",
-  "axon_assets",
-  "src",
-  "index.html"
-);
+const asset_entry = path.join("src", "frontend", "src", "index.html");
 
 module.exports = {
   target: "web",
@@ -65,7 +60,7 @@ module.exports = {
   },
   output: {
     filename: "index.js",
-    path: path.join(__dirname, "dist", "axon_assets"),
+    path: path.join(__dirname, "dist", "frontend"),
   },
 
   // Depending in the language or framework you are using for
@@ -82,19 +77,19 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(__dirname, asset_entry),
-      cache: false
+      cache: false,
     }),
     new CopyPlugin({
       patterns: [
         {
-          from: path.join(__dirname, "src", "axon_assets", "assets"),
-          to: path.join(__dirname, "dist", "axon_assets"),
+          from: path.join(__dirname, "src", "frontend", "assets"),
+          to: path.join(__dirname, "dist", "frontend"),
         },
       ],
     }),
     new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development',
-      AXON_CANISTER_ID: canisters["axon"]
+      NODE_ENV: "development",
+      AXON_CANISTER_ID: canisters["axon"],
     }),
     new webpack.ProvidePlugin({
       Buffer: [require.resolve("buffer/"), "Buffer"],
@@ -113,7 +108,7 @@ module.exports = {
       },
     },
     hot: true,
-    contentBase: path.resolve(__dirname, "./src/axon_assets"),
-    watchContentBase: true
+    contentBase: path.resolve(__dirname, "./src/frontend"),
+    watchContentBase: true,
   },
 };
