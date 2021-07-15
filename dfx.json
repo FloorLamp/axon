@@ -1,0 +1,35 @@
+{
+  "canisters": {
+    "axon": {
+      "main": "src/axon/main.mo",
+      "type": "motoko"
+    },
+    "axon_assets": {
+      "dependencies": [
+        "axon"
+      ],
+      "frontend": {
+        "entrypoint": "src/axon_assets/src/index.html"
+      },
+      "source": [
+        "src/axon_assets/assets",
+        "dist/axon_assets/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "dfx": "0.7.7",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}
