@@ -8,7 +8,8 @@
     "start": "cd src/axon-ui && npm run start",
     "predev": "npm run copy:types",
     "prebuild": "npm run copy:types",
+    "postbuild": "cd src/axon-ui && npm run export",
     "prestart": "npm run copy:types",
-    "copy:types": "rsync -avr .dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/** --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --delete src/declarations"
+    "copy:types": "rsync -avr .dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/** --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --exclude='index.js' --delete src/declarations"
   }
 }
