@@ -131,7 +131,11 @@ shared actor class Axon(init: T.Initialization) {
   // Submit a new Command proposal
   public shared({ caller }) func proposeCommand(request: T.NewProposal<GT.Command>) : async T.Result<()> {
     if (not isOperator(caller)) {
-      return #err(#Unauthorized)
+      return #err(#Unauthorized);
+    };
+
+    if (neuronIds.size() == 0) {
+      return #err(#CannotPropose);
     };
 
     // Snapshot the voters at creation
@@ -141,7 +145,7 @@ shared actor class Axon(init: T.Initialization) {
         vote = null;
       }
     });
-    let timeStart = Time.now();
+    let timeStart = Option.get(request.timeStart, Time.now());
     activeProposals := Array.append(activeProposals, [{
       id = lastId;
       timeStart = timeStart;
@@ -156,8 +160,49 @@ shared actor class Axon(init: T.Initialization) {
     #ok
   };
 
+  // Vote on an active proposal
+  public shared({ caller }) func vote(id: Nat, vote: T.Vote) : async T.Result<()> {
+    if (not isOperator(caller)) {
+      return #err(#Unauthorized)
+    };
+
+    var result: T.Result<()> = #err(#NotFound);
+    activeProposals := Array.map<T.CommandProposal, T.CommandProposal>(activeProposals, func(p) {
+      if (p.id != id) {
+        return p;
+      };
+
+      let ballot = {
+        principal = caller;
+        vote = ?vote;
+      };
+      if (Arr.contains<T.Ballot>(p.ballots, ballot, func(a, b) { a.principal == b.principal })) {
+        result := #err(#AlreadyVoted);
+        return p
+      };
+
+      result := #ok();
+      let ballots = Array.append(p.ballots, [ballot]);
+      {
+        id = p.id;
+        ballots = ballots;
+        timeStart = p.timeStart;
+        timeEnd = p.timeEnd;
+        creator = p.creator;
+        proposal = p.proposal;
+        responses = p.responses;
+      }
+    });
+
+    // Execute if ok
+    if (Result.isOk(result)) {
+      ignore await execute();
+    };
+    result
+  };
+
   // Execute all proposals that have passed, and remove expired proposals
-  public shared({ caller }) func execute() : async T.Result<[T.CommandProposal]> {
+  public shared({ caller }) func execute() : async T.Result<()> {
     if (not isOperator(caller)) {
       return #err(#Unauthorized)
     };
@@ -204,7 +249,7 @@ shared actor class Axon(init: T.Initialization) {
       not Arr.contains<T.CommandProposal>(inactiveArr, r, func(a, b) { a.id == b.id })
     });
 
-    #ok(inactiveArr);
+    #ok();
   };
 
   func isOperator(principal: Principal): Bool {

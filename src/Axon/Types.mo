@@ -22,6 +22,8 @@ module {
     #Unauthorized;
     #NotFound;
     #CannotRemoveOperator;
+    #CannotPropose;
+    #AlreadyVoted;
     #GovernanceError: GT.GovernanceError;
     #Error: { error_message : Text; error_type : Error.ErrorCode };
   };
