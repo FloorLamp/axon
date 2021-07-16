@@ -6,8 +6,19 @@ Axon is a decentralized neuron management canister.
 
 ## Overview
 
-- An Axon canister controls one or more neurons, either as a hot key or as sole controller (not possible until canisters can hold ICP)
+- An Axon canister controls one or more neurons
 - Axons have one or more Principals (operators) that manage its neurons
 - `ManageNeuron` commands are sent to Axon, which queues them for voting
-- Once a majority of operators vote yes to a command, it is forwarded to all controlled neurons
+- A snapshot of operators is taken at time of submission
+- Once a majority of operators vote yes to a proposal, the command is forwarded to all controlled neurons
 - Axons can be public and expose all neuron data
+
+## Usage
+
+Deploy an Axon canister:
+
+```sh
+dfx deploy Axon --argument 'record {owner= (principal "your-principal-here"); visibility= variant{Public}}'
+```
+
+Then, spawn a neuron and set the controller to the Axon canister.
