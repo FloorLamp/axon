@@ -21,6 +21,7 @@ module {
   public type Error = {
     #Unauthorized;
     #NotFound;
+    #NeuronAlreadyExists;
     #CannotRemoveOperator;
     #CannotPropose;
     #AlreadyVoted;

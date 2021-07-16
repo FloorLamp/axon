@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import Buffer "mo:base/Buffer";
 import Error "mo:base/Error";
 import Nat "mo:base/Nat";
+import Nat64 "mo:base/Nat64";
 import Option "mo:base/Option";
 import Prim "mo:prim";
 import Principal "mo:base/Principal";
@@ -61,15 +62,24 @@ shared actor class Axon(init: T.Initialization) {
   * 1) Spawn a new neuron with this canister as controller, or
   * 2) Add this controller as a hot key
   */
-  public func registerNeuron(id: Nat64): async GT.NeuronResult {
-    let res = await Governance.get_full_neuron(id);
-    switch(res) {
-      case (#Ok(_)) {
-        neuronIds := Array.append(neuronIds, [id])
-      };
-      case _ {}
+  public shared({ caller }) func registerNeuron(id: Nat64): async T.Result<GT.Neuron> {
+    if (visibility == #Private and not isOperator(caller)) {
+      return #err(#Unauthorized)
     };
-    res
+
+    if (Arr.contains<Nat64>(neuronIds, id, Nat64.equal)) {
+      return #err(#NeuronAlreadyExists);
+    };
+
+    switch(await Governance.get_full_neuron(id)) {
+      case (#Ok(res)) {
+        neuronIds := Array.append(neuronIds, [id]);
+        #ok(res);
+      };
+      case (#Err(err)) {
+        #err(#GovernanceError(err))
+      }
+    };
   };
 
   public query func getNeuronIds() : async [Nat64] {
