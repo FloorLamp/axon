@@ -2,7 +2,7 @@
 
 _The function of the axon is to transmit information to different neurons - [Wikipedia](https://en.wikipedia.org/wiki/Axon)._
 
-Axon is a decentralized neuron management canister.
+Axon is a neuron management canister.
 
 ## Overview
 
