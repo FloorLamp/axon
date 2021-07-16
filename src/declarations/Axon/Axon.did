@@ -1,4 +1,15 @@
+type Vote = 
+ variant {
+   No;
+   Yes;
+ };
+type Visibility = 
+ variant {
+   Private;
+   Public;
+ };
 type Split = record {amount_e8s: nat64;};
+type SpawnResponse = record {created_neuron_id: opt NeuronId;};
 type Spawn = record {new_controller: opt principal;};
 type SetDissolveTimestamp = record {dissolve_timestamp_seconds: nat64;};
 type SetDefaultFollowees = record {
@@ -18,6 +29,16 @@ type RewardMode =
  variant {
    RewardToAccount: RewardToAccount;
    RewardToNeuron: RewardToNeuron;
+ };
+type Result_2 = 
+ variant {
+   err: Error;
+   ok: vec CommandProposal;
+ };
+type Result_1 = 
+ variant {
+   err: Error;
+   ok: vec opt NeuronResult;
  };
 type Result = 
  variant {
@@ -46,6 +67,12 @@ type Operation =
    StopDissolving: record {};
  };
 type NodeProvider = record {id: opt principal;};
+type NewProposal = 
+ record {
+   durationSeconds: opt nat;
+   proposal: Command;
+   timeStart: opt int;
+ };
 type NeuronStakeTransfer = 
  record {
    block_height: nat64;
@@ -95,18 +122,29 @@ type NetworkEconomics =
    transaction_fee_e8s: nat64;
  };
 type Motion = record {motion_text: text;};
-type ManageOperator = 
- record {
-   action: variant {
-             Add;
-             Remove;
-           };
-   "principal": principal;
+type ManageNeuronResponse = record {command: opt Command_1;};
+type ManageNeuronCall = 
+ variant {
+   err: Error;
+   ok: ManageNeuronResponse;
  };
 type ManageNeuron = 
  record {
    command: opt Command;
    id: opt NeuronId;
+ };
+type ManageAxon = record {
+                    action:
+                     variant {
+                       AddOperator: principal;
+                       RemoveOperator: principal;
+                       UpdateVisibility: Visibility;
+                     };};
+type MakeProposalResponse = record {proposal_id: opt NeuronId;};
+type Initialization = 
+ record {
+   owner: principal;
+   visibility: Visibility;
  };
 type IncreaseDissolveDelay = record {
                                additional_dissolve_delay_seconds: nat32;};
@@ -126,11 +164,26 @@ type ExecuteNnsFunction =
    nns_function: int32;
    payload: vec nat8;
  };
+type ErrorCode = 
+ variant {
+   canister_error;
+   canister_reject;
+   destination_invalid;
+   future: nat32;
+   system_fatal;
+   system_transient;
+ };
 type Error = 
  variant {
+   AlreadyVoted;
+   CannotPropose;
+   CannotRemoveOperator;
+   Error: record {
+            error_message: text;
+            error_type: ErrorCode;
+          };
    GovernanceError: GovernanceError;
    NotFound;
-   Other: text;
    Unauthorized;
  };
 type DissolveState = 
@@ -146,12 +199,35 @@ type DisburseToNeuron =
    new_controller: opt principal;
    nonce: nat64;
  };
+type DisburseResponse = record {transfer_block_height: nat64;};
 type Disburse = 
  record {
    amount: opt Amount;
    to_account: opt AccountIdentifier;
  };
 type Configure = record {operation: opt Operation;};
+type Command_1 = 
+ variant {
+   Configure: record {};
+   Disburse: DisburseResponse;
+   DisburseToNeuron: SpawnResponse;
+   Error: GovernanceError;
+   Follow: record {};
+   MakeProposal: MakeProposalResponse;
+   RegisterVote: record {};
+   Spawn: SpawnResponse;
+   Split: SpawnResponse;
+ };
+type CommandProposal = 
+ record {
+   ballots: vec Ballot;
+   creator: principal;
+   id: nat;
+   proposal: Command;
+   responses: vec ManageNeuronCall;
+   timeEnd: int;
+   timeStart: int;
+ };
 type Command = 
  variant {
    Configure: Configure;
@@ -173,13 +249,23 @@ type BallotInfo =
    proposal_id: opt NeuronId;
    vote: int32;
  };
+type Ballot = 
+ record {
+   "principal": principal;
+   vote: opt Vote;
+ };
 type Axon = 
  service {
+   execute: () -> (Result);
+   getActiveProposals: () -> (Result_2) query;
+   getAllProposals: (opt nat) -> (Result_2) query;
+   getNeuronIds: () -> (vec nat64) query;
    getOperators: () -> (vec principal) query;
-   manage: (ManageNeuron) -> (Result);
-   manageOperator: (ManageOperator) -> (Result);
-   neurons: () -> (vec opt NeuronResult);
+   manage: (ManageAxon) -> (Result);
+   neurons: () -> (Result_1);
+   proposeCommand: (NewProposal) -> (Result);
    registerNeuron: (nat64) -> (NeuronResult);
+   vote: (nat, Vote) -> (Result);
  };
 type ApproveGenesisKyc = record {principals: vec principal;};
 type Amount = record {e8s: nat64;};
@@ -197,4 +283,4 @@ type Action =
    SetDefaultFollowees: SetDefaultFollowees;
  };
 type AccountIdentifier = record {hash: vec nat8;};
-service : (principal) -> Axon
+service : (Initialization) -> Axon

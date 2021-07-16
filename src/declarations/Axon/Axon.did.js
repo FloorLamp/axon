@@ -1,6 +1,62 @@
 export const idlFactory = ({ IDL }) => {
-  const ManageNeuron = IDL.Rec();
+  const Command = IDL.Rec();
+  const Visibility = IDL.Variant({ 'Private' : IDL.Null, 'Public' : IDL.Null });
+  const Initialization = IDL.Record({
+    'owner' : IDL.Principal,
+    'visibility' : Visibility,
+  });
+  const ErrorCode = IDL.Variant({
+    'canister_error' : IDL.Null,
+    'system_transient' : IDL.Null,
+    'future' : IDL.Nat32,
+    'canister_reject' : IDL.Null,
+    'destination_invalid' : IDL.Null,
+    'system_fatal' : IDL.Null,
+  });
+  const GovernanceError = IDL.Record({
+    'error_message' : IDL.Text,
+    'error_type' : IDL.Int32,
+  });
+  const Error = IDL.Variant({
+    'AlreadyVoted' : IDL.Null,
+    'Error' : IDL.Record({
+      'error_message' : IDL.Text,
+      'error_type' : ErrorCode,
+    }),
+    'CannotPropose' : IDL.Null,
+    'NotFound' : IDL.Null,
+    'CannotRemoveOperator' : IDL.Null,
+    'Unauthorized' : IDL.Null,
+    'GovernanceError' : GovernanceError,
+  });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const NeuronId = IDL.Record({ 'id' : IDL.Nat64 });
+  const SpawnResponse = IDL.Record({ 'created_neuron_id' : IDL.Opt(NeuronId) });
+  const MakeProposalResponse = IDL.Record({
+    'proposal_id' : IDL.Opt(NeuronId),
+  });
+  const DisburseResponse = IDL.Record({ 'transfer_block_height' : IDL.Nat64 });
+  const Command_1 = IDL.Variant({
+    'Error' : GovernanceError,
+    'Spawn' : SpawnResponse,
+    'Split' : SpawnResponse,
+    'Follow' : IDL.Record({}),
+    'Configure' : IDL.Record({}),
+    'RegisterVote' : IDL.Record({}),
+    'DisburseToNeuron' : SpawnResponse,
+    'MakeProposal' : MakeProposalResponse,
+    'Disburse' : DisburseResponse,
+  });
+  const ManageNeuronResponse = IDL.Record({ 'command' : IDL.Opt(Command_1) });
+  const ManageNeuronCall = IDL.Variant({
+    'ok' : ManageNeuronResponse,
+    'err' : Error,
+  });
+  const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
+  const Ballot = IDL.Record({
+    'principal' : IDL.Principal,
+    'vote' : IDL.Opt(Vote),
+  });
   const Spawn = IDL.Record({ 'new_controller' : IDL.Opt(IDL.Principal) });
   const Split = IDL.Record({ 'amount_e8s' : IDL.Nat64 });
   const Follow = IDL.Record({
@@ -36,6 +92,10 @@ export const idlFactory = ({ IDL }) => {
     'amount_e8s' : IDL.Nat64,
     'new_controller' : IDL.Opt(IDL.Principal),
     'nonce' : IDL.Nat64,
+  });
+  const ManageNeuron = IDL.Record({
+    'id' : IDL.Opt(NeuronId),
+    'command' : IDL.Opt(Command),
   });
   const ExecuteNnsFunction = IDL.Record({
     'nns_function' : IDL.Int32,
@@ -99,33 +159,37 @@ export const idlFactory = ({ IDL }) => {
     'to_account' : IDL.Opt(AccountIdentifier),
     'amount' : IDL.Opt(Amount),
   });
-  const Command = IDL.Variant({
-    'Spawn' : Spawn,
-    'Split' : Split,
-    'Follow' : Follow,
-    'Configure' : Configure,
-    'RegisterVote' : RegisterVote,
-    'DisburseToNeuron' : DisburseToNeuron,
-    'MakeProposal' : Proposal,
-    'Disburse' : Disburse,
-  });
-  ManageNeuron.fill(
-    IDL.Record({ 'id' : IDL.Opt(NeuronId), 'command' : IDL.Opt(Command) })
+  Command.fill(
+    IDL.Variant({
+      'Spawn' : Spawn,
+      'Split' : Split,
+      'Follow' : Follow,
+      'Configure' : Configure,
+      'RegisterVote' : RegisterVote,
+      'DisburseToNeuron' : DisburseToNeuron,
+      'MakeProposal' : Proposal,
+      'Disburse' : Disburse,
+    })
   );
-  const GovernanceError = IDL.Record({
-    'error_message' : IDL.Text,
-    'error_type' : IDL.Int32,
+  const CommandProposal = IDL.Record({
+    'id' : IDL.Nat,
+    'creator' : IDL.Principal,
+    'responses' : IDL.Vec(ManageNeuronCall),
+    'ballots' : IDL.Vec(Ballot),
+    'timeStart' : IDL.Int,
+    'proposal' : Command,
+    'timeEnd' : IDL.Int,
   });
-  const Error = IDL.Variant({
-    'NotFound' : IDL.Null,
-    'Unauthorized' : IDL.Null,
-    'Other' : IDL.Text,
-    'GovernanceError' : GovernanceError,
+  const Result_2 = IDL.Variant({
+    'ok' : IDL.Vec(CommandProposal),
+    'err' : Error,
   });
-  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
-  const ManageOperator = IDL.Record({
-    'principal' : IDL.Principal,
-    'action' : IDL.Variant({ 'Add' : IDL.Null, 'Remove' : IDL.Null }),
+  const ManageAxon = IDL.Record({
+    'action' : IDL.Variant({
+      'UpdateVisibility' : Visibility,
+      'AddOperator' : IDL.Principal,
+      'RemoveOperator' : IDL.Principal,
+    }),
   });
   const BallotInfo = IDL.Record({
     'vote' : IDL.Int32,
@@ -162,13 +226,34 @@ export const idlFactory = ({ IDL }) => {
     'transfer' : IDL.Opt(NeuronStakeTransfer),
   });
   const NeuronResult = IDL.Variant({ 'Ok' : Neuron, 'Err' : GovernanceError });
+  const Result_1 = IDL.Variant({
+    'ok' : IDL.Vec(IDL.Opt(NeuronResult)),
+    'err' : Error,
+  });
+  const NewProposal = IDL.Record({
+    'timeStart' : IDL.Opt(IDL.Int),
+    'durationSeconds' : IDL.Opt(IDL.Nat),
+    'proposal' : Command,
+  });
   const Axon = IDL.Service({
+    'execute' : IDL.Func([], [Result], []),
+    'getActiveProposals' : IDL.Func([], [Result_2], ['query']),
+    'getAllProposals' : IDL.Func([IDL.Opt(IDL.Nat)], [Result_2], ['query']),
+    'getNeuronIds' : IDL.Func([], [IDL.Vec(IDL.Nat64)], ['query']),
     'getOperators' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
-    'manage' : IDL.Func([ManageNeuron], [Result], []),
-    'manageOperator' : IDL.Func([ManageOperator], [Result], []),
-    'neurons' : IDL.Func([], [IDL.Vec(IDL.Opt(NeuronResult))], []),
+    'manage' : IDL.Func([ManageAxon], [Result], []),
+    'neurons' : IDL.Func([], [Result_1], []),
+    'proposeCommand' : IDL.Func([NewProposal], [Result], []),
     'registerNeuron' : IDL.Func([IDL.Nat64], [NeuronResult], []),
+    'vote' : IDL.Func([IDL.Nat, Vote], [Result], []),
   });
   return Axon;
 };
-export const init = ({ IDL }) => { return [IDL.Principal]; };
+export const init = ({ IDL }) => {
+  const Visibility = IDL.Variant({ 'Private' : IDL.Null, 'Public' : IDL.Null });
+  const Initialization = IDL.Record({
+    'owner' : IDL.Principal,
+    'visibility' : Visibility,
+  });
+  return [Initialization];
+};
