@@ -62,7 +62,7 @@ shared actor class Axon(init: T.Initialization) {
   * 1) Spawn a new neuron with this canister as controller, or
   * 2) Add this controller as a hot key
   */
-  public shared({ caller }) func registerNeuron(id: Nat64): async T.Result<GT.Neuron> {
+  public shared({ caller }) func registerNeuron(id: Nat64): async T.RegisterNeuronResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };
@@ -87,7 +87,7 @@ shared actor class Axon(init: T.Initialization) {
   };
 
   // Get all full neurons. If private, only operators can call
-  public shared({ caller }) func neurons() : async T.Result<[?GT.NeuronResult]> {
+  public shared({ caller }) func neurons() : async T.NeuronResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };
@@ -106,7 +106,7 @@ shared actor class Axon(init: T.Initialization) {
   };
 
   // Get all active proposals. If private, only operators can call
-  public query({ caller }) func getActiveProposals() : async T.Result<[T.CommandProposal]> {
+  public query({ caller }) func getActiveProposals() : async T.ProposalResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };
@@ -115,7 +115,7 @@ shared actor class Axon(init: T.Initialization) {
   };
 
   // Get last 100 proposals, optionally before the specified id. If private, only operators can call
-  public query({ caller }) func getAllProposals(before: ?Nat) : async T.Result<[T.CommandProposal]> {
+  public query({ caller }) func getAllProposals(before: ?Nat) : async T.ProposalResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };

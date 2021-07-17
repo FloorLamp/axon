@@ -59,4 +59,7 @@ module {
   public type CommandProposal = Proposal<GT.Command, ManageNeuronCall>;
 
   public type Result<T> = Result.Result<T, Error>;
+  public type NeuronResult = Result<[?GT.NeuronResult]>;
+  public type ProposalResult = Result<[CommandProposal]>;
+  public type RegisterNeuronResult = Result<GT.Neuron>;
 }

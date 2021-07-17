@@ -30,16 +30,6 @@ type RewardMode =
    RewardToAccount: RewardToAccount;
    RewardToNeuron: RewardToNeuron;
  };
-type Result_2 = 
- variant {
-   err: Error;
-   ok: vec CommandProposal;
- };
-type Result_1 = 
- variant {
-   err: Error;
-   ok: vec opt NeuronResult;
- };
 type Result = 
  variant {
    err: Error;
@@ -50,6 +40,16 @@ type RegisterVote =
  record {
    proposal: opt NeuronId;
    vote: int32;
+ };
+type RegisterNeuronResult = 
+ variant {
+   err: Error;
+   ok: Neuron;
+ };
+type ProposalResult = 
+ variant {
+   err: Error;
+   ok: vec CommandProposal;
  };
 type Proposal = 
  record {
@@ -83,10 +83,15 @@ type NeuronStakeTransfer =
    to_subaccount: vec nat8;
    transfer_timestamp: nat64;
  };
-type NeuronResult = 
+type NeuronResult__1 = 
  variant {
    Err: GovernanceError;
    Ok: Neuron;
+ };
+type NeuronResult = 
+ variant {
+   err: Error;
+   ok: vec opt NeuronResult__1;
  };
 type NeuronId = record {id: nat64;};
 type Neuron = 
@@ -183,6 +188,7 @@ type Error =
             error_type: ErrorCode;
           };
    GovernanceError: GovernanceError;
+   NeuronAlreadyExists;
    NotFound;
    Unauthorized;
  };
@@ -257,14 +263,14 @@ type Ballot =
 type Axon = 
  service {
    execute: () -> (Result);
-   getActiveProposals: () -> (Result_2) query;
-   getAllProposals: (opt nat) -> (Result_2) query;
+   getActiveProposals: () -> (ProposalResult) query;
+   getAllProposals: (opt nat) -> (ProposalResult) query;
    getNeuronIds: () -> (vec nat64) query;
    getOperators: () -> (vec principal) query;
    manage: (ManageAxon) -> (Result);
-   neurons: () -> (Result_1);
+   neurons: () -> (NeuronResult);
    proposeCommand: (NewProposal) -> (Result);
-   registerNeuron: (nat64) -> (NeuronResult);
+   registerNeuron: (nat64) -> (RegisterNeuronResult);
    vote: (nat, Vote) -> (Result);
  };
 type ApproveGenesisKyc = record {principals: vec principal;};

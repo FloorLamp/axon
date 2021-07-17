@@ -23,6 +23,7 @@ export const idlFactory = ({ IDL }) => {
       'error_message' : IDL.Text,
       'error_type' : ErrorCode,
     }),
+    'NeuronAlreadyExists' : IDL.Null,
     'CannotPropose' : IDL.Null,
     'NotFound' : IDL.Null,
     'CannotRemoveOperator' : IDL.Null,
@@ -180,7 +181,7 @@ export const idlFactory = ({ IDL }) => {
     'proposal' : Command,
     'timeEnd' : IDL.Int,
   });
-  const Result_2 = IDL.Variant({
+  const ProposalResult = IDL.Variant({
     'ok' : IDL.Vec(CommandProposal),
     'err' : Error,
   });
@@ -225,9 +226,12 @@ export const idlFactory = ({ IDL }) => {
     'neuron_fees_e8s' : IDL.Nat64,
     'transfer' : IDL.Opt(NeuronStakeTransfer),
   });
-  const NeuronResult = IDL.Variant({ 'Ok' : Neuron, 'Err' : GovernanceError });
-  const Result_1 = IDL.Variant({
-    'ok' : IDL.Vec(IDL.Opt(NeuronResult)),
+  const NeuronResult__1 = IDL.Variant({
+    'Ok' : Neuron,
+    'Err' : GovernanceError,
+  });
+  const NeuronResult = IDL.Variant({
+    'ok' : IDL.Vec(IDL.Opt(NeuronResult__1)),
     'err' : Error,
   });
   const NewProposal = IDL.Record({
@@ -235,16 +239,21 @@ export const idlFactory = ({ IDL }) => {
     'durationSeconds' : IDL.Opt(IDL.Nat),
     'proposal' : Command,
   });
+  const RegisterNeuronResult = IDL.Variant({ 'ok' : Neuron, 'err' : Error });
   const Axon = IDL.Service({
     'execute' : IDL.Func([], [Result], []),
-    'getActiveProposals' : IDL.Func([], [Result_2], ['query']),
-    'getAllProposals' : IDL.Func([IDL.Opt(IDL.Nat)], [Result_2], ['query']),
+    'getActiveProposals' : IDL.Func([], [ProposalResult], ['query']),
+    'getAllProposals' : IDL.Func(
+        [IDL.Opt(IDL.Nat)],
+        [ProposalResult],
+        ['query'],
+      ),
     'getNeuronIds' : IDL.Func([], [IDL.Vec(IDL.Nat64)], ['query']),
     'getOperators' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
     'manage' : IDL.Func([ManageAxon], [Result], []),
-    'neurons' : IDL.Func([], [Result_1], []),
+    'neurons' : IDL.Func([], [NeuronResult], []),
     'proposeCommand' : IDL.Func([NewProposal], [Result], []),
-    'registerNeuron' : IDL.Func([IDL.Nat64], [NeuronResult], []),
+    'registerNeuron' : IDL.Func([IDL.Nat64], [RegisterNeuronResult], []),
     'vote' : IDL.Func([IDL.Nat, Vote], [Result], []),
   });
   return Axon;

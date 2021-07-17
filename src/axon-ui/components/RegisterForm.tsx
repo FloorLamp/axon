@@ -1,6 +1,7 @@
 import { ActorSubclass } from "@dfinity/agent";
 import React, { useState } from "react";
 import Axon from "../../declarations/Axon/Axon.did";
+import { errorToString } from "../lib/utils";
 
 type AxonService = ActorSubclass<Axon._SERVICE>;
 
@@ -26,16 +27,16 @@ export default function RegisterForm({
     console.log(result);
 
     setIsLoading(false);
-    if ("Ok" in result) {
+    if ("ok" in result) {
       refresh();
     } else {
-      setError(JSON.stringify(result.Err));
+      setError(errorToString(result.err));
     }
   };
 
   return (
     <form onSubmit={register}>
-      <div className="flex gap-2">
+      <div className="flex gap-2 pt-4 text-sm">
         <input
           type="number"
           className="px-2 py-1 border border-gray-300 rounded"
@@ -44,7 +45,7 @@ export default function RegisterForm({
           value={neuronId}
         />
         <button
-          className="px-2 py-1 cursor-pointer hover:shadow-md bg-gray-200 rounded"
+          className="px-2 py-1 cursor-pointer hover:bg-pink-300 bg-gray-200 rounded transition-colors transition-200"
           disabled={isLoading}
         >
           {isLoading ? "Loading" : "Register"}

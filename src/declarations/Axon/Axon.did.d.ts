@@ -14,14 +14,14 @@ export interface Amount { 'e8s' : bigint }
 export interface ApproveGenesisKyc { 'principals' : Array<Principal> }
 export interface Axon {
   'execute' : () => Promise<Result>,
-  'getActiveProposals' : () => Promise<Result_2>,
-  'getAllProposals' : (arg_0: [] | [bigint]) => Promise<Result_2>,
+  'getActiveProposals' : () => Promise<ProposalResult>,
+  'getAllProposals' : (arg_0: [] | [bigint]) => Promise<ProposalResult>,
   'getNeuronIds' : () => Promise<Array<bigint>>,
   'getOperators' : () => Promise<Array<Principal>>,
   'manage' : (arg_0: ManageAxon) => Promise<Result>,
-  'neurons' : () => Promise<Result_1>,
+  'neurons' : () => Promise<NeuronResult>,
   'proposeCommand' : (arg_0: NewProposal) => Promise<Result>,
-  'registerNeuron' : (arg_0: bigint) => Promise<NeuronResult>,
+  'registerNeuron' : (arg_0: bigint) => Promise<RegisterNeuronResult>,
   'vote' : (arg_0: bigint, arg_1: Vote) => Promise<Result>,
 }
 export interface Ballot { 'principal' : Principal, 'vote' : [] | [Vote] }
@@ -71,6 +71,7 @@ export type DissolveState = { 'DissolveDelaySeconds' : bigint } |
   { 'WhenDissolvedTimestampSeconds' : bigint };
 export type Error = { 'AlreadyVoted' : null } |
   { 'Error' : { 'error_message' : string, 'error_type' : ErrorCode } } |
+  { 'NeuronAlreadyExists' : null } |
   { 'CannotPropose' : null } |
   { 'NotFound' : null } |
   { 'CannotRemoveOperator' : null } |
@@ -141,7 +142,9 @@ export interface Neuron {
   'transfer' : [] | [NeuronStakeTransfer],
 }
 export interface NeuronId { 'id' : bigint }
-export type NeuronResult = { 'Ok' : Neuron } |
+export type NeuronResult = { 'ok' : Array<[] | [NeuronResult__1]> } |
+  { 'err' : Error };
+export type NeuronResult__1 = { 'Ok' : Neuron } |
   { 'Err' : GovernanceError };
 export interface NeuronStakeTransfer {
   'to_subaccount' : Array<number>,
@@ -169,13 +172,13 @@ export interface Proposal {
   'action' : [] | [Action],
   'summary' : string,
 }
+export type ProposalResult = { 'ok' : Array<CommandProposal> } |
+  { 'err' : Error };
+export type RegisterNeuronResult = { 'ok' : Neuron } |
+  { 'err' : Error };
 export interface RegisterVote { 'vote' : number, 'proposal' : [] | [NeuronId] }
 export interface RemoveHotKey { 'hot_key_to_remove' : [] | [Principal] }
 export type Result = { 'ok' : null } |
-  { 'err' : Error };
-export type Result_1 = { 'ok' : Array<[] | [NeuronResult]> } |
-  { 'err' : Error };
-export type Result_2 = { 'ok' : Array<CommandProposal> } |
   { 'err' : Error };
 export type RewardMode = { 'RewardToNeuron' : RewardToNeuron } |
   { 'RewardToAccount' : RewardToAccount };

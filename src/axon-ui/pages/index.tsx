@@ -2,24 +2,23 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
+import { FaGithub } from "react-icons/fa";
 import { canisterId, createActor } from "../../declarations/Axon";
-import { Result_2 } from "../../declarations/Axon/Axon.did";
+import { ProposalResult } from "../../declarations/Axon/Axon.did";
 import LoginButton from "../components/LoginButton";
-import RegisterForm from "../components/RegisterForm";
+import Neurons from "../components/Neurons";
 
 export default function Home() {
   const [axon, setAxon] = useState(
     createActor(canisterId, new HttpAgent({ host: "https://ic0.app" }))
   );
   const [agent, setAgent] = useState<HttpAgent>(null);
-  const [neurons, setNeurons] = useState<bigint[]>(null);
   const [operators, setOperators] = useState<Principal[]>(null);
-  const [activeProposals, setActiveProposals] = useState<Result_2>(null);
+  const [activeProposals, setActiveProposals] = useState<ProposalResult>(null);
   const fetchData = async () => {
     if (!canisterId) return;
 
     setOperators(await axon.getOperators());
-    setNeurons(await axon.getNeuronIds());
     setActiveProposals(await axon.getActiveProposals());
   };
 
@@ -83,22 +82,7 @@ export default function Home() {
             )}
           </section>
 
-          <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold">Neurons</h2>
-            {neurons ? (
-              neurons.length > 0 ? (
-                <ul>
-                  {neurons.map((n) => (
-                    <li key={n.toString()}>{n.toString()}</li>
-                  ))}
-                </ul>
-              ) : (
-                "None"
-              )
-            ) : (
-              "Loading..."
-            )}
-          </section>
+          <Neurons axon={axon} isAuthed={!!agent} />
 
           <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
             <h2 className="text-xl font-bold">Active Proposals</h2>
@@ -119,18 +103,17 @@ export default function Home() {
             ) : (
               "Loading..."
             )}
-            {agent && <RegisterForm axon={axon} refresh={fetchData} />}
           </section>
         </main>
 
-        <footer>
+        <footer className="py-8 flex justify-center">
           <a
             href="https://github.com/FloorLamp/axon"
-            className="underline"
+            className="underline inline-flex items-center gap-1 text-sm"
             target="_blank"
             rel="noopener noreferrer"
           >
-            View on Github
+            <FaGithub /> Github
           </a>
         </footer>
       </div>
