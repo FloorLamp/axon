@@ -1,6 +1,10 @@
-# Axon
+<p align="center">
+  <img width="400" height="200" src="./src/axon-ui/public/img/axon-full-logo-bg.svg">
+</p>
+<p align="center">
+<i>The function of the axon is to transmit information to different neurons - <a href="https://en.wikipedia.org/wiki/Axon">Wikipedia</a></i></p>
 
-_The function of the axon is to transmit information to different neurons - [Wikipedia](https://en.wikipedia.org/wiki/Axon)._
+---
 
 Axon is a neuron management canister.
 
