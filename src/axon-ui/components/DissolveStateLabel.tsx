@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import React from "react";
-import { DissolveState } from "../../declarations/Axon/Axon.did";
+import { DissolveState } from "../declarations/Axon/Axon.did";
 import { TimestampLabel } from "./TimestampLabel";
 
 export function DissolveStateLabel({ state }: { state: DissolveState }) {

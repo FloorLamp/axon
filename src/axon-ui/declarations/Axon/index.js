@@ -1,7 +1,7 @@
 import { Actor } from "@dfinity/agent";
 import { idlFactory } from "./Axon.did.js";
 
-import CanisterIds from "../../../canister_ids.json";
+import CanisterIds from "../../../../canister_ids.json";
 
 export const canisterId = CanisterIds.Axon.ic;
 

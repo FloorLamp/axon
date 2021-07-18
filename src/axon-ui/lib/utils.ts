@@ -1,4 +1,5 @@
-import { Error, GovernanceError } from "../../declarations/Axon/Axon.did";
+import { Principal } from "@dfinity/principal";
+import { Error, GovernanceError } from "../declarations/Axon/Axon.did";
 
 enum GovernanceErrorType {
   "Unspecified" = 0,
@@ -47,4 +48,11 @@ export const formatNumber = (number: any, digits?: number) => {
   return Intl.NumberFormat("en-US", {
     maximumFractionDigits,
   }).format(n);
+};
+
+export const shortPrincipal = (principal: string | Principal) => {
+  const parts = (
+    typeof principal === "string" ? principal : principal.toText()
+  ).split("-");
+  return `${parts[0]}...${parts.slice(-1)[0]}`;
 };

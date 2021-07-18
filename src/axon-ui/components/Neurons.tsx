@@ -1,12 +1,14 @@
 import { Principal } from "@dfinity/principal";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import { CgSpinner } from "react-icons/cg";
 import { FiExternalLink } from "react-icons/fi";
-import { GovernanceError, Neuron } from "../../declarations/Axon/Axon.did";
+import { GovernanceError, Neuron } from "../declarations/Axon/Axon.did";
 import { subaccountToAccount } from "../lib/account";
 import { errorToString, governanceErrorToString } from "../lib/utils";
 import BalanceLabel from "./BalanceLabel";
 import { DissolveStateLabel } from "./DissolveStateLabel";
+import ManageNeuronModal from "./ManageNeuronModal";
 import RegisterForm from "./RegisterForm";
 import { TimestampLabel } from "./TimestampLabel";
 
@@ -124,14 +126,23 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
 }
 
 export default function Neurons({ axon, isAuthed }) {
+  const [isLoadingNeuronIds, setIsLoadingNeuronIds] = useState(false);
+  const [isLoadingNeurons, setIsLoadingNeurons] = useState(false);
   const [neuronIds, setNeuronIds] = useState<bigint[]>([]);
-  const [neurons, setNeurons] = useState<(Neuron | GovernanceError)[]>(null);
+  const [neurons, setNeurons] = useState<(Neuron | GovernanceError)[]>([]);
   const [error, setError] = useState("");
 
-  const fetchData = async () => {
+  const fetchIds = async () => {
+    setIsLoadingNeuronIds(true);
     const neuronIds = await axon.getNeuronIds();
+    setIsLoadingNeuronIds(false);
     setNeuronIds(neuronIds);
+  };
+
+  const fetchData = async () => {
+    setIsLoadingNeurons(true);
     const neurons = await axon.neurons();
+    setIsLoadingNeurons(false);
     if ("ok" in neurons) {
       const neuronsOrErrors = neurons.ok.map(([res], i) =>
         "Ok" in res ? res.Ok : res.Err
@@ -143,40 +154,46 @@ export default function Neurons({ axon, isAuthed }) {
   };
 
   useEffect(() => {
+    fetchIds();
     fetchData();
-  }, [axon]);
+  }, [isAuthed]);
+
+  const neuronsOnly = neurons.filter((n) => "id" in n) as Neuron[];
 
   return (
     <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
-      <h2 className="text-xl font-bold mb-2">Neurons</h2>
-      {neuronIds ? (
-        neuronIds.length > 0 ? (
-          <ul className="divide-y divide-gray-500">
-            {neuronIds.map((n, i) => {
-              let display = null;
-              if (neurons && neurons[i]) {
-                if ("id" in neurons[i]) {
-                  display = <NeuronDisplay neuron={neurons[i] as Neuron} />;
-                } else {
-                  display = governanceErrorToString(
-                    neurons[i] as GovernanceError
-                  );
-                }
+      <div className="flex justify-between mb-2">
+        <h2 className="text-xl font-bold">Neurons</h2>
+        <ManageNeuronModal axon={axon} neurons={neuronsOnly} />
+      </div>
+      {isLoadingNeuronIds ? (
+        <CgSpinner className="inline-block animate-spin" />
+      ) : neuronIds.length > 0 ? (
+        <ul className="divide-y divide-gray-500">
+          {neuronIds.map((n, i) => {
+            let display = null;
+            if (isLoadingNeurons) {
+              display = <CgSpinner className="block animate-spin" />;
+            } else if (neurons[i]) {
+              if ("id" in neurons[i]) {
+                display = <NeuronDisplay neuron={neurons[i] as Neuron} />;
+              } else {
+                display = governanceErrorToString(
+                  neurons[i] as GovernanceError
+                );
               }
+            }
 
-              return (
-                <li key={n.toString()}>
-                  <strong>{n.toString()}</strong>
-                  {display}
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          "None"
-        )
+            return (
+              <li key={n.toString()}>
+                <strong>{n.toString()}</strong>
+                {display}
+              </li>
+            );
+          })}
+        </ul>
       ) : (
-        "Loading..."
+        "None"
       )}
       {error}
       {isAuthed && <RegisterForm axon={axon} refresh={fetchData} />}

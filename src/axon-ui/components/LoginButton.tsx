@@ -33,7 +33,7 @@ export default function Dropdown({ agent, setAgent }) {
 
   return (
     <button
-      className="flex items-center px-2 py-1 rounded-md bg-white hover:shadow-lg transition-shadow transition-200"
+      className="flex items-center px-2 py-1 rounded-md bg-white hover:shadow-lg transition-shadow transition-300"
       onClick={agent ? handleLogout : handleLogin}
     >
       <img src="/img/dfinity.png" className="w-4 mr-2" />

@@ -21,3 +21,14 @@ export const addCrc32 = (buf: Buffer): Buffer => {
   crc32Buf.writeUInt32BE(getCrc32(buf), 0);
   return Buffer.concat([crc32Buf, buf]);
 };
+
+export const isAccount = (string: string) => {
+  try {
+    const blob = Buffer.from(string, "hex");
+    const crc32Buf = Buffer.alloc(4);
+    crc32Buf.writeUInt32BE(getCrc32(blob.slice(4)));
+    return blob.slice(0, 4).toString() === crc32Buf.toString();
+  } catch (error) {
+    return false;
+  }
+};

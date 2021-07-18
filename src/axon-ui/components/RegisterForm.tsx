@@ -1,9 +1,6 @@
-import { ActorSubclass } from "@dfinity/agent";
 import React, { useState } from "react";
-import Axon from "../../declarations/Axon/Axon.did";
+import { AxonService } from "../lib/types";
 import { errorToString } from "../lib/utils";
-
-type AxonService = ActorSubclass<Axon._SERVICE>;
 
 export default function RegisterForm({
   axon,
@@ -45,7 +42,7 @@ export default function RegisterForm({
           value={neuronId}
         />
         <button
-          className="px-2 py-1 cursor-pointer hover:bg-pink-300 bg-gray-200 rounded transition-colors transition-200"
+          className="px-2 py-1 cursor-pointer bg-gray-200 rounded hover:shadow-lg transition-shadow transition-300"
           disabled={isLoading}
         >
           {isLoading ? "Loading" : "Register"}
