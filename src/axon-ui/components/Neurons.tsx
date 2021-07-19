@@ -2,12 +2,12 @@ import { Principal } from "@dfinity/principal";
 import { DateTime } from "luxon";
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
-import { FiExternalLink } from "react-icons/fi";
 import { GovernanceError, Neuron } from "../declarations/Axon/Axon.did";
 import { subaccountToAccount } from "../lib/account";
 import { useNeuronIds } from "../lib/hooks/useNeuronIds";
 import { useNeurons } from "../lib/hooks/useNeurons";
 import { governanceErrorToString } from "../lib/utils";
+import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
 import { TimestampLabel } from "./Labels/TimestampLabel";
@@ -27,27 +27,17 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
       <div className="flex flex-col sm:flex-row leading-tight">
         <div className="w-32 font-medium">Account</div>
         <div>
-          <a
-            target="_blank"
-            className="inline-flex gap-1 items-center underline text-xs"
-            href={`https://ic.rocks/account/${account}`}
-          >
+          <IdentifierLabelWithButtons type="Account" id={account}>
             {account}
-            <FiExternalLink />
-          </a>
+          </IdentifierLabelWithButtons>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row leading-tight">
         <div className="w-32 font-medium">Controller</div>
         <div>
-          <a
-            target="_blank"
-            className="inline-flex gap-1 items-center underline text-xs"
-            href={`https://ic.rocks/principal/${controller.toText()}`}
-          >
+          <IdentifierLabelWithButtons type="Principal" id={controller}>
             {controller.toText()}
-            <FiExternalLink />
-          </a>
+          </IdentifierLabelWithButtons>
         </div>
       </div>
       <div className="flex flex-col sm:flex-row leading-tight">
@@ -56,14 +46,9 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
           <ul>
             {neuron.hot_keys.map((hotkey) => (
               <li key={hotkey.toText()}>
-                <a
-                  target="_blank"
-                  className="inline-flex gap-1 items-center underline text-xs"
-                  href={`https://ic.rocks/principal/${hotkey.toText()}`}
-                >
+                <IdentifierLabelWithButtons type="Principal" id={hotkey}>
                   {hotkey.toText()}
-                  <FiExternalLink />
-                </a>
+                </IdentifierLabelWithButtons>
               </li>
             ))}
           </ul>
@@ -172,7 +157,9 @@ export default function Neurons() {
             return (
               <li key={n.toString()}>
                 <div className="flex items-center gap-2">
-                  <strong>{n.toString()}</strong>
+                  <IdentifierLabelWithButtons type="Neuron" id={n}>
+                    <strong>{n.toString()}</strong>
+                  </IdentifierLabelWithButtons>
                   {isFetchingNeurons && (
                     <CgSpinner className="block animate-spin" />
                   )}

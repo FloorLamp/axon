@@ -1,6 +1,7 @@
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
 import { useOperators } from "../lib/hooks/useOperators";
+import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 
 export default function Operators() {
   const { data, error, isFetching } = useOperators();
@@ -15,7 +16,11 @@ export default function Operators() {
       {data.length > 0 ? (
         <ul>
           {data.map((p) => (
-            <li key={p.toText()}>{p.toText()}</li>
+            <li key={p.toText()}>
+              <IdentifierLabelWithButtons type="Principal" id={p}>
+                {p.toText()}
+              </IdentifierLabelWithButtons>
+            </li>
           ))}
         </ul>
       ) : (
