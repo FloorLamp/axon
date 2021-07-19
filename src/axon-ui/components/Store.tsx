@@ -1,13 +1,19 @@
 import { HttpAgent } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import React, { createContext, useContext, useReducer } from "react";
 import { canisterId, createActor } from "../declarations/Axon";
 import { AxonService } from "../lib/types";
 
-type Action = {
-  type: "SET_AGENT";
-  agent: HttpAgent | null;
-  isAuthed?: boolean;
-};
+type Action =
+  | {
+      type: "SET_AGENT";
+      agent: HttpAgent | null;
+      isAuthed?: boolean;
+    }
+  | {
+      type: "SET_PRINCIPAL";
+      principal: Principal;
+    };
 
 const reducer = (state: State, action: Action) => {
   switch (action.type) {
@@ -19,8 +25,11 @@ const reducer = (state: State, action: Action) => {
         axon: createActor(canisterId, agent),
         isAuthed: !!action.isAuthed,
       };
-    default:
-      return state;
+    case "SET_PRINCIPAL":
+      return {
+        ...state,
+        principal: action.principal,
+      };
   }
 };
 
@@ -28,6 +37,7 @@ type State = {
   agent: HttpAgent;
   axon: AxonService;
   isAuthed: boolean;
+  principal: Principal | null;
 };
 
 const defaultAgent = new HttpAgent({ host: "https://ic0.app" });
@@ -35,6 +45,7 @@ const initialState: State = {
   agent: defaultAgent,
   axon: createActor(canisterId, defaultAgent),
   isAuthed: false,
+  principal: null,
 };
 
 const Context = createContext({
@@ -60,6 +71,28 @@ export const useGlobalContext = () => {
 export const useAxon = () => {
   const context = useGlobalContext();
   return context.state.axon;
+};
+
+export const useSetAgent = () => {
+  const { dispatch } = useGlobalContext();
+
+  return async ({
+    agent,
+    isAuthed,
+  }: {
+    agent: HttpAgent;
+    isAuthed?: boolean;
+  }) => {
+    dispatch({ type: "SET_AGENT", agent, isAuthed });
+    if (isAuthed) {
+      dispatch({
+        type: "SET_PRINCIPAL",
+        principal: await agent.getPrincipal(),
+      });
+    } else {
+      dispatch({ type: "SET_PRINCIPAL", principal: null });
+    }
+  };
 };
 
 export default Store;

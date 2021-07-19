@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from "react";
 import { Command } from "../../declarations/Axon/Axon.did";
 import useProposeCommand from "../../lib/hooks/useProposeCommand";
 import SpinnerButton from "../Buttons/SpinnerButton";
+import ErrorAlert from "../Labels/ErrorAlert";
 import { ProposalOptionsForm } from "../ProposalOptionsForm";
 
 export default function CommandForm({
@@ -47,11 +48,7 @@ export default function CommandForm({
             </SpinnerButton>
           </div>
 
-          {isError && (
-            <p className="px-2 py-1 rounded border border-red-500 bg-red-200 text-red-500 text-sm">
-              {error}
-            </p>
-          )}
+          {isError && <ErrorAlert>{error}</ErrorAlert>}
         </div>
       </div>
     </form>

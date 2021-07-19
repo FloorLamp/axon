@@ -17,7 +17,11 @@ const SpinnerButton = ({
     <button
       onClick={onClick}
       className={classNames(
-        "p-2 bg-gray-200 rounded hover:shadow-md transition-shadow transition-300 leading-none inline-flex items-center justify-center",
+        "p-2 bg-gray-200 rounded transition-shadow transition-300 leading-none inline-flex items-center justify-center",
+        {
+          "cursor-pointer hover:shadow-md": !isLoading,
+          "cursor-not-allowed": isLoading,
+        },
         className
       )}
       disabled={isLoading}

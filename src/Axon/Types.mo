@@ -44,6 +44,11 @@ module {
     vote: ?Vote;
   };
 
+  public type Execute<R> = {
+    time: Int;
+    responses: [R];
+  };
+
   public type Proposal<T, R> = {
     id: Nat;
     ballots: [Ballot];
@@ -51,7 +56,12 @@ module {
     timeEnd: Int;
     creator: Principal;
     proposal: T;
-    responses: [R];
+    status: {
+      #Active;
+      #Executed: Execute<R>;
+      #Rejected: Int;
+      #Expired: Int;
+    }
   };
 
   public type ManageNeuronCall = Result<GT.ManageNeuronResponse>;

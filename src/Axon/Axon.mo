@@ -140,7 +140,7 @@ shared actor class Axon(init: T.Initialization) {
     let ballots = Array.map<Principal, T.Ballot>(operators, func(p) {
       {
         principal = p;
-        vote = null;
+        vote = if (p == caller) { ?(#Yes) } else { null };
       }
     });
     let timeStart = Option.get(request.timeStart, Time.now());
@@ -151,7 +151,7 @@ shared actor class Axon(init: T.Initialization) {
       ballots = ballots;
       creator = caller;
       proposal = request.proposal;
-      responses = [];
+      status = #Active
     }]);
     lastId += 1;
 
@@ -170,17 +170,22 @@ shared actor class Axon(init: T.Initialization) {
         return p;
       };
 
-      let ballot = {
-        principal = caller;
-        vote = ?vote;
-      };
-      if (Arr.contains<T.Ballot>(p.ballots, ballot, func(a, b) { a.principal == b.principal })) {
-        result := #err(#AlreadyVoted);
-        return p
-      };
-
-      result := #ok();
-      let ballots = Array.append(p.ballots, [ballot]);
+      let ballots = Array.map<T.Ballot, T.Ballot>(p.ballots, func(b) {
+        if (b.principal == caller) {
+          if (Option.isSome(b.vote)) {
+            result := #err(#AlreadyVoted);
+            return b
+          } else {
+            result := #ok();
+            return {
+              principal = caller;
+              vote = ?vote;
+            }
+          }
+        } else {
+          return b;
+        }
+      });
       {
         id = p.id;
         ballots = ballots;
@@ -188,7 +193,7 @@ shared actor class Axon(init: T.Initialization) {
         timeEnd = p.timeEnd;
         creator = p.creator;
         proposal = p.proposal;
-        responses = p.responses;
+        status = p.status;
       }
     });
 
@@ -232,11 +237,22 @@ shared actor class Axon(init: T.Initialization) {
           timeEnd = proposal.timeEnd;
           creator = proposal.creator;
           proposal = proposal.proposal;
-          responses = proposalResponses.toArray();
+          status = #Executed({
+            time = now;
+            responses = proposalResponses.toArray();
+          })
         });
       } else if (now >= proposal.timeEnd) {
         // Remove expired proposals
-        inactive.add(proposal);
+        inactive.add({
+          id = proposal.id;
+          ballots = proposal.ballots;
+          timeStart = proposal.timeStart;
+          timeEnd = proposal.timeEnd;
+          creator = proposal.creator;
+          proposal = proposal.proposal;
+          status = #Expired(now);
+        });
       }
     };
 

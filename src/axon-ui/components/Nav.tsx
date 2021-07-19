@@ -1,5 +1,4 @@
-import { Principal } from "@dfinity/principal";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { shortPrincipal } from "../lib/utils";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 import LoginButton from "./Buttons/LoginButton";
@@ -7,19 +6,8 @@ import { useGlobalContext } from "./Store";
 
 export default function Nav() {
   const {
-    state: { agent },
+    state: { principal },
   } = useGlobalContext();
-
-  const [principal, setPrincipal] = useState<Principal>(null);
-  useEffect(() => {
-    if (agent) {
-      (async () => {
-        setPrincipal(await agent.getPrincipal());
-      })();
-    } else {
-      setPrincipal(null);
-    }
-  }, [agent]);
 
   return (
     <nav className="py-4 flex items-center justify-between border-b border-black border-opacity-10">

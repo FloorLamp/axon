@@ -16,7 +16,7 @@ export default function CopyButton({
   return (
     <button
       onClick={() => clipboard.copy(text)}
-      className="cursor-pointer filter hover:drop-shadow"
+      className="cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all transition-200"
       title={title}
     >
       {clipboard.copied ? <BsCheck /> : <MdContentCopy />}

@@ -1,6 +1,7 @@
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
 import { useActiveProposals } from "../lib/hooks/useActiveProposals";
+import { Proposal } from "./Proposal/Proposal";
 
 export default function ActiveProposals() {
   const { data, error, isFetching } = useActiveProposals();
@@ -13,9 +14,11 @@ export default function ActiveProposals() {
       </div>
       {error}
       {data.length > 0 ? (
-        <ul>
+        <ul className="divide-y divide-gray-300">
           {data.map((p) => (
-            <li key={p.id.toString()}>p.id</li>
+            <li key={p.id.toString()} className="py-2">
+              <Proposal proposal={p} />
+            </li>
           ))}
         </ul>
       ) : (

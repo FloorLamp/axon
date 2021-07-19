@@ -52,6 +52,10 @@ export const idlFactory = ({ IDL }) => {
     'ok' : ManageNeuronResponse,
     'err' : Error,
   });
+  const Execute = IDL.Record({
+    'responses' : IDL.Vec(ManageNeuronCall),
+    'time' : IDL.Int,
+  });
   const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
   const Ballot = IDL.Record({
     'principal' : IDL.Principal,
@@ -173,8 +177,13 @@ export const idlFactory = ({ IDL }) => {
   );
   const CommandProposal = IDL.Record({
     'id' : IDL.Nat,
+    'status' : IDL.Variant({
+      'Active' : IDL.Null,
+      'Rejected' : IDL.Int,
+      'Executed' : Execute,
+      'Expired' : IDL.Int,
+    }),
     'creator' : IDL.Principal,
-    'responses' : IDL.Vec(ManageNeuronCall),
     'ballots' : IDL.Vec(Ballot),
     'timeStart' : IDL.Int,
     'proposal' : Command,

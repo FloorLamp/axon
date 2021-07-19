@@ -12,7 +12,7 @@ export default function ExternalLinkButton({
     <a
       href={link}
       target="_blank"
-      className="cursor-pointer filter hover:drop-shadow"
+      className="cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all transition-200"
       title={title}
     >
       <FiExternalLink />

@@ -2,19 +2,18 @@ import { HttpAgent, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import React, { useEffect, useState } from "react";
 import { ONE_WEEK_NS } from "../../lib/constants";
-import { useGlobalContext } from "../Store";
+import { useGlobalContext, useSetAgent } from "../Store";
 
 export default function Dropdown() {
   const {
     state: { isAuthed },
-    dispatch,
   } = useGlobalContext();
+  const setAgent = useSetAgent();
   const [authClient, setAuthClient] = useState<AuthClient>(null);
 
   const handleAuthenticated = async (authClient: AuthClient) => {
     const identity: Identity = authClient.getIdentity();
-    dispatch({
-      type: "SET_AGENT",
+    setAgent({
       agent: new HttpAgent({ identity, host: "https://ic0.app" }),
       isAuthed: true,
     });
@@ -28,7 +27,7 @@ export default function Dropdown() {
 
   const handleLogout = async () => {
     await authClient.logout();
-    dispatch({ type: "SET_AGENT", agent: null });
+    setAgent({ agent: null });
   };
 
   useEffect(() => {

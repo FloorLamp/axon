@@ -38,8 +38,11 @@ export type Command = { 'Spawn' : Spawn } |
   { 'Disburse' : Disburse };
 export interface CommandProposal {
   'id' : bigint,
+  'status' : { 'Active' : null } |
+    { 'Rejected' : bigint } |
+    { 'Executed' : Execute } |
+    { 'Expired' : bigint },
   'creator' : Principal,
-  'responses' : Array<ManageNeuronCall>,
   'ballots' : Array<Ballot>,
   'timeStart' : bigint,
   'proposal' : Command,
@@ -82,6 +85,10 @@ export type ErrorCode = { 'canister_error' : null } |
   { 'canister_reject' : null } |
   { 'destination_invalid' : null } |
   { 'system_fatal' : null };
+export interface Execute {
+  'responses' : Array<ManageNeuronCall>,
+  'time' : bigint,
+}
 export interface ExecuteNnsFunction {
   'nns_function' : number,
   'payload' : Array<number>,

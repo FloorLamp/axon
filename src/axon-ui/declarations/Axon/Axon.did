@@ -169,6 +169,11 @@ type ExecuteNnsFunction =
    nns_function: int32;
    payload: vec nat8;
  };
+type Execute = 
+ record {
+   responses: vec ManageNeuronCall;
+   time: int;
+ };
 type ErrorCode = 
  variant {
    canister_error;
@@ -229,7 +234,12 @@ type CommandProposal =
    creator: principal;
    id: nat;
    proposal: Command;
-   responses: vec ManageNeuronCall;
+   status: variant {
+             Active;
+             Executed: Execute;
+             Expired: int;
+             Rejected: int;
+           };
    timeEnd: int;
    timeStart: int;
  };

@@ -2,6 +2,7 @@ import { Principal } from "@dfinity/principal";
 import React, { useState } from "react";
 import { Command, Operation } from "../../declarations/Axon/Axon.did";
 import DissolveDelayInput from "../Inputs/DissolveDelayInput";
+import ErrorAlert from "../Labels/ErrorAlert";
 import CommandForm from "./CommandForm";
 
 const operations = [
@@ -118,6 +119,8 @@ export function ConfigureForm() {
           />
         </div>
       )}
+
+      {!!error && <ErrorAlert>{error}</ErrorAlert>}
     </CommandForm>
   );
 }
