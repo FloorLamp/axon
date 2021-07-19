@@ -56,30 +56,18 @@ shared actor class Axon(init: T.Initialization) {
     operators
   };
 
-  /*
-  * Allow this axon to control the specified neuron.
-  * Before registering the neuron, it must either:
-  * 1) Spawn a new neuron with this canister as controller, or
-  * 2) Add this controller as a hot key
-  */
-  public shared({ caller }) func registerNeuron(id: Nat64): async T.RegisterNeuronResult {
+  // Call get_neuron_ids() and save the list of neurons that this canister controls
+  public shared({ caller }) func sync(): async T.SyncResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };
 
-    if (Arr.contains<Nat64>(neuronIds, id, Nat64.equal)) {
-      return #err(#NeuronAlreadyExists);
-    };
-
-    switch(await Governance.get_full_neuron(id)) {
-      case (#Ok(res)) {
-        neuronIds := Array.append(neuronIds, [id]);
-        #ok(res);
-      };
-      case (#Err(err)) {
-        #err(#GovernanceError(err))
-      }
-    };
+    try {
+      neuronIds := await Governance.get_neuron_ids();
+      #ok(neuronIds);
+    } catch (err) {
+      #err(makeError(err))
+    }
   };
 
   public query func getNeuronIds() : async [Nat64] {

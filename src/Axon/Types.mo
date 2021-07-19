@@ -21,7 +21,6 @@ module {
   public type Error = {
     #Unauthorized;
     #NotFound;
-    #NeuronAlreadyExists;
     #CannotRemoveOperator;
     #CannotPropose;
     #AlreadyVoted;
@@ -61,5 +60,5 @@ module {
   public type Result<T> = Result.Result<T, Error>;
   public type NeuronResult = Result<[?GT.NeuronResult]>;
   public type ProposalResult = Result<[CommandProposal]>;
-  public type RegisterNeuronResult = Result<GT.Neuron>;
+  public type SyncResult = Result<[Nat64]>;
 }

@@ -23,7 +23,6 @@ export const idlFactory = ({ IDL }) => {
       'error_message' : IDL.Text,
       'error_type' : ErrorCode,
     }),
-    'NeuronAlreadyExists' : IDL.Null,
     'CannotPropose' : IDL.Null,
     'NotFound' : IDL.Null,
     'CannotRemoveOperator' : IDL.Null,
@@ -239,7 +238,7 @@ export const idlFactory = ({ IDL }) => {
     'durationSeconds' : IDL.Opt(IDL.Nat),
     'proposal' : Command,
   });
-  const RegisterNeuronResult = IDL.Variant({ 'ok' : Neuron, 'err' : Error });
+  const SyncResult = IDL.Variant({ 'ok' : IDL.Vec(IDL.Nat64), 'err' : Error });
   const Axon = IDL.Service({
     'execute' : IDL.Func([], [Result], []),
     'getActiveProposals' : IDL.Func([], [ProposalResult], ['query']),
@@ -253,7 +252,7 @@ export const idlFactory = ({ IDL }) => {
     'manage' : IDL.Func([ManageAxon], [Result], []),
     'neurons' : IDL.Func([], [NeuronResult], []),
     'proposeCommand' : IDL.Func([NewProposal], [Result], []),
-    'registerNeuron' : IDL.Func([IDL.Nat64], [RegisterNeuronResult], []),
+    'sync' : IDL.Func([], [SyncResult], []),
     'vote' : IDL.Func([IDL.Nat, Vote], [Result], []),
   });
   return Axon;

@@ -12,8 +12,8 @@ import BalanceLabel from "./Labels/BalanceLabel";
 import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
 import { TimestampLabel } from "./Labels/TimestampLabel";
 import ManageNeuronModal from "./ManageNeuronModal";
-import RegisterForm from "./RegisterForm";
 import { useGlobalContext } from "./Store";
+import SyncForm from "./SyncForm";
 
 const governanceCanister = Principal.fromText("rrkah-fqaaa-aaaaa-aaaaq-cai");
 
@@ -24,24 +24,24 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
 
   return (
     <div className="flex flex-col gap-1">
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Account</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Account</div>
         <div>
           <IdentifierLabelWithButtons type="Account" id={account}>
             {account}
           </IdentifierLabelWithButtons>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Controller</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Controller</div>
         <div>
           <IdentifierLabelWithButtons type="Principal" id={controller}>
             {controller.toText()}
           </IdentifierLabelWithButtons>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Hot Keys</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Hot Keys</div>
         <div>
           <ul>
             {neuron.hot_keys.map((hotkey) => (
@@ -54,8 +54,8 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
           </ul>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Followees</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Followees</div>
         <div>
           <ul>
             {neuron.followees.map(([topic, followee]) => (
@@ -69,16 +69,16 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
           </ul>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Created</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Created</div>
         <div>
           <TimestampLabel
             dt={DateTime.fromSeconds(Number(neuron.created_timestamp_seconds))}
           />
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Aging Since</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Aging Since</div>
         <div>
           <TimestampLabel
             dt={DateTime.fromSeconds(
@@ -87,20 +87,20 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
           />
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Stake</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Stake</div>
         <div>
           <BalanceLabel value={neuron.cached_neuron_stake_e8s} />
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">Maturity</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Maturity</div>
         <div>
           <BalanceLabel value={neuron.maturity_e8s_equivalent} />
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row leading-tight">
-        <div className="w-32 font-medium">State</div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">State</div>
         <div>
           {neuron.dissolve_state[0] ? (
             <DissolveStateLabel state={neuron.dissolve_state[0]} />
@@ -178,7 +178,7 @@ export default function Neurons() {
           {errorNeurons}
         </p>
       )}
-      {isAuthed && <RegisterForm />}
+      {isAuthed && <SyncForm />}
     </section>
   );
 }

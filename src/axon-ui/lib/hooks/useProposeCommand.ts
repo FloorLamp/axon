@@ -1,4 +1,4 @@
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../components/Store";
 import { Command } from "../../declarations/Axon/Axon.did";
 import { errorToString } from "../utils";
@@ -11,6 +11,8 @@ export default function useProposeCommand({
   durationSeconds?: string;
 }) {
   const axon = useAxon();
+  const queryClient = useQueryClient();
+
   return useMutation(
     async (proposal: Command) => {
       const result = await axon.proposeCommand({
@@ -27,6 +29,7 @@ export default function useProposeCommand({
     {
       onSuccess: (data) => {
         console.log(data);
+        queryClient.refetchQueries(["activeProposals"]);
       },
     }
   );

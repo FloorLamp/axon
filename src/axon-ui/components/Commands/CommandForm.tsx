@@ -42,10 +42,7 @@ export default function CommandForm({
 
         <div className="border-t border-gray-300 flex flex-col gap-2 pt-4">
           <div className="flex gap-2">
-            <SpinnerButton
-              isLoading={isLoading}
-              className="p-2 w-20 bg-gray-200 rounded hover:shadow-md transition-shadow transition-300 leading-none inline-flex items-center justify-center"
-            >
+            <SpinnerButton className="w-20" isLoading={isLoading}>
               Submit
             </SpinnerButton>
           </div>

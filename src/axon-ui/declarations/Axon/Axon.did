@@ -8,6 +8,11 @@ type Visibility =
    Private;
    Public;
  };
+type SyncResult = 
+ variant {
+   err: Error;
+   ok: vec nat64;
+ };
 type Split = record {amount_e8s: nat64;};
 type SpawnResponse = record {created_neuron_id: opt NeuronId;};
 type Spawn = record {new_controller: opt principal;};
@@ -40,11 +45,6 @@ type RegisterVote =
  record {
    proposal: opt NeuronId;
    vote: int32;
- };
-type RegisterNeuronResult = 
- variant {
-   err: Error;
-   ok: Neuron;
  };
 type ProposalResult = 
  variant {
@@ -188,7 +188,6 @@ type Error =
             error_type: ErrorCode;
           };
    GovernanceError: GovernanceError;
-   NeuronAlreadyExists;
    NotFound;
    Unauthorized;
  };
@@ -270,7 +269,7 @@ type Axon =
    manage: (ManageAxon) -> (Result);
    neurons: () -> (NeuronResult);
    proposeCommand: (NewProposal) -> (Result);
-   registerNeuron: (nat64) -> (RegisterNeuronResult);
+   sync: () -> (SyncResult);
    vote: (nat, Vote) -> (Result);
  };
 type ApproveGenesisKyc = record {principals: vec principal;};
