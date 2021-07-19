@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Command } from "../../declarations/Axon/Axon.did";
-import SpinnerButton from "../SpinnerButton";
+import SpinnerButton from "../Buttons/SpinnerButton";
 
 export function SplitForm({
   propose,

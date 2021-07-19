@@ -3,7 +3,7 @@ import { Principal } from "@dfinity/principal";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
-import LoginButton from "../components/LoginButton";
+import LoginButton from "../components/Buttons/LoginButton";
 import Neurons from "../components/Neurons";
 import { canisterId, createActor } from "../declarations/Axon";
 import { ProposalResult } from "../declarations/Axon/Axon.did";

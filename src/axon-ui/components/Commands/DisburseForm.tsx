@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Command, Disburse } from "../../declarations/Axon/Axon.did";
 import { isAccount } from "../../lib/account";
-import SpinnerButton from "../SpinnerButton";
+import SpinnerButton from "../Buttons/SpinnerButton";
 
 export function DisburseForm({
   propose,

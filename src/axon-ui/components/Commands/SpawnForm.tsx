@@ -1,7 +1,7 @@
 import { Principal } from "@dfinity/principal";
 import React, { useState } from "react";
 import { Command, Spawn } from "../../declarations/Axon/Axon.did";
-import SpinnerButton from "../SpinnerButton";
+import SpinnerButton from "../Buttons/SpinnerButton";
 
 export function SpawnForm({
   propose,
@@ -17,11 +17,13 @@ export function SpawnForm({
 
     setError("");
     let new_controller = [];
-    try {
-      new_controller = [Principal.fromText(controller)];
-    } catch (err) {
-      setError("Invalid principal: " + err.message);
-      return;
+    if (controller) {
+      try {
+        new_controller = [Principal.fromText(controller)];
+      } catch (err) {
+        setError("Invalid principal: " + err.message);
+        return;
+      }
     }
 
     propose({

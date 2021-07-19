@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Command, Neuron } from "../declarations/Axon/Axon.did";
 import { AxonService } from "../lib/types";
+import { ConfigureForm } from "./Commands/ConfigureForm";
 import { DisburseForm } from "./Commands/DisburseForm";
+import { DisburseToNeuronForm } from "./Commands/DisburseToNeuronForm";
 import { SpawnForm } from "./Commands/SpawnForm";
 import { SplitForm } from "./Commands/SplitForm";
 import Modal from "./Modal";
@@ -11,11 +13,13 @@ const commands = [
   "Split",
   "Follow",
   "Configure",
-  "RegisterVote",
-  "DisburseToNeuron",
-  "MakeProposal",
+  "Register Vote",
+  "Disburse To Neuron",
+  "Make Proposal",
   "Disburse",
-];
+] as const;
+
+type CommandName = typeof commands[number];
 
 export default function ManageNeuronModal({
   axon,
@@ -28,7 +32,7 @@ export default function ManageNeuronModal({
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  const [command, setCommand] = useState(commands[0]);
+  const [command, setCommand] = useState<CommandName>(commands[0]);
   const [timeStart, setTimeStart] = useState(null);
   const [durationSeconds, setDurationSeconds] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,16 +63,22 @@ export default function ManageNeuronModal({
         closeModal={closeModal}
         title="Manage Neurons"
       >
-        <select
-          className="mt-4 px-2 py-1 rounded border border-gray-300"
-          onChange={(e) => setCommand(e.target.value)}
-        >
-          {commands.map((command) => (
-            <option key={command} value={command}>
-              {command}
-            </option>
-          ))}
-        </select>
+        <div className="pt-4">
+          <label>Command</label>
+          <select
+            className="block px-2 py-1 rounded border border-gray-300"
+            onChange={(e) => setCommand(e.target.value as CommandName)}
+          >
+            {commands.map((command) => (
+              <option key={command} value={command}>
+                {command}
+              </option>
+            ))}
+          </select>
+        </div>
+        {command === "Configure" && (
+          <ConfigureForm propose={propose} isLoading={isLoading} />
+        )}
         {command === "Spawn" && (
           <SpawnForm propose={propose} isLoading={isLoading} />
         )}
@@ -77,6 +87,17 @@ export default function ManageNeuronModal({
         )}
         {command === "Disburse" && (
           <DisburseForm
+            propose={propose}
+            isLoading={isLoading}
+            stake={
+              neurons.length === 1
+                ? neurons[0].cached_neuron_stake_e8s
+                : undefined
+            }
+          />
+        )}
+        {command === "Disburse To Neuron" && (
+          <DisburseToNeuronForm
             propose={propose}
             isLoading={isLoading}
             stake={

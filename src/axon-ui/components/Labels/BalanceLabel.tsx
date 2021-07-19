@@ -1,5 +1,5 @@
 import React from "react";
-import { formatNumber } from "../lib/utils";
+import { formatNumber } from "../../lib/utils";
 
 export default function BalanceLabel({
   value,

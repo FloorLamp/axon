@@ -6,11 +6,11 @@ import { FiExternalLink } from "react-icons/fi";
 import { GovernanceError, Neuron } from "../declarations/Axon/Axon.did";
 import { subaccountToAccount } from "../lib/account";
 import { errorToString, governanceErrorToString } from "../lib/utils";
-import BalanceLabel from "./BalanceLabel";
-import { DissolveStateLabel } from "./DissolveStateLabel";
+import BalanceLabel from "./Labels/BalanceLabel";
+import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
+import { TimestampLabel } from "./Labels/TimestampLabel";
 import ManageNeuronModal from "./ManageNeuronModal";
 import RegisterForm from "./RegisterForm";
-import { TimestampLabel } from "./TimestampLabel";
 
 const governanceCanister = Principal.fromText("rrkah-fqaaa-aaaaa-aaaaq-cai");
 
