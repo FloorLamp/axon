@@ -1,24 +1,34 @@
 import { HttpAgent, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import React, { useEffect, useState } from "react";
+import { ONE_WEEK_NS } from "../../lib/constants";
+import { useGlobalContext } from "../Store";
 
-export default function Dropdown({ agent, setAgent }) {
+export default function Dropdown() {
+  const {
+    state: { isAuthed },
+    dispatch,
+  } = useGlobalContext();
   const [authClient, setAuthClient] = useState<AuthClient>(null);
 
   const handleAuthenticated = async (authClient: AuthClient) => {
     const identity: Identity = authClient.getIdentity();
-    setAgent(new HttpAgent({ identity, host: "https://ic0.app" }));
+    dispatch({
+      type: "SET_AGENT",
+      agent: new HttpAgent({ identity, host: "https://ic0.app" }),
+      isAuthed: true,
+    });
   };
 
   const handleLogin = () =>
     authClient.login({
-      maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1e9), // one week
+      maxTimeToLive: ONE_WEEK_NS,
       onSuccess: () => handleAuthenticated(authClient),
     });
 
   const handleLogout = async () => {
     await authClient.logout();
-    setAgent(null);
+    dispatch({ type: "SET_AGENT", agent: null });
   };
 
   useEffect(() => {
@@ -34,10 +44,10 @@ export default function Dropdown({ agent, setAgent }) {
   return (
     <button
       className="flex items-center px-2 py-1 rounded-md bg-white hover:shadow-lg transition-shadow transition-300"
-      onClick={agent ? handleLogout : handleLogin}
+      onClick={isAuthed ? handleLogout : handleLogin}
     >
       <img src="/img/dfinity.png" className="w-4 mr-2" />
-      {agent ? "Logout" : "Login"}
+      {isAuthed ? "Logout" : "Login"}
     </button>
   );
 }

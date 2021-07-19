@@ -1,16 +1,19 @@
 import { Principal } from "@dfinity/principal";
 import { DateTime } from "luxon";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { CgSpinner } from "react-icons/cg";
 import { FiExternalLink } from "react-icons/fi";
 import { GovernanceError, Neuron } from "../declarations/Axon/Axon.did";
 import { subaccountToAccount } from "../lib/account";
-import { errorToString, governanceErrorToString } from "../lib/utils";
+import { useNeuronIds } from "../lib/hooks/useNeuronIds";
+import { useNeurons } from "../lib/hooks/useNeurons";
+import { governanceErrorToString } from "../lib/utils";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
 import { TimestampLabel } from "./Labels/TimestampLabel";
 import ManageNeuronModal from "./ManageNeuronModal";
 import RegisterForm from "./RegisterForm";
+import { useGlobalContext } from "./Store";
 
 const governanceCanister = Principal.fromText("rrkah-fqaaa-aaaaa-aaaaq-cai");
 
@@ -125,56 +128,38 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
   );
 }
 
-export default function Neurons({ axon, isAuthed }) {
-  const [isLoadingNeuronIds, setIsLoadingNeuronIds] = useState(false);
-  const [isLoadingNeurons, setIsLoadingNeurons] = useState(false);
-  const [neuronIds, setNeuronIds] = useState<bigint[]>([]);
-  const [neurons, setNeurons] = useState<(Neuron | GovernanceError)[]>([]);
-  const [error, setError] = useState("");
+export default function Neurons() {
+  const {
+    state: { isAuthed },
+  } = useGlobalContext();
 
-  const fetchIds = async () => {
-    setIsLoadingNeuronIds(true);
-    const neuronIds = await axon.getNeuronIds();
-    setIsLoadingNeuronIds(false);
-    setNeuronIds(neuronIds);
-  };
-
-  const fetchData = async () => {
-    setIsLoadingNeurons(true);
-    const neurons = await axon.neurons();
-    setIsLoadingNeurons(false);
-    if ("ok" in neurons) {
-      const neuronsOrErrors = neurons.ok.map(([res], i) =>
-        "Ok" in res ? res.Ok : res.Err
-      );
-      setNeurons(neuronsOrErrors);
-    } else {
-      setError(errorToString(neurons.err));
-    }
-  };
-
-  useEffect(() => {
-    fetchIds();
-    fetchData();
-  }, [isAuthed]);
-
-  const neuronsOnly = neurons.filter((n) => "id" in n) as Neuron[];
+  const {
+    data: neuronIds,
+    isFetching: isFetchingNeuronIds,
+    error: errorNeuronIds,
+  } = useNeuronIds();
+  const {
+    data: neurons,
+    isFetching: isFetchingNeurons,
+    error: errorNeurons,
+  } = useNeurons();
 
   return (
     <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
       <div className="flex justify-between mb-2">
-        <h2 className="text-xl font-bold">Neurons</h2>
-        <ManageNeuronModal axon={axon} neurons={neuronsOnly} />
+        <div className="flex gap-2 items-center">
+          <h2 className="text-xl font-bold">Neurons</h2>
+          {isFetchingNeuronIds && (
+            <CgSpinner className="inline-block animate-spin" />
+          )}
+        </div>
+        <ManageNeuronModal />
       </div>
-      {isLoadingNeuronIds ? (
-        <CgSpinner className="inline-block animate-spin" />
-      ) : neuronIds.length > 0 ? (
+      {neuronIds.length > 0 ? (
         <ul className="divide-y divide-gray-500">
           {neuronIds.map((n, i) => {
             let display = null;
-            if (isLoadingNeurons) {
-              display = <CgSpinner className="block animate-spin" />;
-            } else if (neurons[i]) {
+            if (neurons[i]) {
               if ("id" in neurons[i]) {
                 display = <NeuronDisplay neuron={neurons[i] as Neuron} />;
               } else {
@@ -186,7 +171,12 @@ export default function Neurons({ axon, isAuthed }) {
 
             return (
               <li key={n.toString()}>
-                <strong>{n.toString()}</strong>
+                <div className="flex items-center gap-2">
+                  <strong>{n.toString()}</strong>
+                  {isFetchingNeurons && (
+                    <CgSpinner className="block animate-spin" />
+                  )}
+                </div>
                 {display}
               </li>
             );
@@ -195,8 +185,13 @@ export default function Neurons({ axon, isAuthed }) {
       ) : (
         "None"
       )}
-      {error}
-      {isAuthed && <RegisterForm axon={axon} refresh={fetchData} />}
+      {(errorNeuronIds || errorNeurons) && (
+        <p className="px-2 py-1 rounded border border-red-500 bg-red-200 text-red-500 text-sm">
+          {errorNeuronIds}
+          {errorNeurons}
+        </p>
+      )}
+      {isAuthed && <RegisterForm />}
     </section>
   );
 }

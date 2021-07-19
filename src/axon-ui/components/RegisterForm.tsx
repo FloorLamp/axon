@@ -1,34 +1,15 @@
 import React, { useState } from "react";
-import { AxonService } from "../lib/types";
-import { errorToString } from "../lib/utils";
+import useRegisterNeuron from "../lib/hooks/useRegisterNeuron";
 
-export default function RegisterForm({
-  axon,
-  refresh,
-}: {
-  axon: AxonService;
-  refresh: () => void;
-}) {
+export default function RegisterForm() {
   const [neuronId, setNeuronId] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate, isLoading, error } = useRegisterNeuron();
 
-  const register = async (e) => {
+  const register = (e) => {
     e.preventDefault();
     if (!neuronId) return;
 
-    setError("");
-
-    setIsLoading(true);
-    const result = await axon.registerNeuron(BigInt(neuronId));
-    console.log(result);
-
-    setIsLoading(false);
-    if ("ok" in result) {
-      refresh();
-    } else {
-      setError(errorToString(result.err));
-    }
+    mutate(neuronId);
   };
 
   return (

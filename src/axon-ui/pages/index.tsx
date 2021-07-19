@@ -1,39 +1,28 @@
-import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import { FaGithub } from "react-icons/fa";
+import ActiveProposals from "../components/ActiveProposals";
 import LoginButton from "../components/Buttons/LoginButton";
 import Neurons from "../components/Neurons";
-import { canisterId, createActor } from "../declarations/Axon";
-import { ProposalResult } from "../declarations/Axon/Axon.did";
+import Operators from "../components/Operators";
+import { useGlobalContext } from "../components/Store";
+import { canisterId } from "../declarations/Axon";
 import { shortPrincipal } from "../lib/utils";
 
 export default function Home() {
-  const [axon, setAxon] = useState(
-    createActor(canisterId, new HttpAgent({ host: "https://ic0.app" }))
-  );
-  const [agent, setAgent] = useState<HttpAgent>(null);
-  const [operators, setOperators] = useState<Principal[]>(null);
-  const [activeProposals, setActiveProposals] = useState<ProposalResult>(null);
-  const fetchData = async () => {
-    if (!canisterId) return;
+  const {
+    state: { agent },
+  } = useGlobalContext();
 
-    setOperators(await axon.getOperators());
-    setActiveProposals(await axon.getActiveProposals());
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const [principal, setPrincipal] = useState(null);
+  const [principal, setPrincipal] = useState<Principal>(null);
   useEffect(() => {
     if (agent) {
-      setAxon(createActor(canisterId, agent));
       (async () => {
         setPrincipal(await agent.getPrincipal());
       })();
+    } else {
+      setPrincipal(null);
     }
   }, [agent]);
 
@@ -52,10 +41,10 @@ export default function Home() {
             <div className="flex items-center gap-4">
               {principal && (
                 <span title={principal.toText()}>
-                  {shortPrincipal(principal)}
+                  {!principal.isAnonymous() && shortPrincipal(principal)}
                 </span>
               )}
-              <LoginButton agent={agent} setAgent={setAgent} />
+              <LoginButton />
             </div>
           </nav>
           <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
@@ -74,41 +63,11 @@ export default function Home() {
             )}
           </section>
 
-          <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold">Operators</h2>
-            {operators ? (
-              <ul>
-                {operators.map((p) => (
-                  <li key={p.toText()}>{p.toText()}</li>
-                ))}
-              </ul>
-            ) : (
-              "Loading..."
-            )}
-          </section>
+          <Operators />
 
-          <Neurons axon={axon} isAuthed={!!agent} />
+          <Neurons />
 
-          <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold">Active Proposals</h2>
-            {activeProposals ? (
-              "ok" in activeProposals ? (
-                activeProposals.ok.length > 0 ? (
-                  <ul>
-                    {activeProposals.ok.map((p) => (
-                      <li key={p.id.toString()}>p.id</li>
-                    ))}
-                  </ul>
-                ) : (
-                  "None"
-                )
-              ) : (
-                JSON.stringify(activeProposals.err)
-              )
-            ) : (
-              "Loading..."
-            )}
-          </section>
+          <ActiveProposals />
         </main>
 
         <footer className="py-8 flex justify-center">
