@@ -1,5 +1,5 @@
 import { Principal } from "@dfinity/principal";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Command, Operation } from "../../declarations/Axon/Axon.did";
 import DissolveDelayInput from "../Inputs/DissolveDelayInput";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -22,6 +22,9 @@ export function ConfigureForm() {
   const [hotKey, setHotKey] = useState("");
   const [dissolveDelay, setDissolveDelay] = useState("");
   const [timestamp, setTimestamp] = useState("");
+  useEffect(() => {
+    setError("");
+  }, [operation]);
   const [error, setError] = useState("");
 
   const makeCommand = (): Command | null => {

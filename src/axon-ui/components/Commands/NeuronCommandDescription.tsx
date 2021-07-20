@@ -1,10 +1,14 @@
+import { DateTime } from "luxon";
+import React from "react";
 import {
   AddHotKey,
   Command,
   Configure,
   Disburse,
+  DisburseToNeuron,
   IncreaseDissolveDelay,
   NeuronCommand,
+  SetDissolveTimestamp,
   Spawn,
   Split,
 } from "../../declarations/Axon/Axon.did";
@@ -13,6 +17,7 @@ import { CommandKey, OperationKey } from "../../lib/types";
 import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
+import { TimestampLabel } from "../Labels/TimestampLabel";
 
 export default function NeuronCommandDescription({
   neuronCommand: { neuronIds, command },
@@ -20,7 +25,7 @@ export default function NeuronCommandDescription({
   neuronCommand: NeuronCommand;
 }) {
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       <CommandDescription command={command} />
       <NeuronIds neuronIds={neuronIds} />
     </div>
@@ -29,8 +34,8 @@ export default function NeuronCommandDescription({
 
 function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
   return (
-    <div className="flex">
-      <strong className="w-20">Neurons</strong>
+    <div>
+      <strong>Neurons</strong>
       <div>{ids ? ids.map(String).join(", ") : "All"}</div>
     </div>
   );
@@ -104,6 +109,48 @@ function CommandDescription({ command }: { command: Command }) {
         </div>
       );
     }
+    case "DisburseToNeuron": {
+      const {
+        new_controller: [controller],
+        amount_e8s,
+        nonce,
+        kyc_verified,
+        dissolve_delay_seconds,
+      } = command[key] as DisburseToNeuron;
+      return (
+        <div>
+          <strong>Disburse</strong>
+          <div className="flex">
+            <span className="w-28">Controller</span>
+            {controller ? (
+              <IdentifierLabelWithButtons id={controller} type="Principal">
+                {controller.toText()}
+              </IdentifierLabelWithButtons>
+            ) : (
+              <span className="text-gray-500">Not specified</span>
+            )}
+          </div>
+          <div className="flex">
+            <span className="w-28">Amount</span>
+            <div>
+              <BalanceLabel value={amount_e8s} />
+            </div>
+          </div>
+          <div className="flex">
+            <span className="w-28">Dissolve Delay</span>
+            <div>{dissolve_delay_seconds.toString()} sec</div>
+          </div>
+          <div className="flex">
+            <span className="w-28">Nonce</span>
+            <div>{nonce.toString()}</div>
+          </div>
+          <div className="flex">
+            <span className="w-28">KYC</span>
+            <div>{kyc_verified ? "Yes" : "No"}</div>
+          </div>
+        </div>
+      );
+    }
     case "Configure": {
       const operation = (command[key] as Configure).operation[0];
       const opKey = Object.keys(operation)[0] as OperationKey;
@@ -137,9 +184,25 @@ function CommandDescription({ command }: { command: Command }) {
               <strong>{additional_dissolve_delay_seconds}s</strong>
             </span>
           );
+        case "SetDissolveTimestamp":
+          const { dissolve_timestamp_seconds } = operation[
+            opKey
+          ] as SetDissolveTimestamp;
+          return (
+            <div>
+              <strong>Set Dissolve Timestamp</strong>
+              <div>
+                <TimestampLabel
+                  dt={DateTime.fromSeconds(
+                    Number(dissolve_timestamp_seconds / BigInt(1e9))
+                  )}
+                />
+              </div>
+            </div>
+          );
       }
     }
     default:
-      return <>{stringify(command)}</>;
+      return <pre className="text-xs">{stringify(command)}</pre>;
   }
 }

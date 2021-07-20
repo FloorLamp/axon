@@ -20,7 +20,7 @@ export default function Proposals() {
   return (
     <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
       <div className="grid xs:grid-cols-3 gap-2 items-center mb-2">
-        <div>
+        <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold">Proposals</h2>
           {isFetching && <CgSpinner className="inline-block animate-spin" />}
         </div>
@@ -37,8 +37,8 @@ export default function Proposals() {
         {data && data.length > 0 ? (
           <ul className="divide-y divide-gray-300">
             {data.map((p) => (
-              <li key={p.id.toString()} className="py-2">
-                <Proposal proposal={p} />
+              <li key={p.id.toString()}>
+                <Proposal proposal={p} initialVisible={type === "Active"} />
               </li>
             ))}
           </ul>

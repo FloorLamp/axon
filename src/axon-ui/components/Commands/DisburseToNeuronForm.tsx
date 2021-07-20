@@ -16,14 +16,16 @@ export function DisburseToNeuronForm({ stake }: { stake?: bigint }) {
   const makeCommand = (): Command | null => {
     setError("");
     let new_controller = [];
-    try {
-      new_controller = [Principal.fromText(controller)];
-    } catch (err) {
-      setError("Invalid principal: " + err.message);
-      return null;
+    if (controller) {
+      try {
+        new_controller = [Principal.fromText(controller)];
+      } catch (err) {
+        setError("Invalid principal: " + err.message);
+        return null;
+      }
     }
 
-    let nonce_bi;
+    let nonce_bi: BigInt;
     try {
       nonce_bi = BigInt(nonce);
     } catch (err) {
