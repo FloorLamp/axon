@@ -9,7 +9,7 @@ export default function AcceptRejectButtons({
 }) {
   const { mutate, isLoading, isError, error } = useVote();
   const doVote = (acceptReject: boolean) => {
-    mutate({ proposalId, acceptReject });
+    mutate({ proposalId, acceptReject, execute: true });
   };
 
   return (

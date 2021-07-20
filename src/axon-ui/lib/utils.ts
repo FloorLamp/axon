@@ -1,6 +1,20 @@
 import { Principal } from "@dfinity/principal";
 import { Error, GovernanceError } from "../declarations/Axon/Axon.did";
 
+export const stringify = (data) =>
+  JSON.stringify(
+    data,
+    (key, value) =>
+      typeof value === "bigint"
+        ? value.toString()
+        : value instanceof Principal
+        ? value.toText()
+        : Buffer.isBuffer(value)
+        ? value.toString("hex")
+        : value,
+    2
+  );
+
 enum GovernanceErrorType {
   "Unspecified" = 0,
   "Ok" = 1,

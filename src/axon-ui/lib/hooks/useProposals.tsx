@@ -19,3 +19,21 @@ export const useActiveProposals = () => {
     }
   );
 };
+
+export const useAllProposals = () => {
+  const axon = useAxon();
+  return useQuery(
+    "allProposals",
+    async () => {
+      const result = await axon.getAllProposals([]);
+      if ("ok" in result) {
+        return result.ok;
+      } else {
+        throw errorToString(result.err);
+      }
+    },
+    {
+      placeholderData: [],
+    }
+  );
+};

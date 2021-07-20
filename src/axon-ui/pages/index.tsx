@@ -1,12 +1,10 @@
 import Head from "next/head";
 import React from "react";
 import { FaGithub } from "react-icons/fa";
-import ActiveProposals from "../components/ActiveProposals";
-import IdentifierLabelWithButtons from "../components/Buttons/IdentifierLabelWithButtons";
+import AxonDetails from "../components/AxonDetails";
 import Nav from "../components/Nav";
 import Neurons from "../components/Neurons";
-import Operators from "../components/Operators";
-import { canisterId } from "../declarations/Axon";
+import Proposals from "../components/Proposals";
 
 export default function Home() {
   return (
@@ -21,18 +19,11 @@ export default function Home() {
         <main className="flex flex-col gap-8 justify-start">
           <Nav />
 
-          <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold">Canister</h2>
-            <IdentifierLabelWithButtons type="Principal" id={canisterId}>
-              {canisterId}
-            </IdentifierLabelWithButtons>
-          </section>
-
-          <Operators />
+          <AxonDetails />
 
           <Neurons />
 
-          <ActiveProposals />
+          <Proposals />
         </main>
 
         <footer className="py-8 flex justify-center">

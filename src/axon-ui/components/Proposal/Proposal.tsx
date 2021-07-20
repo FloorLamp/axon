@@ -1,16 +1,16 @@
 import { DateTime } from "luxon";
 import React from "react";
-import { CommandProposal } from "../../declarations/Axon/Axon.did";
-import { shortPrincipal } from "../../lib/utils";
+import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
-import CommandDescription from "../Commands/CommandDescription";
+import NeuronCommandDescription from "../Commands/NeuronCommandDescription";
 import { TimestampLabel } from "../Labels/TimestampLabel";
-import VoteLabel from "../Labels/VoteLabel";
 import { useGlobalContext } from "../Store";
 import AcceptRejectButtons from "./AcceptRejectButtons";
+import Ballots from "./Ballots";
+import ExecuteButton from "./ExecuteButton";
+import Results from "./Results";
 
-export const Proposal = ({ proposal }: { proposal: CommandProposal }) => {
-  console.log(proposal);
+export const Proposal = ({ proposal }: { proposal: NeuronCommandProposal }) => {
   const {
     state: { principal, isAuthed },
   } = useGlobalContext();
@@ -20,11 +20,34 @@ export const Proposal = ({ proposal }: { proposal: CommandProposal }) => {
     (ballot) => ballot.principal.toHex() === principal.toHex()
   );
 
+  const actionTime =
+    "Executed" in proposal.status
+      ? proposal.status.Executed.time
+      : "Rejected" in proposal.status ||
+        "Accepted" in proposal.status ||
+        "Expired" in proposal.status
+      ? Object.values(proposal.status)[0]
+      : null;
+
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2 py-2">
       <div className="flex flex-col md:flex-row leading-tight">
         <div className="w-32 font-bold">Proposal ID</div>
         <div>{proposal.id.toString()}</div>
+      </div>
+      <div className="flex flex-col md:flex-row leading-tight">
+        <div className="w-32 font-bold">Status</div>
+        <div>
+          {Object.keys(proposal.status)[0]}
+          {!!actionTime && (
+            <>
+              {" "}
+              <TimestampLabel
+                dt={DateTime.fromSeconds(Number(actionTime / BigInt(1e9)))}
+              />
+            </>
+          )}
+        </div>
       </div>
       <div className="flex flex-col md:flex-row leading-tight">
         <div className="w-32 font-bold">Creator</div>
@@ -51,41 +74,44 @@ export const Proposal = ({ proposal }: { proposal: CommandProposal }) => {
         </div>
       </div>
       <div className="flex flex-col md:flex-row leading-tight">
-        <div className="w-32 font-bold">Command</div>
+        <div className="w-32 font-bold">Action</div>
         <div>
-          <CommandDescription command={proposal.proposal} />
+          <NeuronCommandDescription neuronCommand={proposal.proposal} />
         </div>
       </div>
       <div className="flex flex-col md:flex-row leading-tight">
         <div className="w-32 font-bold">Votes</div>
         <div>
-          <ul className="flex flex-col gap-1">
-            {ballots.map((ballot, i) => {
-              const principalText = ballot.principal.toText();
-              return (
-                <li key={principalText + i} className="flex gap-2">
-                  <VoteLabel vote={ballot.vote[0]} />
-                  <IdentifierLabelWithButtons
-                    type="Principal"
-                    id={ballot.principal}
-                  >
-                    <span title={principalText}>
-                      {shortPrincipal(ballot.principal)}
-                    </span>
-                  </IdentifierLabelWithButtons>
-                </li>
-              );
-            })}
-          </ul>
+          <Ballots ballots={ballots} />
         </div>
       </div>
-      {isAuthed && !hasVoted && (
-        <div className="flex flex-col md:flex-row leading-tight py-4">
-          <div className="w-32" />
+      {"Executed" in proposal.status && (
+        <div className="flex flex-col md:flex-row leading-tight">
+          <div className="w-32 font-bold">Results</div>
           <div>
-            <AcceptRejectButtons proposalId={proposal.id} />
+            <Results results={proposal.status.Executed} />
           </div>
         </div>
+      )}
+      {isAuthed && (
+        <>
+          {!hasVoted && (
+            <div className="flex flex-col md:flex-row leading-tight py-4">
+              <div className="w-32" />
+              <div>
+                <AcceptRejectButtons proposalId={proposal.id} />
+              </div>
+            </div>
+          )}
+          {"Accepted" in proposal.status && (
+            <div className="flex flex-col md:flex-row leading-tight py-4">
+              <div className="w-32" />
+              <div>
+                <ExecuteButton proposalId={proposal.id} />
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

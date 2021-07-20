@@ -28,19 +28,21 @@ export function SpawnForm() {
 
   return (
     <CommandForm makeCommand={makeCommand}>
-      <div>
-        <label>New Controller</label>
-        <input
-          type="text"
-          placeholder="New Controller"
-          className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-          value={controller}
-          onChange={(e) => setController(e.target.value)}
-          maxLength={64}
-        />
-      </div>
+      <div className="flex flex-col py-4 gap-2">
+        <div>
+          <label>New Controller</label>
+          <input
+            type="text"
+            placeholder="New Controller"
+            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            value={controller}
+            onChange={(e) => setController(e.target.value)}
+            maxLength={64}
+          />
+        </div>
 
-      {error && <p>{error}</p>}
+        {error && <p>{error}</p>}
+      </div>
     </CommandForm>
   );
 }

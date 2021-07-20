@@ -1,6 +1,7 @@
 import { Principal } from "@dfinity/principal";
 import { getCrc32 } from "@dfinity/principal/lib/cjs/utils/getCrc";
 import { sha224 } from "@dfinity/principal/lib/cjs/utils/sha224.js";
+import { AccountIdentifier } from "../declarations/Axon/Axon.did";
 
 export const subaccountToAccount = (principal: Principal, bytes: number[]) => {
   const subaccount = Buffer.from(bytes);
@@ -31,4 +32,8 @@ export const isAccount = (string: string) => {
   } catch (error) {
     return false;
   }
+};
+
+export const accountIdentifierToString = (ai: AccountIdentifier) => {
+  return Buffer.from(ai.hash).toString("hex");
 };

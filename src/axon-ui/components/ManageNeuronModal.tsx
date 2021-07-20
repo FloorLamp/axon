@@ -68,18 +68,21 @@ export default function ManageNeuronModal() {
         closeModal={closeModal}
         title="Manage Neurons"
       >
-        <div className="pt-4">
-          <label>Command</label>
-          <select
-            className="block w-full px-2 py-1 rounded border border-gray-300 cursor-pointer"
-            onChange={(e) => setCommand(e.target.value as CommandName)}
-          >
-            {commands.map((command) => (
-              <option key={command} value={command}>
-                {command}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-col divide-gray-300 divide-y">
+          <div className="py-4">
+            <label>Command</label>
+            <select
+              className="block w-full px-2 py-1 rounded border border-gray-300 cursor-pointer"
+              onChange={(e) => setCommand(e.target.value as CommandName)}
+            >
+              {commands.map((command) => (
+                <option key={command} value={command}>
+                  {command}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {renderForm()}
         </div>
       </Modal>

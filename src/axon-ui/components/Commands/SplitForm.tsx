@@ -15,17 +15,19 @@ export function SplitForm({ stake }: { stake?: bigint }) {
 
   return (
     <CommandForm makeCommand={makeCommand}>
-      <div>
-        <label>Amount</label>
-        <input
-          type="number"
-          placeholder="Amount"
-          className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          min={0}
-          max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
-        />
+      <div className="flex flex-col py-4 gap-2">
+        <div>
+          <label>Amount</label>
+          <input
+            type="number"
+            placeholder="Amount"
+            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            min={0}
+            max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
+          />
+        </div>
       </div>
     </CommandForm>
   );

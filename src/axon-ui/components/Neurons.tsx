@@ -2,11 +2,10 @@ import { Principal } from "@dfinity/principal";
 import { DateTime } from "luxon";
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
-import { GovernanceError, Neuron } from "../declarations/Axon/Axon.did";
+import { Neuron } from "../declarations/Axon/Axon.did";
 import { subaccountToAccount } from "../lib/account";
 import { useNeuronIds } from "../lib/hooks/useNeuronIds";
 import { useNeurons } from "../lib/hooks/useNeurons";
-import { governanceErrorToString } from "../lib/utils";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
@@ -142,23 +141,23 @@ export default function Neurons() {
       </div>
       {neuronIds.length > 0 ? (
         <ul className="divide-y divide-gray-500">
-          {neuronIds.map((n, i) => {
+          {neuronIds.map((neuronId) => {
             let display = null;
-            if (neurons[i]) {
-              if ("id" in neurons[i]) {
-                display = <NeuronDisplay neuron={neurons[i] as Neuron} />;
-              } else {
-                display = governanceErrorToString(
-                  neurons[i] as GovernanceError
-                );
-              }
+            const neuron = neurons?.full_neurons.find(
+              (fn) => fn.id[0].id === neuronId
+            );
+            if (neuron) {
+              display = <NeuronDisplay neuron={neuron} />;
             }
 
             return (
-              <li key={n.toString()}>
+              <li key={neuronId.toString()}>
                 <div className="flex items-center gap-2">
-                  <IdentifierLabelWithButtons type="Neuron" id={n}>
-                    <strong>{n.toString()}</strong>
+                  <IdentifierLabelWithButtons
+                    type="Neuron"
+                    id={neuronId.toString()}
+                  >
+                    <strong>{neuronId.toString()}</strong>
                   </IdentifierLabelWithButtons>
                   {isFetchingNeurons && (
                     <CgSpinner className="block animate-spin" />

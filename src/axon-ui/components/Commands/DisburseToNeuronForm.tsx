@@ -44,60 +44,65 @@ export function DisburseToNeuronForm({ stake }: { stake?: bigint }) {
 
   return (
     <CommandForm makeCommand={makeCommand}>
-      <div>
-        <label>Amount</label>
-        <input
-          type="number"
-          placeholder="Amount"
-          className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          min={NEURON_MIN_STAKE}
-          max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
-          required
-        />
-      </div>
-
-      <div>
-        <label>Dissolve Delay</label>
-        <DissolveDelayInput value={dissolveDelay} onChange={setDissolveDelay} />
-      </div>
-
-      <div>
-        <label>New Controller</label>
-        <input
-          type="text"
-          placeholder="New Controller"
-          className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-          value={controller}
-          onChange={(e) => setController(e.target.value)}
-          maxLength={64}
-        />
-      </div>
-
-      <div>
-        <label>Nonce</label>
-        <input
-          type="text"
-          placeholder="Nonce"
-          className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-          value={nonce}
-          onChange={(e) => setNonce(e.target.value)}
-          maxLength={64}
-          required
-        />
-      </div>
-
-      <div>
-        <label>
+      <div className="flex flex-col py-4 gap-2">
+        <div>
+          <label>Amount</label>
           <input
-            type="checkbox"
-            className="mr-1"
-            checked={kyc}
-            onChange={(e) => setKyc(e.target.checked)}
+            type="number"
+            placeholder="Amount"
+            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            min={NEURON_MIN_STAKE}
+            max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
+            required
           />
-          KYCed
-        </label>
+        </div>
+
+        <div>
+          <label>Dissolve Delay</label>
+          <DissolveDelayInput
+            value={dissolveDelay}
+            onChange={setDissolveDelay}
+          />
+        </div>
+
+        <div>
+          <label>New Controller</label>
+          <input
+            type="text"
+            placeholder="New Controller"
+            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            value={controller}
+            onChange={(e) => setController(e.target.value)}
+            maxLength={64}
+          />
+        </div>
+
+        <div>
+          <label>Nonce</label>
+          <input
+            type="text"
+            placeholder="Nonce"
+            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            value={nonce}
+            onChange={(e) => setNonce(e.target.value)}
+            maxLength={64}
+            required
+          />
+        </div>
+
+        <div>
+          <label className="cursor-pointer">
+            <input
+              type="checkbox"
+              className="mr-1"
+              checked={kyc}
+              onChange={(e) => setKyc(e.target.checked)}
+            />
+            KYCed
+          </label>
+        </div>
       </div>
     </CommandForm>
   );

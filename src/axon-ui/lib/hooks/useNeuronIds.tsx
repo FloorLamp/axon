@@ -7,7 +7,7 @@ export const useNeuronIds = () => {
     "neuronIds",
     async () => {
       const ids = await axon.getNeuronIds();
-      return ids.map(String);
+      return ids;
     },
     {
       placeholderData: [],

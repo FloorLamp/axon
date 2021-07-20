@@ -4,41 +4,38 @@ import { FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { FOUR_HOUR_SEC } from "../lib/constants";
 
 export function ProposalOptionsForm({
-  timeStart,
-  setTimeStart,
-  durationSeconds,
-  setDurationSeconds,
+  onChangeOptions,
+}: {
+  onChangeOptions: (any) => void;
 }) {
   const [isVisible, setIsVisible] = useState(false);
+  const [timeStart, setTimeStart] = useState("");
+  const [durationSeconds, setDurationSeconds] = useState("");
+  const [execute, setExecute] = useState(true);
 
   // Clear state when closed
   useEffect(() => {
-    if (!isVisible) {
-      setTimeStart("");
-      setDurationSeconds("");
-    }
-  }, [isVisible]);
+    onChangeOptions({ timeStart, durationSeconds, execute });
+  }, [timeStart, durationSeconds, execute]);
 
   return (
-    <>
-      <div>
-        <label
-          className={classNames(
-            "leading-none inline-flex items-center cursor-pointer",
-            {
-              "text-gray-400": !isVisible,
-              "text-black": isVisible,
-            }
-          )}
-          onClick={() => setIsVisible(!isVisible)}
-        >
-          Proposal Settings
-          {isVisible ? <FiChevronDown /> : <FiChevronRight />}
-        </label>
-      </div>
+    <div className="py-4">
+      <label
+        className={classNames(
+          "group leading-none inline-flex items-center cursor-pointer"
+        )}
+        onClick={() => setIsVisible(!isVisible)}
+      >
+        Proposal Settings
+        {isVisible ? (
+          <FiChevronDown />
+        ) : (
+          <FiChevronRight className="transform group-hover:translate-x-0.5 transition-transform transition-100" />
+        )}
+      </label>
 
       {isVisible && (
-        <div className="border-t border-gray-300 flex flex-col gap-2 pt-2">
+        <div className="flex flex-col gap-2 pt-2">
           <div>
             <label>Time Start</label>
             <input
@@ -62,8 +59,20 @@ export function ProposalOptionsForm({
               min={FOUR_HOUR_SEC}
             />
           </div>
+
+          <div>
+            <label className="cursor-pointer">
+              <input
+                type="checkbox"
+                className="mr-1"
+                checked={execute}
+                onChange={(e) => setExecute(e.target.checked)}
+              />
+              Execute immediately
+            </label>
+          </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

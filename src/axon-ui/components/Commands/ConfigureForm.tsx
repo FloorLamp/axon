@@ -68,59 +68,61 @@ export function ConfigureForm() {
 
   return (
     <CommandForm makeCommand={makeCommand}>
-      <div>
-        <label>Operation</label>
-        <select
-          className="block w-full px-2 py-1 rounded border border-gray-300 cursor-pointer"
-          onChange={(e) => setOperation(e.target.value as OperationName)}
-        >
-          {operations.map((operation) => (
-            <option key={operation} value={operation}>
-              {operation}
-            </option>
-          ))}
-        </select>
+      <div className="flex flex-col py-4 gap-2">
+        <div>
+          <label>Operation</label>
+          <select
+            className="block w-full px-2 py-1 rounded border border-gray-300 cursor-pointer"
+            onChange={(e) => setOperation(e.target.value as OperationName)}
+          >
+            {operations.map((operation) => (
+              <option key={operation} value={operation}>
+                {operation}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {(operation === "Add Hot Key" || operation === "Remove Hot Key") && (
+          <div>
+            <label>Hot Key</label>
+            <input
+              type="text"
+              placeholder="Hot Key"
+              className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+              value={hotKey}
+              onChange={(e) => setHotKey(e.target.value)}
+              maxLength={64}
+            />
+          </div>
+        )}
+
+        {operation === "Increase Dissolve Delay" && (
+          <div>
+            <label>Additional Dissolve Delay</label>
+            <DissolveDelayInput
+              value={dissolveDelay}
+              onChange={setDissolveDelay}
+            />
+          </div>
+        )}
+
+        {operation === "Set Dissolve Timestamp" && (
+          <div>
+            <label>Dissolve Timestamp</label>
+            <input
+              type="text"
+              placeholder="Dissolve Timestamp"
+              className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+              value={timestamp}
+              onChange={(e) => setTimestamp(e.target.value)}
+              maxLength={20}
+            />
+          </div>
+        )}
+
+        {!!error && <ErrorAlert>{error}</ErrorAlert>}
       </div>
-
-      {(operation === "Add Hot Key" || operation === "Remove Hot Key") && (
-        <div>
-          <label>Hot Key</label>
-          <input
-            type="text"
-            placeholder="Hot Key"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-            value={hotKey}
-            onChange={(e) => setHotKey(e.target.value)}
-            maxLength={64}
-          />
-        </div>
-      )}
-
-      {operation === "Increase Dissolve Delay" && (
-        <div>
-          <label>Additional Dissolve Delay</label>
-          <DissolveDelayInput
-            value={dissolveDelay}
-            onChange={setDissolveDelay}
-          />
-        </div>
-      )}
-
-      {operation === "Set Dissolve Timestamp" && (
-        <div>
-          <label>Dissolve Timestamp</label>
-          <input
-            type="text"
-            placeholder="Dissolve Timestamp"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-            value={timestamp}
-            onChange={(e) => setTimestamp(e.target.value)}
-            maxLength={20}
-          />
-        </div>
-      )}
-
-      {!!error && <ErrorAlert>{error}</ErrorAlert>}
     </CommandForm>
   );
 }
