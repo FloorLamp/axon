@@ -1,48 +1,57 @@
 import { Principal } from "@dfinity/principal";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Command, Spawn } from "../../declarations/Axon/Axon.did";
-import CommandForm from "./CommandForm";
+import useDebounce from "../../lib/hooks/useDebounce";
+import ErrorAlert from "../Labels/ErrorAlert";
 
-export function SpawnForm() {
+export function SpawnForm({
+  makeCommand,
+}: {
+  makeCommand: (cmd: Command | null) => void;
+}) {
   const [controller, setController] = useState("");
   const [error, setError] = useState("");
+  const debouncedController = useDebounce(controller);
 
-  const makeCommand = (): Command | null => {
+  useEffect(() => {
     setError("");
     let new_controller = [];
     if (controller) {
       try {
         new_controller = [Principal.fromText(controller)];
       } catch (err) {
-        setError("Invalid principal: " + err.message);
-        return null;
+        setError("Invalid principal");
+        return makeCommand(null);
       }
     }
 
-    return {
+    makeCommand({
       Spawn: {
         new_controller,
       } as Spawn,
-    };
-  };
+    });
+  }, [debouncedController]);
 
   return (
-    <CommandForm makeCommand={makeCommand}>
-      <div className="flex flex-col py-4 gap-2">
-        <div>
-          <label>New Controller</label>
+    <div className="flex flex-col py-4 gap-2">
+      <div>
+        <label className="block">
+          <div className="flex justify-between">
+            <span>New Controller</span>
+            <span className="text-gray-400">Optional</span>
+          </div>
           <input
             type="text"
             placeholder="New Controller"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            className="w-full mt-1"
             value={controller}
             onChange={(e) => setController(e.target.value)}
             maxLength={64}
           />
-        </div>
-
-        {error && <p>{error}</p>}
+        </label>
       </div>
-    </CommandForm>
+
+      {!!error && <ErrorAlert>{error}</ErrorAlert>}
+    </div>
   );
 }

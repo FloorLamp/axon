@@ -1,24 +1,7 @@
 import React, { useState } from "react";
-import { ConfigureForm } from "./Commands/ConfigureForm";
-import { DisburseForm } from "./Commands/DisburseForm";
-import { DisburseToNeuronForm } from "./Commands/DisburseToNeuronForm";
-import { SpawnForm } from "./Commands/SpawnForm";
-import { SplitForm } from "./Commands/SplitForm";
+import NeuronCommandForm from "./Commands/CommandForm";
 import Modal from "./Modal";
 import { useGlobalContext } from "./Store";
-
-const commands = [
-  "Spawn",
-  "Split",
-  "Follow",
-  "Configure",
-  "Register Vote",
-  "Disburse To Neuron",
-  "Make Proposal",
-  "Disburse",
-] as const;
-
-type CommandName = typeof commands[number];
 
 export default function ManageNeuronModal() {
   const {
@@ -27,25 +10,6 @@ export default function ManageNeuronModal() {
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
-
-  const [command, setCommand] = useState<CommandName>(commands[0]);
-
-  const renderForm = () => {
-    switch (command) {
-      case "Configure":
-        return <ConfigureForm />;
-      case "Spawn":
-        return <SpawnForm />;
-      case "Split":
-        return <SplitForm />;
-      case "Disburse":
-        return <DisburseForm />;
-      case "Disburse To Neuron":
-        return <DisburseToNeuronForm />;
-      default:
-        return "TODO";
-    }
-  };
 
   if (!isAuthed) {
     return null;
@@ -57,7 +21,7 @@ export default function ManageNeuronModal() {
         <button
           type="button"
           onClick={openModal}
-          className="text-xs px-2 py-1 bg-gray-200 rounded hover:shadow-md transition-shadow transition-300"
+          className="text-xs px-2 py-1 btn-secondary"
         >
           Manage
         </button>
@@ -68,23 +32,7 @@ export default function ManageNeuronModal() {
         closeModal={closeModal}
         title="Manage Neurons"
       >
-        <div className="flex flex-col divide-gray-300 divide-y">
-          <div className="py-4">
-            <label>Command</label>
-            <select
-              className="block w-full px-2 py-1 rounded border border-gray-300 cursor-pointer"
-              onChange={(e) => setCommand(e.target.value as CommandName)}
-            >
-              {commands.map((command) => (
-                <option key={command} value={command}>
-                  {command}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {renderForm()}
-        </div>
+        <NeuronCommandForm />
       </Modal>
     </>
   );

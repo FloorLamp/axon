@@ -11,7 +11,7 @@ export default function DissolveDelayInput({
     <input
       type="number"
       placeholder="Dissolve Delay"
-      className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+      className="w-full mt-1"
       value={value}
       onChange={(e) => onChange(e.target.value)}
       min={0}

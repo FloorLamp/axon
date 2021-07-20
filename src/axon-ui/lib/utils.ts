@@ -82,7 +82,7 @@ export const neuronCommandToString = ({
     }
     case "Split": {
       const amount = (command[key] as Split).amount_e8s;
-      return `Spawn ${formatE8s(amount)} ICP`;
+      return `Split ${formatE8s(amount)} ICP`;
     }
     case "Disburse": {
       const {

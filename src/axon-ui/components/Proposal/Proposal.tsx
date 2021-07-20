@@ -52,7 +52,7 @@ export const Proposal = ({
         <>
           <Disclosure.Button
             as="div"
-            className="group flex items-center cursor-pointer p-2 hover:bg-gray-100 transition-colors transition-100"
+            className="group flex items-center cursor-pointer p-2 hover:bg-gray-100 transition-colors duration-75"
           >
             <div className="w-28">Proposal {proposal.id.toString()}</div>
             <div className="pl-2 flex-1">

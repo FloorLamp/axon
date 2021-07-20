@@ -23,7 +23,7 @@ export function ProposalOptionsForm({
     <Disclosure as="div" className="py-4">
       {({ open }) => (
         <>
-          <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer">
+          <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer px-2 py-1">
             Proposal Settings
             <FiChevronRight
               className={classNames(
@@ -42,7 +42,7 @@ export function ProposalOptionsForm({
               <input
                 type="number"
                 placeholder="Time Start"
-                className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+                className="w-full mt-1"
                 value={timeStart}
                 onChange={(e) => setTimeStart(e.target.value)}
                 min={0}
@@ -54,7 +54,7 @@ export function ProposalOptionsForm({
               <input
                 type="number"
                 placeholder="Duration (seconds)"
-                className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+                className="w-full mt-1"
                 value={durationSeconds}
                 onChange={(e) => setDurationSeconds(e.target.value)}
                 min={FOUR_HOUR_SEC}
@@ -62,7 +62,7 @@ export function ProposalOptionsForm({
             </div>
 
             <div>
-              <label className="cursor-pointer">
+              <label className="inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
                   className="mr-1"

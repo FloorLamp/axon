@@ -3,3 +3,30 @@
 @tailwind utilities;
 
 @import url("https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap");
+
+textarea,
+input[type="text"],
+input[type="number"],
+input[type="button"],
+input[type="radio"],
+button,
+select {
+  @apply border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none rounded-md;
+}
+
+input[type="checkbox"] {
+  @apply border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none rounded-sm;
+}
+
+.btn-cta {
+  @apply bg-indigo-600 text-white hover:bg-indigo-500 transition-colors;
+}
+.btn-cta-disabled {
+  @apply bg-indigo-300 text-white;
+}
+.btn-secondary {
+  @apply bg-indigo-200 hover:bg-indigo-100 transition-colors text-indigo-800;
+}
+.btn-secondary-disabled {
+  @apply bg-indigo-100 text-indigo-500;
+}

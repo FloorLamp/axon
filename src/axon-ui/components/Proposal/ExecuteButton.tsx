@@ -11,6 +11,8 @@ export default function ExecuteButton({ proposalId }: { proposalId: bigint }) {
         <SpinnerButton
           className="bg-indigo-200 w-20"
           isLoading={isLoading}
+          activeClassName="btn-cta"
+          disabledClassName="btn-cta-disabled"
           onClick={() => mutate({ proposalId })}
         >
           Execute

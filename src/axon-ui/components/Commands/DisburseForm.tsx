@@ -1,35 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Command, Disburse } from "../../declarations/Axon/Axon.did";
 import { isAccount } from "../../lib/account";
-import CommandForm from "./CommandForm";
+import useDebounce from "../../lib/hooks/useDebounce";
+import ErrorAlert from "../Labels/ErrorAlert";
 
-export function DisburseForm({ stake }: { stake?: bigint }) {
+export function DisburseForm({
+  makeCommand,
+  stake,
+}: {
+  makeCommand: (cmd: Command | null) => void;
+  stake?: bigint;
+}) {
   const [account, setAccount] = useState("");
   const [amount, setAmount] = useState("");
+  const [error, setError] = useState("");
 
-  const makeCommand = (): Command | null => {
+  const debouncedAccount = useDebounce(account);
+  const debouncedAmount = useDebounce(amount);
+
+  useEffect(() => {
+    console.log("debounced");
+
     let to_account = [];
-    if (isAccount(account)) {
-      to_account = [{ hash: Array.from(Buffer.from(account, "hex")) }];
+    setError("");
+    if (account) {
+      if (isAccount(account)) {
+        to_account = [{ hash: Array.from(Buffer.from(account, "hex")) }];
+      } else {
+        setError("Invalid account");
+        return makeCommand(null);
+      }
     }
+    console.log("after");
 
-    return {
+    makeCommand({
       Disburse: {
         to_account,
         amount: amount ? [{ e8s: BigInt(amount) * BigInt(1e8) }] : [],
       } as Disburse,
-    };
-  };
+    });
+  }, [debouncedAccount, debouncedAmount]);
 
   return (
-    <CommandForm makeCommand={makeCommand}>
+    <>
       <div className="flex flex-col py-4 gap-2">
         <div>
           <label>Account</label>
           <input
             type="text"
             placeholder="Account"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            className="w-full mt-1"
             value={account}
             onChange={(e) => setAccount(e.target.value)}
             maxLength={64}
@@ -41,7 +61,7 @@ export function DisburseForm({ stake }: { stake?: bigint }) {
           <input
             type="number"
             placeholder="Amount"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+            className="w-full mt-1"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             min={0}
@@ -49,6 +69,8 @@ export function DisburseForm({ stake }: { stake?: bigint }) {
           />
         </div>
       </div>
-    </CommandForm>
+
+      {!!error && <ErrorAlert>{error}</ErrorAlert>}
+    </>
   );
 }

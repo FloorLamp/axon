@@ -27,7 +27,7 @@ export default function NeuronSelectionForm({
     <Disclosure as="div" className="py-4">
       {({ open }) => (
         <>
-          <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer">
+          <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer px-2 py-1">
             Neurons (
             {neuronIds.length ? `${neuronIds.length} selected` : "All Selected"}
             )

@@ -9,6 +9,7 @@ import { useNeurons } from "../lib/hooks/useNeurons";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
+import ErrorAlert from "./Labels/ErrorAlert";
 import { TimestampLabel } from "./Labels/TimestampLabel";
 import ManageNeuronModal from "./ManageNeuronModal";
 import { useGlobalContext } from "./Store";
@@ -172,10 +173,10 @@ export default function Neurons() {
         "None"
       )}
       {(errorNeuronIds || errorNeurons) && (
-        <p className="px-2 py-1 rounded border border-red-500 bg-red-200 text-red-500 text-sm">
+        <ErrorAlert>
           {errorNeuronIds}
           {errorNeurons}
-        </p>
+        </ErrorAlert>
       )}
       {isAuthed && <SyncForm />}
     </section>

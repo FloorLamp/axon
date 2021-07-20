@@ -1,9 +1,9 @@
 import { Principal } from "@dfinity/principal";
 import React, { useEffect, useState } from "react";
 import { Command, Operation } from "../../declarations/Axon/Axon.did";
+import useDebounce from "../../lib/hooks/useDebounce";
 import DissolveDelayInput from "../Inputs/DissolveDelayInput";
 import ErrorAlert from "../Labels/ErrorAlert";
-import CommandForm from "./CommandForm";
 
 const operations = [
   "Add Hot Key",
@@ -16,26 +16,38 @@ const operations = [
 
 type OperationName = typeof operations[number];
 
-export function ConfigureForm() {
+export function ConfigureForm({
+  makeCommand,
+}: {
+  makeCommand: (cmd: Command | null) => void;
+}) {
   const [operation, setOperation] = useState<OperationName>(operations[0]);
 
   const [hotKey, setHotKey] = useState("");
   const [dissolveDelay, setDissolveDelay] = useState("");
   const [timestamp, setTimestamp] = useState("");
+  const [error, setError] = useState("");
+
+  const debouncedHotKey = useDebounce(hotKey);
+  const debouncedDissolveDelay = useDebounce(dissolveDelay);
+  const debouncedTimestamp = useDebounce(timestamp);
+
   useEffect(() => {
     setError("");
   }, [operation]);
-  const [error, setError] = useState("");
 
-  const makeCommand = (): Command | null => {
+  useEffect(() => {
+    setError("");
+
     let op: Operation;
     if (operation === "Add Hot Key" || operation === "Remove Hot Key") {
+      if (!hotKey) return makeCommand(null);
       let new_hot_key;
       try {
         new_hot_key = [Principal.fromText(hotKey)];
       } catch (err) {
         setError("Invalid principal");
-        return null;
+        return makeCommand(null);
       }
       op = {
         [operation === "Add Hot Key" ? "AddHotKey" : "RemoveHotKey"]: {
@@ -43,6 +55,9 @@ export function ConfigureForm() {
         },
       } as Operation;
     } else if (operation === "Increase Dissolve Delay") {
+      if (!dissolveDelay) {
+        return makeCommand(null);
+      }
       op = {
         IncreaseDissolveDelay: {
           additional_dissolve_delay_seconds: Number(dissolveDelay),
@@ -57,6 +72,9 @@ export function ConfigureForm() {
         StopDissolving: null,
       };
     } else if (operation === "Set Dissolve Timestamp") {
+      if (!timestamp) {
+        return makeCommand(null);
+      }
       op = {
         SetDissolveTimestamp: {
           dissolve_timestamp_seconds: BigInt(timestamp),
@@ -64,18 +82,18 @@ export function ConfigureForm() {
       };
     }
 
-    return {
+    makeCommand({
       Configure: { operation: [op] },
-    };
-  };
+    });
+  }, [operation, debouncedHotKey, debouncedDissolveDelay, debouncedTimestamp]);
 
   return (
-    <CommandForm makeCommand={makeCommand}>
+    <>
       <div className="flex flex-col py-4 gap-2">
         <div>
           <label>Operation</label>
           <select
-            className="block w-full px-2 py-1 rounded border border-gray-300 cursor-pointer"
+            className="w-full mt-1"
             onChange={(e) => setOperation(e.target.value as OperationName)}
           >
             {operations.map((operation) => (
@@ -92,7 +110,7 @@ export function ConfigureForm() {
             <input
               type="text"
               placeholder="Hot Key"
-              className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+              className="w-full mt-1"
               value={hotKey}
               onChange={(e) => setHotKey(e.target.value)}
               maxLength={64}
@@ -106,6 +124,7 @@ export function ConfigureForm() {
             <DissolveDelayInput
               value={dissolveDelay}
               onChange={setDissolveDelay}
+              required
             />
           </div>
         )}
@@ -114,18 +133,19 @@ export function ConfigureForm() {
           <div>
             <label>Dissolve Timestamp</label>
             <input
-              type="text"
+              type="number"
               placeholder="Dissolve Timestamp"
-              className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
+              className="w-full mt-1"
               value={timestamp}
               onChange={(e) => setTimestamp(e.target.value)}
               maxLength={20}
+              required
             />
           </div>
         )}
 
         {!!error && <ErrorAlert>{error}</ErrorAlert>}
       </div>
-    </CommandForm>
+    </>
   );
 }

@@ -1,34 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Command } from "../../declarations/Axon/Axon.did";
-import CommandForm from "./CommandForm";
 
-export function SplitForm({ stake }: { stake?: bigint }) {
+export function SplitForm({
+  makeCommand,
+  stake,
+}: {
+  makeCommand: (cmd: Command | null) => void;
+  stake?: bigint;
+}) {
   const [amount, setAmount] = useState("");
 
-  const makeCommand = (): Command | null => {
-    return {
+  useEffect(() => {
+    if (!amount) return makeCommand(null);
+
+    makeCommand({
       Split: {
         amount_e8s: BigInt(amount) * BigInt(1e8),
       },
-    };
-  };
+    });
+  }, [amount]);
 
   return (
-    <CommandForm makeCommand={makeCommand}>
-      <div className="flex flex-col py-4 gap-2">
-        <div>
-          <label>Amount</label>
-          <input
-            type="number"
-            placeholder="Amount"
-            className="w-full px-2 py-1 bg-gray-200 dark:bg-gray-700 text-sm"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            min={0}
-            max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
-          />
-        </div>
+    <div className="flex flex-col py-4 gap-2">
+      <div>
+        <label>Amount</label>
+        <input
+          type="number"
+          placeholder="Amount"
+          className="w-full mt-1"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          min={0}
+          max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
+          required
+        />
       </div>
-    </CommandForm>
+    </div>
   );
 }

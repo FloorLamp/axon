@@ -16,7 +16,7 @@ export default function NavButtons({
         <li
           key={value}
           className={classNames(
-            "px-4 py-1 rounded cursor-pointer hover:bg-indigo-200 transition-colors transition-300",
+            "px-4 py-1 rounded cursor-pointer hover:bg-indigo-200 transition-colors",
             {
               "bg-indigo-200 text-indigo-500": value === selected,
             }

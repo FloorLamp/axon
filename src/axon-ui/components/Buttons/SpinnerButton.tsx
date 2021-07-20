@@ -4,27 +4,36 @@ import { CgSpinner } from "react-icons/cg";
 
 const SpinnerButton = ({
   isLoading,
+  isDisabled,
   className,
+  activeClassName = "btn-secondary",
+  disabledClassName = "btn-secondary-disabled",
   onClick,
   children,
 }: {
   isLoading?: boolean;
+  isDisabled?: boolean;
   className?: string;
+  activeClassName?: string;
+  disabledClassName?: string;
   onClick?: MouseEventHandler;
   children: ReactNode;
 }) => {
+  const disabled = isDisabled || isLoading;
   return (
     <button
       onClick={onClick}
       className={classNames(
-        "p-2 bg-gray-200 rounded transition-shadow transition-300 leading-none inline-flex items-center justify-center",
+        "p-2 rounded-md leading-none inline-flex items-center justify-center",
         {
-          "cursor-pointer hover:shadow-md": !isLoading,
-          "cursor-not-allowed": isLoading,
+          [activeClassName]: !isDisabled,
+          [disabledClassName]: isDisabled,
+          "cursor-pointer": !disabled,
+          "cursor-not-allowed": disabled,
         },
         className
       )}
-      disabled={isLoading}
+      disabled={disabled}
     >
       {isLoading ? (
         <CgSpinner className="inline-block animate-spin" />
