@@ -146,8 +146,13 @@ export const neuronCommandToString = ({
   }
 };
 
-export const formatE8s = (number: bigint, digits?: number) =>
-  formatNumber(number / BigInt(1e8), digits);
+export const formatE8s = (number: any, digits?: number) => {
+  let n = number;
+  if (typeof number !== "number") {
+    n = Number(n);
+  }
+  return formatNumber(n / 1e8, digits);
+};
 
 export const formatNumber = (number: any, digits?: number) => {
   let n = number;

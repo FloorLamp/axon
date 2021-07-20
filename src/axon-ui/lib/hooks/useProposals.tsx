@@ -1,5 +1,6 @@
 import { useQuery } from "react-query";
 import { useAxon } from "../../components/Store";
+import { FIVE_MINUTES_MS } from "../constants";
 import { errorToString } from "../utils";
 
 export const useActiveProposals = () => {
@@ -8,6 +9,8 @@ export const useActiveProposals = () => {
     "activeProposals",
     async () => {
       const result = await axon.getActiveProposals();
+      console.log("activeProposals", result);
+
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -16,6 +19,7 @@ export const useActiveProposals = () => {
     },
     {
       placeholderData: [],
+      refetchInterval: FIVE_MINUTES_MS,
     }
   );
 };
@@ -34,6 +38,7 @@ export const useAllProposals = () => {
     },
     {
       placeholderData: [],
+      refetchInterval: FIVE_MINUTES_MS,
     }
   );
 };

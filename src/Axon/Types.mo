@@ -23,6 +23,7 @@ module {
 
   public type ManageAxon = {
     action: {
+      #SetPolicy: {needed: Nat};
       #AddOperator: {principal: Principal; needed: Nat};
       #RemoveOperator: {principal: Principal; needed: Nat};
       #UpdateVisibility: Visibility;

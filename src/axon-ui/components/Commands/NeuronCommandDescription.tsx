@@ -100,11 +100,13 @@ function CommandDescription({ command }: { command: Command }) {
           </div>
           <div className="flex">
             <span className="w-20">Amount</span>
-            {amt ? (
-              <BalanceLabel value={amt.e8s} />
-            ) : (
-              <span className="text-gray-500">Not specified</span>
-            )}
+            <div>
+              {amt ? (
+                <BalanceLabel value={amt.e8s} />
+              ) : (
+                <span className="text-gray-500">Not specified</span>
+              )}
+            </div>
           </div>
         </div>
       );
@@ -133,7 +135,7 @@ function CommandDescription({ command }: { command: Command }) {
           <div className="flex">
             <span className="w-28">Amount</span>
             <div>
-              <BalanceLabel value={amount_e8s} />
+              <BalanceLabel value={amount_e8s} digits={8} />
             </div>
           </div>
           <div className="flex">

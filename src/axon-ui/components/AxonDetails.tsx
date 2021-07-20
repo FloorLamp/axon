@@ -44,8 +44,9 @@ export default function AxonDetails() {
           </div>
           {data && data.policy[0] ? (
             <span>
-              <strong>{data.policy[0].needed}</strong> out of{" "}
-              <strong>{data.policy[0].total}</strong> operators need to approve
+              <strong>{data.policy[0].needed.toString()}</strong> out of{" "}
+              <strong>{data.policy[0].total.toString()}</strong> operators need
+              to approve
             </span>
           ) : (
             <span>

@@ -36,6 +36,12 @@ shared actor class Axon(init: T.Initialization) {
     };
 
     switch(request.action) {
+      case (#SetPolicy({ needed })) {
+        if (needed > operators.size() or needed == 0) {
+          return #err(#InvalidAction);
+        };
+        policy := ?{ needed = needed; total = operators.size() };
+      };
       case (#AddOperator({ principal; needed })) {
         if (not isOperator(principal)) {
           if (needed > operators.size() + 1 or needed == 0) {

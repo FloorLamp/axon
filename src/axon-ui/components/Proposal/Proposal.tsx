@@ -28,7 +28,7 @@ export const Proposal = ({
 
   const ballots = proposal.ballots.filter(({ vote }) => !!vote[0]);
   const hasVoted = ballots.find(
-    (ballot) => ballot.principal.toHex() === principal.toHex()
+    (ballot) => principal && ballot.principal.toHex() === principal.toHex()
   );
 
   const status = Object.keys(proposal.status)[0] as StatusKey;
@@ -52,13 +52,15 @@ export const Proposal = ({
         <>
           <Disclosure.Button
             as="div"
-            className="group flex items-center cursor-pointer p-2 hover:bg-gray-100 transition-colors duration-75"
+            className="group flex items-center cursor-pointer p-2 bg-gray-100 hover:bg-gray-200 transition-colors duration-75"
           >
-            <div className="w-28">Proposal {proposal.id.toString()}</div>
-            <div className="pl-2 flex-1">
+            <div className="hidden sm:block w-28">
+              Proposal {proposal.id.toString()}
+            </div>
+            <div className="sm:pl-2 flex-1">
               {neuronCommandToString(proposal.proposal)}
             </div>
-            <div className="flex-1">
+            <div className="pl-2 flex-1">
               {status}
               {status !== "Active" && ` ${actionTime.toRelative()}`}
             </div>
@@ -134,6 +136,22 @@ export const Proposal = ({
                 <div className="w-32 font-bold">Action</div>
                 <div>
                   <NeuronCommandDescription neuronCommand={proposal.proposal} />
+                </div>
+              </div>
+              <div className="flex flex-col md:flex-row leading-tight">
+                <div className="w-32 font-bold">Policy</div>
+                <div>
+                  {proposal && proposal.policy[0] ? (
+                    <span>
+                      <strong>{proposal.policy[0].needed.toString()}</strong>{" "}
+                      out of{" "}
+                      <strong>{proposal.policy[0].total.toString()}</strong>
+                    </span>
+                  ) : (
+                    <span>
+                      <strong>No policy set</strong>
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col md:flex-row leading-tight">

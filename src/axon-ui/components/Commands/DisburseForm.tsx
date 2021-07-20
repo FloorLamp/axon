@@ -19,8 +19,6 @@ export function DisburseForm({
   const debouncedAmount = useDebounce(amount);
 
   useEffect(() => {
-    console.log("debounced");
-
     let to_account = [];
     setError("");
     if (account) {
@@ -31,12 +29,20 @@ export function DisburseForm({
         return makeCommand(null);
       }
     }
-    console.log("after");
+
+    let maybeAmount = [];
+    if (amount) {
+      try {
+        maybeAmount = [{ e8s: BigInt(Number(amount) * 1e8) }];
+      } catch (err) {
+        setError("Invalid amount");
+      }
+    }
 
     makeCommand({
       Disburse: {
         to_account,
-        amount: amount ? [{ e8s: BigInt(amount) * BigInt(1e8) }] : [],
+        amount: maybeAmount,
       } as Disburse,
     });
   }, [debouncedAccount, debouncedAmount]);
@@ -59,7 +65,7 @@ export function DisburseForm({
         <div>
           <label>Amount</label>
           <input
-            type="number"
+            type="text"
             placeholder="Amount"
             className="w-full mt-1"
             value={amount}
