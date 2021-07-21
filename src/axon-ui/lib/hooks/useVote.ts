@@ -29,7 +29,10 @@ export default function useVote() {
     },
     {
       onSuccess: (data) => {
-        queryClient.refetchQueries(["activeProposals"]);
+        console.log("vote", data);
+        setTimeout(() => {
+          queryClient.refetchQueries(["activeProposals", "allProposals"]);
+        }, 2000);
       },
     }
   );

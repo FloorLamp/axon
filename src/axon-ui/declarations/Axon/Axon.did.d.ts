@@ -13,8 +13,8 @@ export interface AddOrRemoveNodeProvider { 'change' : [] | [Change] }
 export interface Amount { 'e8s' : bigint }
 export interface ApproveGenesisKyc { 'principals' : Array<Principal> }
 export interface Axon {
-  'cleanup' : () => Promise<Result>,
-  'execute' : (arg_0: bigint) => Promise<Result_2>,
+  'cleanup' : () => Promise<Result_2>,
+  'execute' : (arg_0: bigint) => Promise<Result_3>,
   'getActiveProposals' : () => Promise<NeuronCommandProposalResult>,
   'getAllProposals' : (arg_0: [] | [bigint]) => Promise<
       NeuronCommandProposalResult
@@ -22,8 +22,8 @@ export interface Axon {
   'getNeuronIds' : () => Promise<Array<bigint>>,
   'info' : () => Promise<Info>,
   'listNeurons' : () => Promise<ListNeuronsResult>,
-  'manage' : (arg_0: ManageAxon) => Promise<Result>,
-  'proposeCommand' : (arg_0: NewProposal) => Promise<Result>,
+  'manage' : (arg_0: ManageAxon) => Promise<Result_2>,
+  'proposeCommand' : (arg_0: NewProposal) => Promise<Result_2>,
   'sync' : () => Promise<SyncResult>,
   'vote' : (arg_0: VoteRequest) => Promise<Result>,
 }
@@ -209,11 +209,13 @@ export interface Proposal {
 }
 export interface RegisterVote { 'vote' : number, 'proposal' : [] | [NeuronId] }
 export interface RemoveHotKey { 'hot_key_to_remove' : [] | [Principal] }
-export type Result = { 'ok' : null } |
+export type Result = { 'ok' : [] | [NeuronCommandProposal] } |
   { 'err' : Error };
 export type Result_1 = { 'ok' : ManageNeuronResponse } |
   { 'err' : Error };
-export type Result_2 = { 'ok' : NeuronCommandProposal } |
+export type Result_2 = { 'ok' : null } |
+  { 'err' : Error };
+export type Result_3 = { 'ok' : NeuronCommandProposal } |
   { 'err' : Error };
 export type RewardMode = { 'RewardToNeuron' : RewardToNeuron } |
   { 'RewardToAccount' : RewardToAccount };

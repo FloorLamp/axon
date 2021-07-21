@@ -31,7 +31,7 @@ export const idlFactory = ({ IDL }) => {
     'Unauthorized' : IDL.Null,
     'GovernanceError' : GovernanceError,
   });
-  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const Result_2 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const NeuronId = IDL.Record({ 'id' : IDL.Nat64 });
   const SpawnResponse = IDL.Record({ 'created_neuron_id' : IDL.Opt(NeuronId) });
   const MakeProposalResponse = IDL.Record({
@@ -197,7 +197,7 @@ export const idlFactory = ({ IDL }) => {
     'timeEnd' : IDL.Int,
     'policy' : IDL.Opt(Policy),
   });
-  const Result_2 = IDL.Variant({ 'ok' : NeuronCommandProposal, 'err' : Error });
+  const Result_3 = IDL.Variant({ 'ok' : NeuronCommandProposal, 'err' : Error });
   const NeuronCommandProposalResult = IDL.Variant({
     'ok' : IDL.Vec(NeuronCommandProposal),
     'err' : Error,
@@ -284,9 +284,13 @@ export const idlFactory = ({ IDL }) => {
     'vote' : Vote,
     'execute' : IDL.Bool,
   });
+  const Result = IDL.Variant({
+    'ok' : IDL.Opt(NeuronCommandProposal),
+    'err' : Error,
+  });
   const Axon = IDL.Service({
-    'cleanup' : IDL.Func([], [Result], []),
-    'execute' : IDL.Func([IDL.Nat], [Result_2], []),
+    'cleanup' : IDL.Func([], [Result_2], []),
+    'execute' : IDL.Func([IDL.Nat], [Result_3], []),
     'getActiveProposals' : IDL.Func(
         [],
         [NeuronCommandProposalResult],
@@ -300,8 +304,8 @@ export const idlFactory = ({ IDL }) => {
     'getNeuronIds' : IDL.Func([], [IDL.Vec(IDL.Nat64)], ['query']),
     'info' : IDL.Func([], [Info], ['query']),
     'listNeurons' : IDL.Func([], [ListNeuronsResult], []),
-    'manage' : IDL.Func([ManageAxon], [Result], []),
-    'proposeCommand' : IDL.Func([NewProposal], [Result], []),
+    'manage' : IDL.Func([ManageAxon], [Result_2], []),
+    'proposeCommand' : IDL.Func([NewProposal], [Result_2], []),
     'sync' : IDL.Func([], [SyncResult], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),
   });

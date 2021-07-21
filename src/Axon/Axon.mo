@@ -13,7 +13,7 @@ import Arr "./Array";
 import GT "./GovernanceTypes";
 import T "./Types";
 
-shared actor class Axon(init: T.Initialization) {
+shared actor class Axon(init: T.Initialization) = this {
   let Governance = actor "rrkah-fqaaa-aaaaa-aaaaq-cai" : GT.Service;
   stable var visibility = init.visibility;
   stable var operators: [Principal] = [init.owner];
@@ -186,13 +186,14 @@ shared actor class Axon(init: T.Initialization) {
   };
 
   // Vote on an active proposal
-  public shared({ caller }) func vote(request: T.VoteRequest) : async T.Result<()> {
+  public shared({ caller }) func vote(request: T.VoteRequest) : async T.Result<?T.NeuronCommandProposal> {
     if (not isOperator(caller)) {
       return #err(#Unauthorized)
     };
 
     let now = Time.now();
-    var result: T.Result<()> = #err(#NotFound);
+    var result: T.Result<?T.NeuronCommandProposal> = #err(#NotFound);
+    var proposal: ?T.NeuronCommandProposal = null;
     activeProposals := Array.map<T.NeuronCommandProposal, T.NeuronCommandProposal>(activeProposals, func(p) {
       if (p.id != request.id) {
         return p;
@@ -204,7 +205,7 @@ shared actor class Axon(init: T.Initialization) {
             result := #err(#AlreadyVoted);
             return b
           } else {
-            result := #ok();
+            result := #ok(null);
             return {
               principal = caller;
               vote = ?request.vote;
@@ -214,7 +215,7 @@ shared actor class Axon(init: T.Initialization) {
           return b;
         }
       });
-      {
+      proposal := ?{
         id = p.id;
         ballots = ballots;
         timeStart = p.timeStart;
@@ -223,13 +224,31 @@ shared actor class Axon(init: T.Initialization) {
         proposal = p.proposal;
         status = Option.get(statusFromPolicy(p.policy, ballots), p.status);
         policy = p.policy;
-      }
+      };
+      Option.unwrap(proposal)
     });
 
-    // Execute if ok
-    if (Result.isOk(result) and request.execute) {
-      ignore await execute(request.id);
+    if (Result.isOk(result)) {
+      let proposal_ = Option.unwrap(proposal);
+      switch (proposal_.status) {
+        // Execute if accepted
+        case (#Accepted(_)) {
+          if (request.execute) {
+            let execution = await execute(request.id);
+            return Result.mapOk<T.NeuronCommandProposal, ?T.NeuronCommandProposal, T.Error>(execution, func(r) { ?r })
+          }
+        };
+        // Remove from active list if rejected
+        case (#Rejected(_)) {
+          allProposals := Array.append(allProposals, [proposal_]);
+          activeProposals := Array.filter<T.NeuronCommandProposal>(activeProposals, func(p) {
+            p.id != proposal_.id
+          });
+        };
+        case _ {};
+      };
     };
+
     result
   };
 
@@ -336,7 +355,9 @@ shared actor class Axon(init: T.Initialization) {
     };
   };
 
+  // Returns true if the principal is in the operators array OR if it's this canister
   func isOperator(principal: Principal): Bool {
+    principal == Principal.fromActor(this) or
     Arr.contains<Principal>(operators, principal, Principal.equal)
   };
 

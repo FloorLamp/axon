@@ -49,10 +49,15 @@ type RewardMode =
    RewardToAccount: RewardToAccount;
    RewardToNeuron: RewardToNeuron;
  };
-type Result_2 = 
+type Result_3 = 
  variant {
    err: Error;
    ok: NeuronCommandProposal;
+ };
+type Result_2 = 
+ variant {
+   err: Error;
+   ok;
  };
 type Result_1 = 
  variant {
@@ -62,7 +67,7 @@ type Result_1 =
 type Result = 
  variant {
    err: Error;
-   ok;
+   ok: opt NeuronCommandProposal;
  };
 type RemoveHotKey = record {hot_key_to_remove: opt principal;};
 type RegisterVote = 
@@ -332,15 +337,15 @@ type Ballot =
  };
 type Axon = 
  service {
-   cleanup: () -> (Result);
-   execute: (nat) -> (Result_2);
+   cleanup: () -> (Result_2);
+   execute: (nat) -> (Result_3);
    getActiveProposals: () -> (NeuronCommandProposalResult) query;
    getAllProposals: (opt nat) -> (NeuronCommandProposalResult) query;
    getNeuronIds: () -> (vec nat64) query;
    info: () -> (Info) query;
    listNeurons: () -> (ListNeuronsResult);
-   manage: (ManageAxon) -> (Result);
-   proposeCommand: (NewProposal) -> (Result);
+   manage: (ManageAxon) -> (Result_2);
+   proposeCommand: (NewProposal) -> (Result_2);
    sync: () -> (SyncResult);
    vote: (VoteRequest) -> (Result);
  };

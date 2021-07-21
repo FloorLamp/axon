@@ -18,7 +18,9 @@ export default function useExecute() {
     {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.refetchQueries(["activeProposals", "allProposals"]);
+        setTimeout(() => {
+          queryClient.refetchQueries(["activeProposals", "allProposals"]);
+        }, 2000);
       },
     }
   );
