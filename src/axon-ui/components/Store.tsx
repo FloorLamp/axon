@@ -2,6 +2,7 @@ import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import React, { createContext, useContext, useReducer } from "react";
 import { canisterId, createActor } from "../declarations/Axon";
+import { defaultAgent } from "../lib/canisters";
 import { AxonService } from "../lib/types";
 
 type Action =
@@ -40,7 +41,6 @@ type State = {
   principal: Principal | null;
 };
 
-const defaultAgent = new HttpAgent({ host: "https://ic0.app" });
 const initialState: State = {
   agent: defaultAgent,
   axon: createActor(canisterId, defaultAgent),

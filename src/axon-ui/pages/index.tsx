@@ -4,6 +4,7 @@ import { FaGithub } from "react-icons/fa";
 import AxonDetails from "../components/AxonDetails";
 import Nav from "../components/Nav";
 import Neurons from "../components/Neurons";
+import NnsProposals from "../components/NnsProposals";
 import Proposals from "../components/Proposals";
 
 export default function Home() {
@@ -24,6 +25,8 @@ export default function Home() {
           <Neurons />
 
           <Proposals />
+
+          <NnsProposals />
         </main>
 
         <footer className="py-8 flex justify-center">

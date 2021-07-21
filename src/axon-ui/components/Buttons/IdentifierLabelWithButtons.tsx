@@ -9,10 +9,15 @@ export default function IdentifierLabelWithButtons({
   id,
 }: {
   children: ReactNode;
-  type: "Principal" | "Account" | "Neuron";
-  id: Principal | string;
+  type: "Principal" | "Account" | "Neuron" | "Proposal";
+  id: Principal | string | bigint;
 }) {
-  const str = id instanceof Principal ? id.toText() : id;
+  const str =
+    id instanceof Principal
+      ? id.toText()
+      : typeof id === "bigint"
+      ? id.toString()
+      : id;
   let link;
   switch (type) {
     case "Principal":
@@ -23,6 +28,9 @@ export default function IdentifierLabelWithButtons({
       break;
     case "Neuron":
       link = `https://ic.rocks/neuron/${str}`;
+      break;
+    case "Proposal":
+      link = `https://ic.rocks/proposal/${str}`;
       break;
   }
   return (

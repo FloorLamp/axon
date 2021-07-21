@@ -14,7 +14,8 @@ import {
   Split,
 } from "../../declarations/Axon/Axon.did";
 import { accountIdentifierToString } from "../../lib/account";
-import { CommandKey, OperationKey, Topic } from "../../lib/types";
+import { Topic } from "../../lib/governance";
+import { CommandKey, OperationKey } from "../../lib/types";
 import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";

@@ -1,5 +1,6 @@
 import { Principal } from "@dfinity/principal";
 import { Error, GovernanceError } from "../declarations/Axon/Axon.did";
+import { ErrorType } from "./governance";
 
 export const pluralize = (str: string, n: number) =>
   n === 1 ? str : str + "s";
@@ -18,28 +19,8 @@ export const stringify = (data) =>
     2
   );
 
-enum GovernanceErrorType {
-  "Unspecified" = 0,
-  "Ok" = 1,
-  "Unavailable" = 2,
-  "Not Authorized" = 3,
-  "Not Found" = 4,
-  "Invalid Command" = 5,
-  "Requires Locked" = 6,
-  "Requires Dissolving" = 7,
-  "Requires Dissolved" = 8,
-  "Hot Key" = 9,
-  "Resource Exhausted" = 10,
-  "Precondition Failed" = 11,
-  "External" = 12,
-  "Ledger Update Ongoing" = 13,
-  "Insufficient Funds" = 14,
-  "Invalid Principal" = 15,
-  "Invalid Proposal" = 16,
-}
-
 export const governanceErrorToString = (error: GovernanceError) =>
-  GovernanceErrorType[error.error_type] +
+  ErrorType[error.error_type] +
   (error.error_message ? ` (${error.error_message})` : "");
 
 export const errorToString = (error: Error) => {
