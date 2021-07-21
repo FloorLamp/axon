@@ -10,7 +10,7 @@ export default function Nav() {
   } = useGlobalContext();
 
   return (
-    <nav className="py-4 flex items-center justify-between border-b border-black border-opacity-10">
+    <nav className="py-4 flex flex-col sm:flex-row items-center justify-between border-b border-black border-opacity-10">
       <img src="/img/axon-full-logo.svg" className="h-14" />
       <div className="flex items-center gap-4">
         {principal && !principal.isAnonymous() && (

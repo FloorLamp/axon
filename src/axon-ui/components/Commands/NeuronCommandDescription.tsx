@@ -6,6 +6,7 @@ import {
   Configure,
   Disburse,
   DisburseToNeuron,
+  Follow,
   IncreaseDissolveDelay,
   NeuronCommand,
   SetDissolveTimestamp,
@@ -13,7 +14,7 @@ import {
   Split,
 } from "../../declarations/Axon/Axon.did";
 import { accountIdentifierToString } from "../../lib/account";
-import { CommandKey, OperationKey } from "../../lib/types";
+import { CommandKey, OperationKey, Topic } from "../../lib/types";
 import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
@@ -44,6 +45,37 @@ function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
 function CommandDescription({ command }: { command: Command }) {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
+    case "Follow": {
+      const { followees, topic } = command[key] as Follow;
+      return (
+        <div>
+          <strong>Set Following</strong>
+          <div className="flex">
+            <span className="w-20">Topic</span>
+            <span>{Topic[topic]}</span>
+          </div>
+          <div className="flex">
+            <span className="w-20">Neurons</span>
+            <div>
+              {followees.length > 0
+                ? followees.map(({ id }) => {
+                    const nid = id.toString();
+                    return (
+                      <IdentifierLabelWithButtons
+                        key={nid}
+                        id={nid}
+                        type="Neuron"
+                      >
+                        {nid}
+                      </IdentifierLabelWithButtons>
+                    );
+                  })
+                : "None"}
+            </div>
+          </div>
+        </div>
+      );
+    }
     case "Spawn": {
       const controller = (command[key] as Spawn).new_controller[0];
       return (
@@ -56,7 +88,7 @@ function CommandDescription({ command }: { command: Command }) {
                 {controller.toText()}
               </IdentifierLabelWithButtons>
             ) : (
-              <span className="text-gray-500">Not specified</span>
+              <span>Not specified</span>
             )}
           </div>
         </span>
@@ -95,7 +127,7 @@ function CommandDescription({ command }: { command: Command }) {
                 {accountId}
               </IdentifierLabelWithButtons>
             ) : (
-              <span className="text-gray-500">Not specified</span>
+              <span>Not specified</span>
             )}
           </div>
           <div className="flex">
@@ -104,7 +136,7 @@ function CommandDescription({ command }: { command: Command }) {
               {amt ? (
                 <BalanceLabel value={amt.e8s} />
               ) : (
-                <span className="text-gray-500">Not specified</span>
+                <span>Not specified</span>
               )}
             </div>
           </div>
@@ -129,7 +161,7 @@ function CommandDescription({ command }: { command: Command }) {
                 {controller.toText()}
               </IdentifierLabelWithButtons>
             ) : (
-              <span className="text-gray-500">Not specified</span>
+              <span>Not specified</span>
             )}
           </div>
           <div className="flex">

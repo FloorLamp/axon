@@ -85,7 +85,10 @@ export function DisburseToNeuronForm({
         </div>
 
         <div>
-          <label>New Controller</label>
+          <div className="flex justify-between">
+            <span>New Controller</span>
+            <span className="text-gray-400">Optional</span>
+          </div>
           <input
             type="text"
             placeholder="New Controller"

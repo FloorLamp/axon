@@ -114,7 +114,8 @@ export interface MakeProposalResponse { 'proposal_id' : [] | [NeuronId] }
 export interface ManageAxon {
   'action' : { 'UpdateVisibility' : Visibility } |
     { 'AddOperator' : { 'principal' : Principal, 'needed' : bigint } } |
-    { 'RemoveOperator' : { 'principal' : Principal, 'needed' : bigint } },
+    { 'RemoveOperator' : { 'principal' : Principal, 'needed' : bigint } } |
+    { 'SetPolicy' : { 'needed' : bigint } },
 }
 export interface ManageNeuron {
   'id' : [] | [NeuronId],

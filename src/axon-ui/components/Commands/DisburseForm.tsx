@@ -36,6 +36,7 @@ export function DisburseForm({
         maybeAmount = [{ e8s: BigInt(Number(amount) * 1e8) }];
       } catch (err) {
         setError("Invalid amount");
+        return makeCommand(null);
       }
     }
 
@@ -51,7 +52,10 @@ export function DisburseForm({
     <>
       <div className="flex flex-col py-4 gap-2">
         <div>
-          <label>Account</label>
+          <div className="flex justify-between">
+            <span>Account</span>
+            <span className="text-gray-400">Optional</span>
+          </div>
           <input
             type="text"
             placeholder="Account"
@@ -63,7 +67,10 @@ export function DisburseForm({
         </div>
 
         <div>
-          <label>Amount</label>
+          <div className="flex justify-between">
+            <span>Amount</span>
+            <span className="text-gray-400">Optional</span>
+          </div>
           <input
             type="text"
             placeholder="Amount"

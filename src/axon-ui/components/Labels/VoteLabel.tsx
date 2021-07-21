@@ -9,8 +9,8 @@ export default function VoteLabel({ vote }: { vote: Vote }) {
       className={classNames(
         "w-20 text-center py-0.5 rounded text-xs uppercase",
         {
-          "bg-green-300": isYes,
-          "bg-red-300": !isYes,
+          "bg-green-300 text-green-700": isYes,
+          "bg-red-300 text-red-700": !isYes,
         }
       )}
     >

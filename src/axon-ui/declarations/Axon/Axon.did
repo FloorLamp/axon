@@ -197,6 +197,7 @@ type ManageAxon = record {
                           needed: nat;
                           "principal": principal;
                         };
+                       SetPolicy: record {needed: nat;};
                        UpdateVisibility: Visibility;
                      };};
 type MakeProposalResponse = record {proposal_id: opt NeuronId;};

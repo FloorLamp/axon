@@ -4,8 +4,8 @@ import { DateTime } from "luxon";
 import React from "react";
 import { FiChevronRight } from "react-icons/fi";
 import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
+import { neuronCommandToString } from "../../lib/neuronCommandToString";
 import { StatusKey } from "../../lib/types";
-import { neuronCommandToString } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import NeuronCommandDescription from "../Commands/NeuronCommandDescription";
 import { TimestampLabel } from "../Labels/TimestampLabel";
@@ -163,7 +163,7 @@ export const Proposal = ({
               {"Executed" in proposal.status && (
                 <div className="flex flex-col md:flex-row leading-tight">
                   <div className="w-32 font-bold">Results</div>
-                  <div>
+                  <div className="flex-1">
                     <Results results={proposal.status.Executed} />
                   </div>
                 </div>

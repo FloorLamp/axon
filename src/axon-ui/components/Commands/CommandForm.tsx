@@ -7,6 +7,7 @@ import { ProposalOptionsForm } from "../ProposalOptionsForm";
 import { ConfigureForm } from "./ConfigureForm";
 import { DisburseForm } from "./DisburseForm";
 import { DisburseToNeuronForm } from "./DisburseToNeuronForm";
+import FollowForm from "./FollowForm";
 import NeuronSelectionForm from "./NeuronSelectionForm";
 import { SpawnForm } from "./SpawnForm";
 import { SplitForm } from "./SplitForm";
@@ -36,6 +37,8 @@ export default function NeuronCommandForm() {
 
   const renderForm = () => {
     switch (commandName) {
+      case "Follow":
+        return <FollowForm makeCommand={setCommand} />;
       case "Configure":
         return <ConfigureForm makeCommand={setCommand} />;
       case "Spawn":

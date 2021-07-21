@@ -269,6 +269,7 @@ export const idlFactory = ({ IDL }) => {
         'principal' : IDL.Principal,
         'needed' : IDL.Nat,
       }),
+      'SetPolicy' : IDL.Record({ 'needed' : IDL.Nat }),
     }),
   });
   const NewProposal = IDL.Record({
