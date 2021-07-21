@@ -1,6 +1,9 @@
 import { Principal } from "@dfinity/principal";
 import { Error, GovernanceError } from "../declarations/Axon/Axon.did";
 
+export const pluralize = (str: string, n: number) =>
+  n === 1 ? str : str + "s";
+
 export const stringify = (data) =>
   JSON.stringify(
     data,

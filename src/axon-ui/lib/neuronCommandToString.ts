@@ -23,7 +23,7 @@ export const neuronCommandToString = ({
   switch (key) {
     case "Follow": {
       const { followees, topic } = command[key] as Follow;
-      return `Set following for Topic ${topic}`;
+      return `Set Following for Topic ${topic}`;
     }
     case "Spawn": {
       const controller = (command[key] as Spawn).new_controller[0];

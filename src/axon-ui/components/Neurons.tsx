@@ -6,6 +6,7 @@ import { Neuron } from "../declarations/Axon/Axon.did";
 import { subaccountToAccount } from "../lib/account";
 import { useNeuronIds } from "../lib/hooks/useNeuronIds";
 import { useNeurons } from "../lib/hooks/useNeurons";
+import { Topic } from "../lib/types";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "./Labels/BalanceLabel";
 import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
@@ -55,12 +56,12 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
         </div>
       </div>
       <div className="flex flex-col md:flex-row leading-tight">
-        <div className="w-32 font-bold">Followees</div>
+        <div className="w-32 font-bold">Following</div>
         <div>
           <ul>
             {neuron.followees.map(([topic, followee]) => (
               <li key={topic} className="divide-x divide-gray-400">
-                <label className="pr-2">{topic}</label>
+                <label className="pr-2">{Topic[topic]}</label>
                 <span className="pl-2">
                   {followee.followees.map((f) => f.id).join(", ")}
                 </span>

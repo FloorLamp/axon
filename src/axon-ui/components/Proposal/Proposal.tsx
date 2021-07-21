@@ -6,14 +6,11 @@ import { FiChevronRight } from "react-icons/fi";
 import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
 import { neuronCommandToString } from "../../lib/neuronCommandToString";
 import { StatusKey } from "../../lib/types";
-import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import NeuronCommandDescription from "../Commands/NeuronCommandDescription";
+import StatusLabel from "../Labels/StatusLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import { useGlobalContext } from "../Store";
-import AcceptRejectButtons from "./AcceptRejectButtons";
-import Ballots from "./Ballots";
-import ExecuteButton from "./ExecuteButton";
-import Results from "./Results";
+import Steps from "./Steps";
 
 export const Proposal = ({
   proposal,
@@ -54,15 +51,17 @@ export const Proposal = ({
             as="div"
             className="group flex items-center cursor-pointer p-2 bg-gray-100 hover:bg-gray-200 transition-colors duration-75"
           >
-            <div className="hidden sm:block w-28">
-              Proposal {proposal.id.toString()}
+            <div className="hidden sm:block w-10 text-gray-500">
+              #{proposal.id.toString()}
             </div>
-            <div className="sm:pl-2 flex-1">
-              {neuronCommandToString(proposal.proposal)}
-            </div>
-            <div className="pl-2 flex-1">
-              {status}
-              {status !== "Active" && ` ${actionTime.toRelative()}`}
+            <div className="flex-1 flex flex-col xs:flex-row">
+              <div className="sm:pl-2 flex-1">
+                {neuronCommandToString(proposal.proposal)}
+              </div>
+              <div className="xs:pl-2 flex-1 flex flex-row items-center gap-2">
+                <StatusLabel status={status} />
+                {status !== "Active" && actionTime.toRelative()}
+              </div>
             </div>
             <div>
               <FiChevronRight
@@ -84,35 +83,19 @@ export const Proposal = ({
             leaveFrom="transform translate-y-0 opacity-100"
             leaveTo="transform -translate-y-1 opacity-0"
           >
-            <Disclosure.Panel className="flex flex-col gap-2 pt-2 pb-4">
-              <div className="flex flex-col md:flex-row leading-tight">
+            <Disclosure.Panel className="flex flex-col divide-y divide-gray-200 pb-4">
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Proposal ID</div>
                 <div>{proposal.id.toString()}</div>
               </div>
-              <div className="flex flex-col md:flex-row leading-tight">
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Status</div>
-                <div>
-                  {status}
-                  {!!actionTime && (
-                    <>
-                      {" "}
-                      <TimestampLabel dt={actionTime} />
-                    </>
-                  )}
+                <div className="flex items-center gap-1">
+                  <StatusLabel status={status} />
+                  {!!actionTime && <TimestampLabel dt={actionTime} />}
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row leading-tight">
-                <div className="w-32 font-bold">Creator</div>
-                <div>
-                  <IdentifierLabelWithButtons
-                    type="Principal"
-                    id={proposal.creator}
-                  >
-                    {proposal.creator.toText()}
-                  </IdentifierLabelWithButtons>
-                </div>
-              </div>
-              <div className="flex flex-col md:flex-row leading-tight">
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Started</div>
                 <div>
                   <TimestampLabel
@@ -122,7 +105,7 @@ export const Proposal = ({
                   />
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row leading-tight">
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">End</div>
                 <div>
                   <TimestampLabel
@@ -132,19 +115,19 @@ export const Proposal = ({
                   />
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row leading-tight">
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Action</div>
                 <div>
                   <NeuronCommandDescription neuronCommand={proposal.proposal} />
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row leading-tight">
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Policy</div>
                 <div>
-                  {proposal && proposal.policy[0] ? (
+                  {proposal.policy[0] ? (
                     <span>
-                      <strong>{proposal.policy[0].needed.toString()}</strong>{" "}
-                      out of{" "}
+                      <strong>{proposal.policy[0].needed.toString()}</strong>
+                      {" out of "}
                       <strong>{proposal.policy[0].total.toString()}</strong>
                     </span>
                   ) : (
@@ -154,40 +137,12 @@ export const Proposal = ({
                   )}
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row leading-tight">
-                <div className="w-32 font-bold">Votes</div>
-                <div>
-                  <Ballots ballots={ballots} />
+              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
+                <div className="w-32 font-bold">Progress</div>
+                <div className="flex-1">
+                  <Steps proposal={proposal} />
                 </div>
               </div>
-              {"Executed" in proposal.status && (
-                <div className="flex flex-col md:flex-row leading-tight">
-                  <div className="w-32 font-bold">Results</div>
-                  <div className="flex-1">
-                    <Results results={proposal.status.Executed} />
-                  </div>
-                </div>
-              )}
-              {isAuthed && (
-                <>
-                  {!hasVoted && (
-                    <div className="flex flex-col md:flex-row leading-tight py-4">
-                      <div className="w-32" />
-                      <div>
-                        <AcceptRejectButtons proposalId={proposal.id} />
-                      </div>
-                    </div>
-                  )}
-                  {"Accepted" in proposal.status && (
-                    <div className="flex flex-col md:flex-row leading-tight py-4">
-                      <div className="w-32" />
-                      <div>
-                        <ExecuteButton proposalId={proposal.id} />
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
             </Disclosure.Panel>
           </Transition>
         </>

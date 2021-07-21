@@ -14,15 +14,13 @@ const ErrorDisplay = ({
 }) => {
   return (
     <ErrorAlert>
-      <div className="p-1">
-        <div className="flex items-center">
-          <FaTimesCircle className="w-4 text-red-500" />
-          <div className="pl-1 font-bold">{neuronId}</div>
-        </div>
-        <div className="flex pt-0.5">
-          <div className="w-5" />
-          <div className="flex-1">{children}</div>
-        </div>
+      <div className="flex items-center">
+        <FaTimesCircle className="w-4 text-red-500" />
+        <div className="pl-1 font-bold">{neuronId}</div>
+      </div>
+      <div className="flex pt-0.5">
+        <div className="w-5" />
+        <div className="flex-1">{children}</div>
       </div>
     </ErrorAlert>
   );
@@ -50,45 +48,35 @@ const Result = ({
 
   return (
     <SuccessAlert>
-      <div className="p-1">
-        <div className="flex items-center">
-          <FaCheckCircle className="w-4 text-green-500" />
-          <div className="pl-1 font-bold">{neuronId}</div>
-        </div>
-        {message && (
-          <div className="flex pt-0.5">
-            <div className="w-5" />
-            <div className="flex-1">{message}</div>
-          </div>
-        )}
+      <div className="flex items-center">
+        <FaCheckCircle className="w-4 text-green-500" />
+        <div className="pl-1 font-bold">{neuronId}</div>
       </div>
+      {message && (
+        <div className="flex pt-0.5">
+          <div className="w-5" />
+          <div className="flex-1">{message}</div>
+        </div>
+      )}
     </SuccessAlert>
   );
 };
 
 export default function Results({ results }: { results: Execute }) {
   return (
-    <div className="flex flex-col gap-2">
-      <ul className="flex gap-2">
-        {results.responses.map(([neuronId, res]) => {
-          const id = neuronId.toString();
-          let display;
-          if ("err" in res) {
-            display = (
-              <ErrorDisplay neuronId={id}>
-                {errorToString(res.err)}
-              </ErrorDisplay>
-            );
-          } else {
-            display = <Result neuronId={id} result={res.ok.command[0]} />;
-          }
-          return (
-            <li key={id} className="flex flex-col gap-1">
-              {display}
-            </li>
+    <ul className="pt-2 flex flex-col gap-2">
+      {results.responses.map(([neuronId, res]) => {
+        const id = neuronId.toString();
+        let display;
+        if ("err" in res) {
+          display = (
+            <ErrorDisplay neuronId={id}>{errorToString(res.err)}</ErrorDisplay>
           );
-        })}
-      </ul>
-    </div>
+        } else {
+          display = <Result neuronId={id} result={res.ok.command[0]} />;
+        }
+        return <li key={id}>{display}</li>;
+      })}
+    </ul>
   );
 }

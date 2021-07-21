@@ -16,14 +16,16 @@ export default function AcceptRejectButtons({
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
         <SpinnerButton
-          className="bg-green-400 w-20"
+          className="w-20"
+          activeClassName="text-white bg-green-500 hover:bg-green-400 transition-colors"
           isLoading={isLoading}
           onClick={() => doVote(true)}
         >
           Accept
         </SpinnerButton>
         <SpinnerButton
-          className="bg-red-400 w-20"
+          className="w-20"
+          activeClassName="text-white bg-red-500 hover:bg-red-400 transition-colors"
           isLoading={isLoading}
           onClick={() => doVote(false)}
         >
