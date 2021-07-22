@@ -92,17 +92,15 @@ export default function NeuronCommandForm() {
         <ProposalOptionsForm onChangeOptions={onChangeOptions} />
 
         <div className="flex flex-col gap-2 py-4">
-          <div className="flex gap-2">
-            <SpinnerButton
-              className="w-20"
-              activeClassName="btn-cta"
-              disabledClassName="btn-cta-disabled"
-              isLoading={isLoading}
-              isDisabled={!command}
-            >
-              Submit
-            </SpinnerButton>
-          </div>
+          <SpinnerButton
+            className="w-20"
+            activeClassName="btn-cta"
+            disabledClassName="btn-cta-disabled"
+            isLoading={isLoading}
+            isDisabled={!command}
+          >
+            Submit
+          </SpinnerButton>
 
           {isError && (
             <ErrorAlert>

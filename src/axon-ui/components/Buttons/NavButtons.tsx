@@ -11,14 +11,15 @@ export default function NavButtons({
   onChange: (string) => void;
 }) {
   return (
-    <ul className="flex gap-2">
+    <ul className="flex gap-1 border-b border-gray-300 text-sm">
       {values.map((value) => (
         <li
           key={value}
           className={classNames(
-            "px-4 py-1 rounded cursor-pointer hover:bg-indigo-200 transition-colors",
+            "px-3 py-1 cursor-pointer hover:border-indigo-500 hover:border-b-2 transition-all duration-75",
             {
-              "bg-indigo-200 text-indigo-500": value === selected,
+              "border-b-2 border-indigo-500 text-indigo-500":
+                value === selected,
             }
           )}
           onClick={() => onChange(value)}

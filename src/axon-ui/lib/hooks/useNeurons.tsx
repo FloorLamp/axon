@@ -4,13 +4,21 @@ import { errorToString } from "../utils";
 
 export const useNeurons = () => {
   const axon = useAxon();
-  return useQuery("neurons", async () => {
-    const neurons = await axon.listNeurons();
+  return useQuery(
+    "neurons",
+    async () => {
+      const neurons = await axon.listNeurons();
 
-    if ("ok" in neurons) {
-      return neurons.ok;
-    } else {
-      throw errorToString(neurons.err);
+      if ("ok" in neurons) {
+        console.log("neurons", neurons.ok);
+
+        return neurons.ok;
+      } else {
+        throw errorToString(neurons.err);
+      }
+    },
+    {
+      keepPreviousData: true,
     }
-  });
+  );
 };

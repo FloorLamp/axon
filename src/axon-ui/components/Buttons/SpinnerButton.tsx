@@ -26,8 +26,8 @@ const SpinnerButton = ({
       className={classNames(
         "p-2 rounded-md leading-none inline-flex items-center justify-center",
         {
-          [activeClassName]: !isDisabled,
-          [disabledClassName]: isDisabled,
+          [activeClassName]: !disabled,
+          [disabledClassName]: disabled,
           "cursor-pointer": !disabled,
           "cursor-not-allowed": disabled,
         },

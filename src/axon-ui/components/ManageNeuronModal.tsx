@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NeuronCommandForm from "./Commands/CommandForm";
+import ActionsMenu from "./Axon/ActionsMenu";
 import Modal from "./Modal";
 import { useGlobalContext } from "./Store";
 
@@ -32,7 +32,7 @@ export default function ManageNeuronModal() {
         closeModal={closeModal}
         title="Manage Neurons"
       >
-        <NeuronCommandForm />
+        <ActionsMenu />
       </Modal>
     </>
   );

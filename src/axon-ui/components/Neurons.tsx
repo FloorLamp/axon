@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
 import { Neuron } from "../declarations/Axon/Axon.did";
+import { canisterId as governanceCanisterId } from "../declarations/Governance";
 import { subaccountToAccount } from "../lib/account";
 import { Topic } from "../lib/governance";
 import { useNeuronIds } from "../lib/hooks/useNeuronIds";
@@ -13,15 +14,12 @@ import { DissolveStateLabel } from "./Labels/DissolveStateLabel";
 import ErrorAlert from "./Labels/ErrorAlert";
 import { TimestampLabel } from "./Labels/TimestampLabel";
 import ManageNeuronModal from "./ManageNeuronModal";
-import { useGlobalContext } from "./Store";
-import SyncForm from "./SyncForm";
 
-const governanceCanister = Principal.fromText("rrkah-fqaaa-aaaaa-aaaaq-cai");
+const governanceCanister = Principal.fromText(governanceCanisterId);
 
 function NeuronDisplay({ neuron }: { neuron: Neuron }) {
   const controller = neuron.controller[0];
   const account = subaccountToAccount(governanceCanister, neuron.account);
-  console.log(neuron);
 
   return (
     <div className="flex flex-col gap-1">
@@ -116,10 +114,6 @@ function NeuronDisplay({ neuron }: { neuron: Neuron }) {
 
 export default function Neurons() {
   const {
-    state: { isAuthed },
-  } = useGlobalContext();
-
-  const {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
     error: errorNeuronIds,
@@ -142,7 +136,7 @@ export default function Neurons() {
         <ManageNeuronModal />
       </div>
       {neuronIds.length > 0 ? (
-        <ul className="divide-y divide-gray-500">
+        <ul className="divide-y divide-gray-300">
           {neuronIds.map((neuronId) => {
             let display = null;
             const neuron = neurons?.full_neurons.find(
@@ -153,7 +147,7 @@ export default function Neurons() {
             }
 
             return (
-              <li key={neuronId.toString()}>
+              <li key={neuronId.toString()} className="py-2">
                 <div className="flex items-center gap-2">
                   <IdentifierLabelWithButtons
                     type="Neuron"
@@ -179,7 +173,6 @@ export default function Neurons() {
           {errorNeurons}
         </ErrorAlert>
       )}
-      {isAuthed && <SyncForm />}
     </section>
   );
 }

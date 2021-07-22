@@ -49,7 +49,7 @@ export default function Modal({
             leaveTo="opacity-0 scale-95"
           >
             <div className="inline-block w-full max-w-sm p-4 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-100 dark:bg-gray-800 shadow-xl rounded-2xl">
-              <div className="flex justify-between pb-4 border-b border-gray-300">
+              <div className="flex justify-between pb-2">
                 <Dialog.Title as="h3" className="text-lg leading-tight">
                   {title}
                 </Dialog.Title>

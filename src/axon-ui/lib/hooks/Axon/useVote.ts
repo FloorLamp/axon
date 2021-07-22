@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
-import { useAxon } from "../../components/Store";
-import { errorToString } from "../utils";
+import { useAxon } from "../../../components/Store";
+import { errorToString } from "../../utils";
 
 export default function useVote() {
   const axon = useAxon();
@@ -30,9 +30,8 @@ export default function useVote() {
     {
       onSuccess: (data) => {
         console.log("vote", data);
-        setTimeout(() => {
-          queryClient.refetchQueries(["activeProposals", "allProposals"]);
-        }, 2000);
+        queryClient.refetchQueries(["activeProposals"]);
+        queryClient.refetchQueries(["allProposals"]);
       },
     }
   );

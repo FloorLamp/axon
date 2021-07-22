@@ -16,9 +16,10 @@ export default function useSync() {
       }
     },
     {
-      onSuccess: (data) => {
+      onSuccess: async (data) => {
         console.log(data);
-        queryClient.refetchQueries(["neuronIds", "neurons"]);
+        queryClient.refetchQueries(["neuronIds"]);
+        queryClient.refetchQueries(["neurons"]);
       },
     }
   );

@@ -18,6 +18,7 @@ export const useActiveProposals = () => {
       }
     },
     {
+      keepPreviousData: true,
       placeholderData: [],
       refetchInterval: FIVE_MINUTES_MS,
     }
@@ -37,6 +38,7 @@ export const useAllProposals = () => {
       }
     },
     {
+      keepPreviousData: true,
       placeholderData: [],
       refetchInterval: FIVE_MINUTES_MS,
     }

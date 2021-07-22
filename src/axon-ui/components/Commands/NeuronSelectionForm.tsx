@@ -42,12 +42,12 @@ export default function NeuronSelectionForm({
             />
           </Disclosure.Button>
 
-          <Disclosure.Panel as="ul" className="flex flex-col gap-2 py-2">
+          <Disclosure.Panel as="ul" className="flex flex-col gap-1 py-2">
             {data.map((nid) => {
               const id = nid.toString();
               return (
                 <li key={id}>
-                  <label className="cursor-pointer">
+                  <label className="inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
                       className="mr-2"

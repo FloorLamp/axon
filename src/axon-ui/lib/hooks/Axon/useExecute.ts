@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
-import { useAxon } from "../../components/Store";
-import { errorToString } from "../utils";
+import { useAxon } from "../../../components/Store";
+import { errorToString } from "../../utils";
 
 export default function useExecute() {
   const axon = useAxon();
@@ -18,9 +18,8 @@ export default function useExecute() {
     {
       onSuccess: (data) => {
         console.log(data);
-        setTimeout(() => {
-          queryClient.refetchQueries(["activeProposals", "allProposals"]);
-        }, 2000);
+        queryClient.refetchQueries(["activeProposals"]);
+        queryClient.refetchQueries(["allProposals"]);
       },
     }
   );

@@ -10,6 +10,7 @@ export const useNeuronIds = () => {
       return ids;
     },
     {
+      keepPreviousData: true,
       placeholderData: [],
     }
   );
