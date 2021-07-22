@@ -18,7 +18,7 @@ export default function CleanupForm() {
           <label>Cleanup Neurons</label>
           <p className="text-sm text-gray-500">Remove expired neurons.</p>
           <div className="pt-2">
-            <SpinnerButton className="w-20" isLoading={isLoading}>
+            <SpinnerButton className="w-20 p-2" isLoading={isLoading}>
               Cleanup
             </SpinnerButton>
           </div>

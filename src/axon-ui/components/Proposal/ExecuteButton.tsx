@@ -15,7 +15,7 @@ export default function ExecuteButton({
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
         <SpinnerButton
-          className="bg-indigo-200 w-20"
+          className="w-20 p-2"
           isLoading={isLoading}
           isDisabled={isDisabled}
           activeClassName="btn-cta"

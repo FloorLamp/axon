@@ -19,6 +19,7 @@ module.exports = {
       dropShadow: ["hover", "focus"],
       translate: ["group-hover"],
       borderWidth: ["hover", "focus"],
+      display: ["group-hover", "hover", "focus"],
     },
   },
   plugins: [require("@tailwindcss/forms")],

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import CreatableSelect from "react-select/creatable";
 import { Command } from "../../declarations/Axon/Axon.did";
 import { Topic } from "../../lib/governance";
+import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import useDebounce from "../../lib/hooks/useDebounce";
-import { useNeuronIds } from "../../lib/hooks/useNeuronIds";
 import { enumEntries } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
 

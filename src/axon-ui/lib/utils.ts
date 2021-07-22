@@ -68,3 +68,11 @@ export const shortPrincipal = (principal: string | Principal) => {
 
 export const enumEntries = (enum_: Object): [string, number][] =>
   Object.entries(enum_).filter(([name, id]) => typeof id === "number");
+
+export const principalIsEqual = (p1: Principal, p2: Principal) => {
+  const a1 = p1.toUint8Array();
+  const a2 = p2.toUint8Array();
+  return (
+    a1.length === a2.length && a1.every((value, index) => value === a2[index])
+  );
+};

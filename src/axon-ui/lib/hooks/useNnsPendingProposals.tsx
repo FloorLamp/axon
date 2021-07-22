@@ -61,6 +61,8 @@ export const useNnsPendingProposals = () => {
     async () => {
       const result = await governance.get_pending_proposals();
       result.reverse();
+      console.log("nnsPendingProposals", result);
+
       return result;
     },
     {

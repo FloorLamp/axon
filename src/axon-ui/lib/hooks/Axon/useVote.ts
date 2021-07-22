@@ -2,23 +2,16 @@ import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store";
 import { errorToString } from "../../utils";
 
-export default function useVote() {
+export default function useVote(proposalId: bigint) {
   const axon = useAxon();
   const queryClient = useQueryClient();
 
   return useMutation(
-    async ({
-      proposalId,
-      acceptReject,
-      execute,
-    }: {
-      proposalId: bigint;
-      acceptReject: boolean;
-      execute: boolean;
-    }) => {
+    ["vote", proposalId],
+    async ({ yesNo, execute }: { yesNo: boolean; execute: boolean }) => {
       const result = await axon.vote({
         id: proposalId,
-        vote: acceptReject ? { Yes: null } : { No: null },
+        vote: yesNo ? { Yes: null } : { No: null },
         execute,
       });
       if ("ok" in result) {

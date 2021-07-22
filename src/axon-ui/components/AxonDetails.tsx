@@ -1,7 +1,7 @@
 import React from "react";
 import { CgSpinner } from "react-icons/cg";
 import { canisterId } from "../declarations/Axon";
-import { useInfo } from "../lib/hooks/useInfo";
+import { useInfo } from "../lib/hooks/Axon/useInfo";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
 import ErrorAlert from "./Labels/ErrorAlert";
 

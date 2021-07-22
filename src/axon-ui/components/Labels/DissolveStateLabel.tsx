@@ -5,7 +5,7 @@ import { DissolveState } from "../../declarations/Axon/Axon.did";
 import { formatDuration } from "../../lib/datetime";
 
 export function DissolveStateLabel({ state }: { state: DissolveState }) {
-  let label, info;
+  let label: string, info: string;
   if ("DissolveDelaySeconds" in state) {
     if (state.DissolveDelaySeconds === BigInt(0)) {
       label = "Dissolved";
@@ -31,7 +31,7 @@ export function DissolveStateLabel({ state }: { state: DissolveState }) {
           "block w-20 text-center py-0.5 rounded text-xs uppercase",
           {
             "bg-green-300 text-green-700": label === "Locked",
-            "bg-yellow-200 text-yellow-600": label === "Dissolving",
+            "bg-yellow-200 text-yellow-700": label === "Dissolving",
             "bg-gray-300 text-gray-700": label === "Dissolved",
           }
         )}

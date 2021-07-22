@@ -2,7 +2,7 @@ import { Disclosure } from "@headlessui/react";
 import classNames from "classnames";
 import React from "react";
 import { FiChevronRight } from "react-icons/fi";
-import { useNeuronIds } from "../../lib/hooks/useNeuronIds";
+import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 
 export default function NeuronSelectionForm({
   neuronIds,

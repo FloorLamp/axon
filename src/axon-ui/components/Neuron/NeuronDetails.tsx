@@ -132,7 +132,7 @@ export default function NeuronDetails({
         <>
           <ListButton open={open} disabled={!neuron}>
             <div className="flex flex-col sm:flex-row">
-              <div className="w-64 flex gap-2 items-center">
+              <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 items-center">
                 <IdentifierLabelWithButtons type="Neuron" id={id}>
                   {id}
                 </IdentifierLabelWithButtons>

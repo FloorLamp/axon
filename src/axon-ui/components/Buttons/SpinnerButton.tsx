@@ -10,6 +10,7 @@ const SpinnerButton = ({
   disabledClassName = "btn-secondary-disabled",
   onClick,
   children,
+  title,
 }: {
   isLoading?: boolean;
   isDisabled?: boolean;
@@ -18,13 +19,14 @@ const SpinnerButton = ({
   disabledClassName?: string;
   onClick?: MouseEventHandler;
   children: ReactNode;
+  title?: string;
 }) => {
   const disabled = isDisabled || isLoading;
   return (
     <button
       onClick={onClick}
       className={classNames(
-        "p-2 rounded-md leading-none inline-flex items-center justify-center",
+        "rounded-md leading-none inline-flex items-center justify-center",
         {
           [activeClassName]: !disabled,
           [disabledClassName]: disabled,
@@ -34,6 +36,7 @@ const SpinnerButton = ({
         className
       )}
       disabled={disabled}
+      title={title}
     >
       {isLoading ? (
         <CgSpinner className="inline-block animate-spin" />

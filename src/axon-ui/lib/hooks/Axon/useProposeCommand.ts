@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "react-query";
-import { useAxon } from "../../components/Store";
-import { NeuronCommand } from "../../declarations/Axon/Axon.did";
-import { errorToString } from "../utils";
+import { useAxon } from "../../../components/Store";
+import { NeuronCommand } from "../../../declarations/Axon/Axon.did";
+import { errorToString } from "../../utils";
 
 export default function useProposeCommand({
   timeStart,

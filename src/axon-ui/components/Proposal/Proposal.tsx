@@ -1,7 +1,11 @@
 import { Disclosure } from "@headlessui/react";
+import classNames from "classnames";
 import { DateTime } from "luxon";
 import React from "react";
+import { useIsMutating } from "react-query";
+import { MutationFilters } from "react-query/types/core/utils";
 import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
+import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { neuronCommandToString } from "../../lib/neuronCommandToString";
 import { StatusKey } from "../../lib/types";
 import NeuronCommandDescription from "../Commands/NeuronCommandDescription";
@@ -10,25 +14,30 @@ import ListPanel from "../ExpandableList/ListPanel";
 import StatusLabel from "../Labels/StatusLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import { useGlobalContext } from "../Store";
+import ApproveRejectButtons from "./ApproveRejectButtons";
 import Steps from "./Steps";
 
 export const Proposal = ({
   proposal,
-  initialVisible = false,
+  defaultOpen = false,
 }: {
   proposal: NeuronCommandProposal;
-  initialVisible?: boolean;
+  defaultOpen?: boolean;
 }) => {
   const {
-    state: { principal, isAuthed },
+    state: { principal },
   } = useGlobalContext();
-
-  const ballots = proposal.ballots.filter(({ vote }) => !!vote[0]);
-  const hasVoted = ballots.find(
-    (ballot) => principal && ballot.principal.toHex() === principal.toHex()
-  );
+  const isOwner = useIsOwner();
 
   const status = Object.keys(proposal.status)[0] as StatusKey;
+
+  const myVote = proposal.ballots.find(
+    (ballot) => principal && ballot.principal.toHex() === principal.toHex()
+  );
+  const isEligibleToVote =
+    isOwner && status === "Active" && myVote && !myVote.vote[0];
+  const isMutating = !!useIsMutating(["vote", proposal.id] as MutationFilters);
+
   let actionTime: DateTime;
   if (
     status === "Executed" ||
@@ -44,22 +53,49 @@ export const Proposal = ({
   }
 
   return (
-    <Disclosure defaultOpen={initialVisible}>
+    <Disclosure defaultOpen={defaultOpen}>
       {({ open }) => (
         <>
           <ListButton open={open}>
             <div className="flex">
-              <div className="hidden sm:block w-10 text-gray-500">
-                #{proposal.id.toString()}
-              </div>
-              <div className="flex-1 flex flex-col xs:flex-row">
-                <div className="sm:pl-2 flex-1">
-                  {neuronCommandToString(proposal.proposal)}
+              <div className="flex flex-col sm:flex-row">
+                <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 items-center">
+                  <span className="text-gray-500">
+                    #{proposal.id.toString()}
+                  </span>
+                  <span>{neuronCommandToString(proposal.proposal)}</span>
                 </div>
-                <div className="xs:pl-2 flex-1 flex flex-row items-center gap-2">
+                <div className="flex-1 flex items-center gap-2">
                   <StatusLabel status={status} />
-                  {status !== "Active" && actionTime.toRelative()}
+                  {status !== "Active" && (
+                    <span className="text-gray-500 text-xs">
+                      {actionTime.toRelative()}
+                    </span>
+                  )}
                 </div>
+              </div>
+              <div className="flex-1 flex items-center justify-end pr-2">
+                {isEligibleToVote && (
+                  <>
+                    <div
+                      className={classNames("pr-4", {
+                        "hidden group-hover:block": !isMutating,
+                      })}
+                    >
+                      <ApproveRejectButtons
+                        proposalId={proposal.id}
+                        size="small"
+                      />
+                    </div>
+                    <span
+                      className="w-2 h-2 relative"
+                      title="Needs your approval"
+                    >
+                      <span className="h-full w-full animate-ping absolute inline-flex rounded-full bg-indigo-300 opacity-75" />
+                      <span className="absolute inline-flex rounded-full h-2 w-2 bg-indigo-400" />
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </ListButton>
@@ -121,7 +157,10 @@ export const Proposal = ({
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Progress</div>
                 <div className="flex-1">
-                  <Steps proposal={proposal} />
+                  <Steps
+                    proposal={proposal}
+                    isEligibleToVote={isEligibleToVote}
+                  />
                 </div>
               </div>
             </div>

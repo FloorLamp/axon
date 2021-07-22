@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useProposeCommand from "../../lib/hooks/useProposeCommand";
+import useProposeCommand from "../../lib/hooks/Axon/useProposeCommand";
 import { stringify } from "../../lib/utils";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -93,7 +93,7 @@ export default function NeuronCommandForm() {
 
         <div className="flex flex-col gap-2 py-4">
           <SpinnerButton
-            className="w-20"
+            className="w-20 p-2"
             activeClassName="btn-cta"
             disabledClassName="btn-cta-disabled"
             isLoading={isLoading}

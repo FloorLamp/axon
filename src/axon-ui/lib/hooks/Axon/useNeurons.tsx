@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
-import { useAxon } from "../../components/Store";
-import { errorToString } from "../utils";
+import { useAxon } from "../../../components/Store";
+import { errorToString } from "../../utils";
 
 export const useNeurons = () => {
   const axon = useAxon();

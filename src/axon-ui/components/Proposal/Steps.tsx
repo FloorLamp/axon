@@ -11,11 +11,11 @@ import {
   Ballot,
   NeuronCommandProposal,
 } from "../../declarations/Axon/Axon.did";
+import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { StatusKey } from "../../lib/types";
 import { pluralize, shortPrincipal } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
-import { useGlobalContext } from "../Store";
-import AcceptRejectButtons from "./AcceptRejectButtons";
+import ApproveRejectButtons from "./ApproveRejectButtons";
 import ExecuteButton from "./ExecuteButton";
 import Results from "./Results";
 
@@ -71,35 +71,32 @@ function BallotsList({ ballots }: { ballots: Ballot[] }) {
 
 export default function Steps({
   proposal,
+  isEligibleToVote,
 }: {
   proposal: NeuronCommandProposal;
+  isEligibleToVote: boolean;
 }) {
-  const {
-    state: { principal, isAuthed },
-  } = useGlobalContext();
+  const isOwner = useIsOwner();
 
   const ballots = proposal.ballots.filter(({ vote }) => !!vote[0]);
-  const hasVoted = ballots.find(
-    (ballot) => principal && ballot.principal.toHex() === principal.toHex()
-  );
 
   const status = Object.keys(proposal.status)[0] as StatusKey;
   const policy = proposal.policy[0];
 
-  let activeStep;
+  let activeStep: JSX.Element;
   if (status === "Active" || status === "Accepted") {
-    let remaining;
+    let remaining: JSX.Element;
     if (status === "Active" && policy) {
       const neededMinusCurrent = Number(policy.needed) - ballots.length;
       remaining = (
         <span className="text-gray-400">
           <strong>{neededMinusCurrent}</strong> more{" "}
-          {pluralize("approval", remaining)} needed
+          {pluralize("approval", neededMinusCurrent)} needed
         </span>
       );
     }
 
-    const showActions = isAuthed && (!hasVoted || status === "Accepted");
+    const showActions = isOwner && (isEligibleToVote || status === "Accepted");
 
     activeStep = (
       <Step
@@ -110,7 +107,9 @@ export default function Steps({
         {remaining}
         {showActions && (
           <div className="mt-2 border-t border-gray-300 pt-3">
-            {!hasVoted && <AcceptRejectButtons proposalId={proposal.id} />}
+            {isEligibleToVote && (
+              <ApproveRejectButtons proposalId={proposal.id} />
+            )}
             {status === "Accepted" && (
               <ExecuteButton proposalId={proposal.id} />
             )}

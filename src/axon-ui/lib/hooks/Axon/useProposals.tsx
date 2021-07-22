@@ -1,7 +1,7 @@
 import { useQuery } from "react-query";
-import { useAxon } from "../../components/Store";
-import { FIVE_MINUTES_MS } from "../constants";
-import { errorToString } from "../utils";
+import { useAxon } from "../../../components/Store";
+import { FIVE_MINUTES_MS } from "../../constants";
+import { errorToString } from "../../utils";
 
 export const useActiveProposals = () => {
   const axon = useAxon();

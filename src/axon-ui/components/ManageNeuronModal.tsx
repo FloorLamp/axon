@@ -1,17 +1,15 @@
 import React, { useState } from "react";
+import { useIsOwner } from "../lib/hooks/Axon/useIsOwner";
 import ActionsMenu from "./Axon/ActionsMenu";
 import Modal from "./Modal";
-import { useGlobalContext } from "./Store";
 
 export default function ManageNeuronModal() {
-  const {
-    state: { isAuthed },
-  } = useGlobalContext();
+  const isOwner = useIsOwner();
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  if (!isAuthed) {
+  if (!isOwner) {
     return null;
   }
 
