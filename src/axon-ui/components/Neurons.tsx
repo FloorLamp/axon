@@ -1,9 +1,9 @@
-import classNames from "classnames";
 import React from "react";
-import { GrRefresh } from "react-icons/gr";
+import { BsInboxFill } from "react-icons/bs";
 import { useQueryClient } from "react-query";
 import { useNeuronIds } from "../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../lib/hooks/Axon/useNeurons";
+import { RefreshButton } from "./Buttons/RefreshButton";
 import ErrorAlert from "./Labels/ErrorAlert";
 import ManageNeuronModal from "./ManageNeuronModal";
 import NeuronDetails from "./Neuron/NeuronDetails";
@@ -32,14 +32,10 @@ export default function Neurons() {
       <div className="px-4 flex justify-between mb-2">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold">Neurons</h2>
-          <GrRefresh
-            className={classNames("", {
-              "cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all":
-                !isFetching,
-              "inline-block animate-spin": isFetching,
-            })}
-            onClick={isFetching ? undefined : handleRefresh}
-            title={isFetching ? "Loading neurons..." : "Refresh neurons"}
+          <RefreshButton
+            isFetching={isFetching}
+            onClick={handleRefresh}
+            title="Refresh neurons"
           />
         </div>
         <ManageNeuronModal />
@@ -54,17 +50,21 @@ export default function Neurons() {
 
             return (
               <li key={id}>
-                <NeuronDetails
-                  isFetching={isFetchingNeurons}
-                  id={id}
-                  neuron={neuron}
-                />
+                <NeuronDetails id={id} neuron={neuron} />
               </li>
             );
           })}
         </ul>
       ) : (
-        "None"
+        <div className="h-32 flex flex-col items-center justify-center">
+          {!isFetching && (
+            <>
+              <BsInboxFill size={48} />
+              <p className="py-2">No neurons</p>
+              <p className="text-gray-500">Add your first neuron!</p>
+            </>
+          )}
+        </div>
       )}
       {(errorNeuronIds || errorNeurons) && (
         <ErrorAlert>

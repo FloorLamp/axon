@@ -48,6 +48,12 @@ export enum Topic {
   "Node Provider Rewards" = 10,
 }
 
+export enum Vote {
+  Unspecified = 0,
+  Yes = 1,
+  No = 2,
+}
+
 export enum RewardStatus {
   "Unknown" = 0,
   "Accept Votes" = 1,

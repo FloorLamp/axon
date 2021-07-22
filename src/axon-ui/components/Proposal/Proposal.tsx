@@ -3,7 +3,6 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import React from "react";
 import { useIsMutating } from "react-query";
-import { MutationFilters } from "react-query/types/core/utils";
 import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { neuronCommandToString } from "../../lib/neuronCommandToString";
@@ -36,7 +35,7 @@ export const Proposal = ({
   );
   const isEligibleToVote =
     isOwner && status === "Active" && myVote && !myVote.vote[0];
-  const isMutating = !!useIsMutating(["vote", proposal.id] as MutationFilters);
+  const isMutating = !!useIsMutating({ mutationKey: ["vote", proposal.id] });
 
   let actionTime: DateTime;
   if (
@@ -102,7 +101,7 @@ export const Proposal = ({
           <ListPanel>
             <div className="shadow-inner flex flex-col divide-y divide-gray-200 px-6 py-4">
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                <div className="w-32 font-bold">Proposal ID</div>
+                <div className="w-32 font-bold">Action ID</div>
                 <div>{proposal.id.toString()}</div>
               </div>
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">

@@ -7,11 +7,13 @@ import {
   Follow,
   IncreaseDissolveDelay,
   NeuronCommand,
+  RegisterVote,
   SetDissolveTimestamp,
   Spawn,
   Split,
 } from "../declarations/Axon/Axon.did";
 import { accountIdentifierToString } from "./account";
+import { Vote } from "./governance";
 import { CommandKey, OperationKey } from "./types";
 import { formatE8s, shortAccount, shortPrincipal, stringify } from "./utils";
 
@@ -21,6 +23,10 @@ export const neuronCommandToString = ({
 }: NeuronCommand) => {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
+    case "RegisterVote": {
+      const { vote, proposal } = command[key] as RegisterVote;
+      return `Vote ${Vote[vote]} on Proposal ${proposal[0].id.toString()}`;
+    }
     case "Follow": {
       const { followees, topic } = command[key] as Follow;
       return `Set Following for Topic ${topic}`;

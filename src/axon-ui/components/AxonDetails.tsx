@@ -1,18 +1,25 @@
 import React from "react";
-import { CgSpinner } from "react-icons/cg";
 import { canisterId } from "../declarations/Axon";
 import { useInfo } from "../lib/hooks/Axon/useInfo";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
+import { RefreshButton } from "./Buttons/RefreshButton";
 import ErrorAlert from "./Labels/ErrorAlert";
 
 export default function AxonDetails() {
-  const { data, error, isFetching } = useInfo();
+  const { data, error, isFetching, refetch } = useInfo();
 
   return (
     <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
       <div className="flex flex-col gap-2">
         <div>
-          <h2 className="text-xl font-bold">Axon Canister</h2>
+          <div className="flex gap-2 items-center">
+            <h2 className="text-xl font-bold">Axon Canister</h2>
+            <RefreshButton
+              isFetching={isFetching}
+              onClick={refetch}
+              title="Refresh Axon"
+            />
+          </div>
           <IdentifierLabelWithButtons type="Principal" id={canisterId}>
             {canisterId}
           </IdentifierLabelWithButtons>
@@ -21,10 +28,7 @@ export default function AxonDetails() {
         {error && <ErrorAlert>{error}</ErrorAlert>}
 
         <div>
-          <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-bold">Operators</h2>
-            {isFetching && <CgSpinner className="inline-block animate-spin" />}
-          </div>
+          <h2 className="text-xl font-bold">Operators</h2>
           <ul>
             {data &&
               data.operators.map((p) => (
@@ -38,10 +42,7 @@ export default function AxonDetails() {
         </div>
 
         <div>
-          <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-bold">Policy</h2>
-            {isFetching && <CgSpinner className="inline-block animate-spin" />}
-          </div>
+          <h2 className="text-xl font-bold">Policy</h2>
           {data && data.policy[0] ? (
             <span>
               <strong>{data.policy[0].needed.toString()}</strong> out of{" "}

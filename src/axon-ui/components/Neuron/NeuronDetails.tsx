@@ -2,7 +2,6 @@ import { Principal } from "@dfinity/principal";
 import { Disclosure } from "@headlessui/react";
 import { DateTime } from "luxon";
 import React from "react";
-import { CgSpinner } from "react-icons/cg";
 import { Neuron } from "../../declarations/Axon/Axon.did";
 import { canisterId as governanceCanisterId } from "../../declarations/Governance";
 import { subaccountToAccount } from "../../lib/account";
@@ -117,12 +116,10 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
 
 export default function NeuronDetails({
   id,
-  isFetching,
   neuron,
   defaultOpen,
 }: {
   id: string;
-  isFetching?: boolean;
   neuron: Neuron | null;
   defaultOpen?: boolean;
 }) {
@@ -136,7 +133,6 @@ export default function NeuronDetails({
                 <IdentifierLabelWithButtons type="Neuron" id={id}>
                   {id}
                 </IdentifierLabelWithButtons>
-                {isFetching && <CgSpinner className="block animate-spin" />}
               </div>
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center">
                 {neuron && (

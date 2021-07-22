@@ -1,10 +1,11 @@
 import React from "react";
 import { BiListUl } from "react-icons/bi";
-import { CgSpinner } from "react-icons/cg";
 import { ProposalInfo } from "../declarations/Governance/Governance.did.d";
 import { Action, Topic } from "../lib/governance";
 import { useNnsPendingProposals } from "../lib/hooks/useNnsPendingProposals";
 import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
+import { RefreshButton } from "./Buttons/RefreshButton";
+import AcceptRejectButtons from "./NnsProposal/AcceptRejectButtons";
 
 const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
   const id = proposal.id[0].id;
@@ -21,18 +22,25 @@ const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
         <div>{Action[actionKey]}</div>
         <div className="text-xs">{proposal.proposal[0].summary}</div>
       </div>
+      <div>
+        <AcceptRejectButtons proposalId={id} />
+      </div>
     </div>
   );
 };
 
 export default function NnsProposals() {
-  const { data, error, isFetching } = useNnsPendingProposals();
+  const { data, error, isFetching, refetch } = useNnsPendingProposals();
 
   return (
     <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
       <div className="flex gap-2 items-center mb-2">
         <h2 className="text-xl font-bold">Open NNS Proposals</h2>
-        {isFetching && <CgSpinner className="inline-block animate-spin" />}
+        <RefreshButton
+          isFetching={isFetching}
+          onClick={refetch}
+          title="Refresh proposals"
+        />
       </div>
       <div>
         {error}

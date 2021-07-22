@@ -9,12 +9,13 @@ import {
   Follow,
   IncreaseDissolveDelay,
   NeuronCommand,
+  RegisterVote,
   SetDissolveTimestamp,
   Spawn,
   Split,
 } from "../../declarations/Axon/Axon.did";
 import { accountIdentifierToString } from "../../lib/account";
-import { Topic } from "../../lib/governance";
+import { Topic, Vote } from "../../lib/governance";
 import { CommandKey, OperationKey } from "../../lib/types";
 import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -46,6 +47,26 @@ function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
 function CommandDescription({ command }: { command: Command }) {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
+    case "RegisterVote": {
+      const { vote, proposal } = command[key] as RegisterVote;
+      return (
+        <div>
+          <strong>Register Vote</strong>
+          <div className="flex">
+            <span className="w-20">Vote</span>
+            {Vote[vote]}
+          </div>
+          <div className="flex">
+            <span className="w-20">Proposal</span>
+            <div>
+              <IdentifierLabelWithButtons id={proposal[0].id} type="Proposal">
+                {proposal[0].id.toString()}
+              </IdentifierLabelWithButtons>
+            </div>
+          </div>
+        </div>
+      );
+    }
     case "Follow": {
       const { followees, topic } = command[key] as Follow;
       return (

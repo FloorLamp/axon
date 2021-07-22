@@ -5,10 +5,12 @@ export default function NavButtons({
   values,
   selected,
   onChange,
+  renderValue,
 }: {
   values: readonly string[];
   selected: string;
   onChange: (string) => void;
+  renderValue?: (string) => JSX.Element;
 }) {
   return (
     <ul className="flex gap-1 border-b border-gray-300 text-sm">
@@ -24,7 +26,7 @@ export default function NavButtons({
           )}
           onClick={() => onChange(value)}
         >
-          {value}
+          {renderValue ? renderValue(value) : value}
         </li>
       ))}
     </ul>

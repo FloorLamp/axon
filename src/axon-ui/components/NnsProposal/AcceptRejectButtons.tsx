@@ -1,24 +1,33 @@
 import classNames from "classnames";
 import React, { MouseEvent } from "react";
 import { BsCheck, BsX } from "react-icons/bs";
-import { useIsMutating } from "react-query";
-import useVote from "../../lib/hooks/Axon/useVote";
+import { Vote } from "../../lib/governance";
+import useProposeCommand from "../../lib/hooks/Axon/useProposeCommand";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 
-export default function ApproveRejectButtons({
+export default function AcceptRejectButtons({
   proposalId,
   size = "large",
 }: {
   proposalId: bigint;
   size?: "small" | "large";
 }) {
-  const { mutate, isError, error } = useVote(proposalId);
+  const { mutate, isError, isLoading, error } = useProposeCommand({
+    execute: true,
+  });
   const handleVote = (e: MouseEvent, yesNo: boolean) => {
     e.stopPropagation();
-    mutate({ yesNo, execute: true });
+    mutate({
+      command: {
+        RegisterVote: {
+          vote: yesNo ? Vote.Yes : Vote.No,
+          proposal: [{ id: proposalId }],
+        },
+      },
+      neuronIds: [],
+    });
   };
-  const isLoading = !!useIsMutating({ mutationKey: ["vote", proposalId] });
 
   return (
     <div className="flex flex-col gap-2">
@@ -32,9 +41,9 @@ export default function ApproveRejectButtons({
           disabledClassName="text-white bg-green-300"
           isLoading={isLoading}
           onClick={(e) => handleVote(e, true)}
-          title="Approve"
+          title="Accept"
         >
-          {size === "large" ? "Approve" : <BsCheck />}
+          {size === "large" ? "Accept" : <BsCheck />}
         </SpinnerButton>
         <SpinnerButton
           className={classNames({

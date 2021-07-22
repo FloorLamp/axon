@@ -70,6 +70,7 @@ export const enumEntries = (enum_: Object): [string, number][] =>
   Object.entries(enum_).filter(([name, id]) => typeof id === "number");
 
 export const principalIsEqual = (p1: Principal, p2: Principal) => {
+  if (!p1 || !p2) return false;
   const a1 = p1.toUint8Array();
   const a2 = p2.toUint8Array();
   return (
