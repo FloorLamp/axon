@@ -10,8 +10,8 @@ export default function BalanceLabel({
 }) {
   const num = typeof value === "bigint" ? value : BigInt(value);
   return (
-    <>
+    <span>
       {formatE8s(num, digits)} <span className="text-xs">ICP</span>
-    </>
+    </span>
   );
 }

@@ -13,9 +13,14 @@ export default function CopyButton({
     copiedTimeout: 1000,
   });
 
+  const handleClick = (e) => {
+    e.stopPropagation();
+    clipboard.copy(text);
+  };
+
   return (
     <button
-      onClick={() => clipboard.copy(text)}
+      onClick={handleClick}
       className="cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all"
       title={title}
     >

@@ -9,12 +9,11 @@ export function ProposalOptionsForm({
 }: {
   onChangeOptions: (any) => void;
 }) {
-  const [isVisible, setIsVisible] = useState(false);
   const [timeStart, setTimeStart] = useState("");
   const [durationSeconds, setDurationSeconds] = useState("");
   const [execute, setExecute] = useState(true);
 
-  // Clear state when closed
+  // Sync state with parent
   useEffect(() => {
     onChangeOptions({ timeStart, durationSeconds, execute });
   }, [timeStart, durationSeconds, execute]);

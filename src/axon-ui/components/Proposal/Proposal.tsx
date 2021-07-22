@@ -1,12 +1,12 @@
-import { Disclosure, Transition } from "@headlessui/react";
-import classNames from "classnames";
+import { Disclosure } from "@headlessui/react";
 import { DateTime } from "luxon";
 import React from "react";
-import { FiChevronRight } from "react-icons/fi";
 import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
 import { neuronCommandToString } from "../../lib/neuronCommandToString";
 import { StatusKey } from "../../lib/types";
 import NeuronCommandDescription from "../Commands/NeuronCommandDescription";
+import ListButton from "../ExpandableList/ListButton";
+import ListPanel from "../ExpandableList/ListPanel";
 import StatusLabel from "../Labels/StatusLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import { useGlobalContext } from "../Store";
@@ -47,43 +47,24 @@ export const Proposal = ({
     <Disclosure defaultOpen={initialVisible}>
       {({ open }) => (
         <>
-          <Disclosure.Button
-            as="div"
-            className="group flex items-center cursor-pointer p-2 bg-gray-100 hover:bg-gray-200 transition-colors duration-75"
-          >
-            <div className="hidden sm:block w-10 text-gray-500">
-              #{proposal.id.toString()}
-            </div>
-            <div className="flex-1 flex flex-col xs:flex-row">
-              <div className="sm:pl-2 flex-1">
-                {neuronCommandToString(proposal.proposal)}
+          <ListButton open={open}>
+            <div className="flex">
+              <div className="hidden sm:block w-10 text-gray-500">
+                #{proposal.id.toString()}
               </div>
-              <div className="xs:pl-2 flex-1 flex flex-row items-center gap-2">
-                <StatusLabel status={status} />
-                {status !== "Active" && actionTime.toRelative()}
+              <div className="flex-1 flex flex-col xs:flex-row">
+                <div className="sm:pl-2 flex-1">
+                  {neuronCommandToString(proposal.proposal)}
+                </div>
+                <div className="xs:pl-2 flex-1 flex flex-row items-center gap-2">
+                  <StatusLabel status={status} />
+                  {status !== "Active" && actionTime.toRelative()}
+                </div>
               </div>
             </div>
-            <div>
-              <FiChevronRight
-                className={classNames(
-                  "transform transition-transform transition-100",
-                  {
-                    "group-hover:translate-x-1": !open,
-                    "rotate-90": open,
-                  }
-                )}
-              />
-            </div>
-          </Disclosure.Button>
-          <Transition
-            enter="transition duration-50 ease-in"
-            enterFrom="transform -translate-y-1 opacity-0"
-            enterTo="transform translate-y-0 opacity-100"
-            leave="transition duration-50 ease-out"
-            leaveFrom="transform translate-y-0 opacity-100"
-            leaveTo="transform -translate-y-1 opacity-0"
-          >
-            <Disclosure.Panel className="flex flex-col divide-y divide-gray-200 pb-4">
+          </ListButton>
+          <ListPanel>
+            <div className="shadow-inner flex flex-col divide-y divide-gray-200 px-6 py-4">
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Proposal ID</div>
                 <div>{proposal.id.toString()}</div>
@@ -143,8 +124,8 @@ export const Proposal = ({
                   <Steps proposal={proposal} />
                 </div>
               </div>
-            </Disclosure.Panel>
-          </Transition>
+            </div>
+          </ListPanel>
         </>
       )}
     </Disclosure>
