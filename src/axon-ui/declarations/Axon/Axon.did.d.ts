@@ -20,11 +20,11 @@ export interface Axon {
       NeuronCommandProposalResult
     >,
   'getNeuronIds' : () => Promise<Array<bigint>>,
+  'getNeurons' : () => Promise<ListNeuronsResult>,
   'info' : () => Promise<Info>,
-  'listNeurons' : () => Promise<ListNeuronsResult>,
   'manage' : (arg_0: ManageAxon) => Promise<Result_2>,
   'proposeCommand' : (arg_0: NewProposal) => Promise<Result_2>,
-  'sync' : () => Promise<SyncResult>,
+  'sync' : () => Promise<ListNeuronsResult>,
   'vote' : (arg_0: VoteRequest) => Promise<Result>,
 }
 export interface Ballot { 'principal' : Principal, 'vote' : [] | [Vote] }
@@ -238,8 +238,6 @@ export type Status = { 'Active' : null } |
   { 'Executed' : Execute } |
   { 'Accepted' : bigint } |
   { 'Expired' : bigint };
-export type SyncResult = { 'ok' : Array<bigint> } |
-  { 'err' : Error };
 export type Visibility = { 'Private' : null } |
   { 'Public' : null };
 export type Vote = { 'No' : null } |

@@ -14,11 +14,6 @@ type Visibility =
    Private;
    Public;
  };
-type SyncResult = 
- variant {
-   err: Error;
-   ok: vec nat64;
- };
 type Status = 
  variant {
    Accepted: int;
@@ -342,11 +337,11 @@ type Axon =
    getActiveProposals: () -> (NeuronCommandProposalResult) query;
    getAllProposals: (opt nat) -> (NeuronCommandProposalResult) query;
    getNeuronIds: () -> (vec nat64) query;
+   getNeurons: () -> (ListNeuronsResult) query;
    info: () -> (Info) query;
-   listNeurons: () -> (ListNeuronsResult);
    manage: (ManageAxon) -> (Result_2);
    proposeCommand: (NewProposal) -> (Result_2);
-   sync: () -> (SyncResult);
+   sync: () -> (ListNeuronsResult);
    vote: (VoteRequest) -> (Result);
  };
 type ApproveGenesisKyc = record {principals: vec principal;};

@@ -2,6 +2,7 @@ import React from "react";
 import { BsInboxFill } from "react-icons/bs";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
+import useSync from "../../lib/hooks/Axon/useSync";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 import ManageNeuronModal from "./ManageNeuronModal";
@@ -12,20 +13,18 @@ export default function Neurons() {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
     error: errorNeuronIds,
-    refetch: refetchNeuronIds,
   } = useNeuronIds();
   const {
     data: neurons,
     isFetching: isFetchingNeurons,
     error: errorNeurons,
-    refetch: refetchNeurons,
   } = useNeurons();
+  const sync = useSync();
 
   const handleRefresh = () => {
-    refetchNeuronIds();
-    refetchNeurons();
+    sync.mutate();
   };
-  const isFetching = isFetchingNeuronIds || isFetchingNeurons;
+  const isFetching = sync.isLoading || isFetchingNeuronIds || isFetchingNeurons;
 
   return (
     <section className="py-4 bg-gray-50 rounded-lg shadow-lg">
@@ -67,10 +66,12 @@ export default function Neurons() {
         </div>
       )}
       {(errorNeuronIds || errorNeurons) && (
-        <ErrorAlert>
-          {errorNeuronIds}
-          {errorNeurons}
-        </ErrorAlert>
+        <div className="px-4">
+          <ErrorAlert>
+            {errorNeuronIds}
+            {errorNeurons}
+          </ErrorAlert>
+        </div>
       )}
     </section>
   );

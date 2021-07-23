@@ -7,6 +7,7 @@ export default function useSync() {
   const queryClient = useQueryClient();
 
   return useMutation(
+    "sync",
     async () => {
       const result = await axon.sync();
       if ("ok" in result) {

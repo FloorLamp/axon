@@ -20,6 +20,7 @@ shared actor class Axon(init: T.Initialization) = this {
   // Default policy is null, so the owner has complete authority
   stable var policy: ?T.Policy = null;
   stable var neuronIds: [Nat64] = [];
+  stable var neurons: ?GT.ListNeuronsResponse = null;
   stable var allProposals: [T.NeuronCommandProposal] = [];
   stable var activeProposals: [T.NeuronCommandProposal] = [];
   stable var lastId: Nat = 0;
@@ -76,26 +77,31 @@ shared actor class Axon(init: T.Initialization) = this {
     }
   };
 
-  // Call get_neuron_ids() and save the list of neurons that this canister controls
-  public shared({ caller }) func sync(): async T.SyncResult {
+  public query func getNeuronIds() : async [Nat64] {
+    switch (neurons) {
+      case (?data) {
+        Array.map<(Nat64, GT.NeuronInfo), Nat64>(data.neuron_infos, func(i) { i.0 })
+      };
+      case _ { [] }
+    }
+  };
+
+  // Get all full neurons. If private, only operators can call
+  public query({ caller }) func getNeurons() : async T.ListNeuronsResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };
 
-    try {
-      neuronIds := await Governance.get_neuron_ids();
-      #ok(neuronIds);
-    } catch (err) {
-      #err(makeError(err))
+    switch (neurons) {
+      case (?data) {
+        #ok(data)
+      };
+      case _ { #err(#NotFound) }
     }
   };
 
-  public query func getNeuronIds() : async [Nat64] {
-    neuronIds
-  };
-
-  // Get all full neurons. If private, only operators can call
-  public shared({ caller }) func listNeurons() : async T.ListNeuronsResult {
+  // Call list_neurons() and save the list of neurons that this canister controls
+  public shared({ caller }) func sync() : async T.ListNeuronsResult {
     if (visibility == #Private and not isOperator(caller)) {
       return #err(#Unauthorized)
     };
@@ -104,6 +110,11 @@ shared actor class Axon(init: T.Initialization) = this {
       neuron_ids = [];
       include_neurons_readable_by_caller = true;
     });
+    neurons := ?response;
+
+    // Since this will be called from the client periodically, call cleanup
+    ignore cleanup();
+
     #ok(response)
   };
 
@@ -304,7 +315,7 @@ shared actor class Axon(init: T.Initialization) = this {
     }
   };
 
-  // Remove expired proposals
+  // Remove expired proposals. Called by sync
   public shared({ caller }) func cleanup() : async T.Result<()> {
     if (not isOperator(caller)) {
       return #err(#Unauthorized)

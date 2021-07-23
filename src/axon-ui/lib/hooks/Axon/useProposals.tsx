@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { FIVE_MINUTES_MS } from "../../constants";
+import { ONE_MINUTES_MS } from "../../constants";
 import { errorToString } from "../../utils";
 
 export const useActiveProposals = () => {
@@ -20,7 +20,7 @@ export const useActiveProposals = () => {
     {
       keepPreviousData: true,
       placeholderData: [],
-      refetchInterval: FIVE_MINUTES_MS,
+      refetchInterval: ONE_MINUTES_MS,
     }
   );
 };
@@ -40,7 +40,7 @@ export const useAllProposals = () => {
     {
       keepPreviousData: true,
       placeholderData: [],
-      refetchInterval: FIVE_MINUTES_MS,
+      refetchInterval: ONE_MINUTES_MS,
     }
   );
 };

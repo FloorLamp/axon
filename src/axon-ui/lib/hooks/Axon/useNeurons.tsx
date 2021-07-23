@@ -1,5 +1,6 @@
 import { useQuery } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
+import { FIVE_MINUTES_MS } from "../../constants";
 import { errorToString } from "../../utils";
 
 export const useNeurons = () => {
@@ -7,7 +8,7 @@ export const useNeurons = () => {
   return useQuery(
     "neurons",
     async () => {
-      const neurons = await axon.listNeurons();
+      const neurons = await axon.getNeurons();
 
       if ("ok" in neurons) {
         console.log("neurons", neurons.ok);
@@ -19,6 +20,7 @@ export const useNeurons = () => {
     },
     {
       keepPreviousData: true,
+      refetchInterval: FIVE_MINUTES_MS,
     }
   );
 };
