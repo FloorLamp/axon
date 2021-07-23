@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { NeuronCommand } from "../../../declarations/Axon/Axon.did";
+import { ActionType } from "../../../declarations/Axon/Axon.did";
 import { errorToString } from "../../utils";
 
-export default function useProposeCommand({
+export default function useInitiate({
   timeStart,
   durationSeconds,
   execute,
@@ -16,11 +16,11 @@ export default function useProposeCommand({
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (proposal: NeuronCommand) => {
-      const result = await axon.proposeCommand({
+    async (action: ActionType) => {
+      const result = await axon.initiate({
         timeStart: timeStart ? [BigInt(timeStart)] : [],
         durationSeconds: durationSeconds ? [BigInt(durationSeconds)] : [],
-        proposal,
+        action,
         execute: execute ? [true] : [],
       });
       if ("ok" in result) {
@@ -32,7 +32,7 @@ export default function useProposeCommand({
     {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.refetchQueries(["activeProposals"]);
+        queryClient.refetchQueries(["pendingActions"]);
       },
     }
   );

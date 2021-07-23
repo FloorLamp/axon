@@ -1,11 +1,11 @@
 import Head from "next/head";
 import React from "react";
 import { FaGithub } from "react-icons/fa";
+import Actions from "../components/Action/Actions";
 import AxonDetails from "../components/Axon/AxonDetails";
 import Nav from "../components/Layout/Nav";
 import Neurons from "../components/Neuron/Neurons";
 import NnsProposals from "../components/NnsProposal/NnsProposals";
-import Proposals from "../components/Proposal/Proposals";
 
 export default function Home() {
   return (
@@ -24,7 +24,7 @@ export default function Home() {
 
           <Neurons />
 
-          <Proposals />
+          <Actions />
 
           <NnsProposals />
         </main>

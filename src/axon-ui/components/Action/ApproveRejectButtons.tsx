@@ -7,18 +7,18 @@ import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 
 export default function ApproveRejectButtons({
-  proposalId,
+  id,
   size = "large",
 }: {
-  proposalId: bigint;
+  id: bigint;
   size?: "small" | "large";
 }) {
-  const { mutate, isError, error } = useVote(proposalId);
+  const { mutate, isError, error } = useVote(id);
   const handleVote = (e: MouseEvent, yesNo: boolean) => {
     e.stopPropagation();
     mutate({ yesNo, execute: true });
   };
-  const isLoading = !!useIsMutating({ mutationKey: ["vote", proposalId] });
+  const isLoading = !!useIsMutating({ mutationKey: ["vote", id] });
 
   return (
     <div className="flex flex-col gap-2">

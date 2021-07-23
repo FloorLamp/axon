@@ -1,6 +1,20 @@
 import type { Principal } from '@dfinity/principal';
 export interface AccountIdentifier { 'hash' : Array<number> }
-export type Action = { 'ManageNeuron' : ManageNeuron } |
+export interface Action {
+  'id' : bigint,
+  'status' : Status,
+  'creator' : Principal,
+  'action' : ActionType,
+  'ballots' : Array<Ballot>,
+  'timeStart' : bigint,
+  'timeEnd' : bigint,
+  'policy' : [] | [Policy],
+}
+export type ActionResult = { 'ok' : Array<Action> } |
+  { 'err' : Error };
+export type ActionType = { 'NeuronCommand' : NeuronCommand } |
+  { 'AxonCommand' : AxonCommand };
+export type Action__1 = { 'ManageNeuron' : ManageNeuron } |
   { 'ExecuteNnsFunction' : ExecuteNnsFunction } |
   { 'RewardNodeProvider' : RewardNodeProvider } |
   { 'SetDefaultFollowees' : SetDefaultFollowees } |
@@ -15,18 +29,34 @@ export interface ApproveGenesisKyc { 'principals' : Array<Principal> }
 export interface Axon {
   'cleanup' : () => Promise<Result_2>,
   'execute' : (arg_0: bigint) => Promise<Result_3>,
-  'getActiveProposals' : () => Promise<NeuronCommandProposalResult>,
-  'getAllProposals' : (arg_0: [] | [bigint]) => Promise<
-      NeuronCommandProposalResult
-    >,
+  'getAllActions' : (arg_0: [] | [bigint]) => Promise<ActionResult>,
   'getNeuronIds' : () => Promise<Array<bigint>>,
   'getNeurons' : () => Promise<ListNeuronsResult>,
+  'getPendingActions' : () => Promise<ActionResult>,
   'info' : () => Promise<Info>,
-  'manage' : (arg_0: ManageAxon) => Promise<Result_2>,
-  'proposeCommand' : (arg_0: NewProposal) => Promise<Result_2>,
+  'initiate' : (arg_0: InitiateAction) => Promise<Result_2>,
   'sync' : () => Promise<ListNeuronsResult>,
   'vote' : (arg_0: VoteRequest) => Promise<Result>,
 }
+export type AxonCommand = [AxonCommandRequest, [] | [AxonCommandResponse]];
+export type AxonCommandRequest = {
+    'RemoveOwner' : {
+      'principal' : Principal,
+      'total' : [] | [bigint],
+      'needed' : bigint,
+    }
+  } |
+  { 'UpdateVisibility' : Visibility } |
+  {
+    'AddOwner' : {
+      'principal' : Principal,
+      'total' : [] | [bigint],
+      'needed' : bigint,
+    }
+  } |
+  { 'SetPolicy' : { 'needed' : bigint } };
+export type AxonCommandResponse = { 'ok' : null } |
+  { 'err' : Error };
 export interface Ballot { 'principal' : Principal, 'vote' : [] | [Vote] }
 export interface BallotInfo { 'vote' : number, 'proposal_id' : [] | [NeuronId] }
 export type Change = { 'ToRemove' : NodeProvider } |
@@ -66,11 +96,11 @@ export type DissolveState = { 'DissolveDelaySeconds' : bigint } |
 export type Error = { 'AlreadyVoted' : null } |
   { 'Error' : { 'error_message' : string, 'error_type' : ErrorCode } } |
   { 'CannotExecute' : null } |
-  { 'CannotPropose' : null } |
   { 'InvalidAction' : null } |
   { 'NotFound' : null } |
-  { 'CannotRemoveOperator' : null } |
+  { 'CannotRemoveOwner' : null } |
   { 'Unauthorized' : null } |
+  { 'NoNeurons' : null } |
   { 'GovernanceError' : GovernanceError };
 export type ErrorCode = { 'canister_error' : null } |
   { 'system_transient' : null } |
@@ -78,10 +108,6 @@ export type ErrorCode = { 'canister_error' : null } |
   { 'canister_reject' : null } |
   { 'destination_invalid' : null } |
   { 'system_fatal' : null };
-export interface Execute {
-  'responses' : Array<ManageNeuronCall>,
-  'time' : bigint,
-}
 export interface ExecuteNnsFunction {
   'nns_function' : number,
   'payload' : Array<number>,
@@ -96,13 +122,19 @@ export interface IncreaseDissolveDelay {
   'additional_dissolve_delay_seconds' : number,
 }
 export interface Info {
-  'operators' : Array<Principal>,
+  'owners' : Array<Principal>,
   'visibility' : Visibility,
   'policy' : [] | [Policy],
 }
 export interface Initialization {
   'owner' : Principal,
   'visibility' : Visibility,
+}
+export interface InitiateAction {
+  'action' : ActionType,
+  'timeStart' : [] | [bigint],
+  'durationSeconds' : [] | [bigint],
+  'execute' : [] | [boolean],
 }
 export interface ListNeuronsResponse {
   'neuron_infos' : Array<[bigint, NeuronInfo]>,
@@ -111,17 +143,10 @@ export interface ListNeuronsResponse {
 export type ListNeuronsResult = { 'ok' : ListNeuronsResponse } |
   { 'err' : Error };
 export interface MakeProposalResponse { 'proposal_id' : [] | [NeuronId] }
-export interface ManageAxon {
-  'action' : { 'UpdateVisibility' : Visibility } |
-    { 'AddOperator' : { 'principal' : Principal, 'needed' : bigint } } |
-    { 'RemoveOperator' : { 'principal' : Principal, 'needed' : bigint } } |
-    { 'SetPolicy' : { 'needed' : bigint } },
-}
 export interface ManageNeuron {
   'id' : [] | [NeuronId],
   'command' : [] | [Command],
 }
-export type ManageNeuronCall = [bigint, Result_1];
 export interface ManageNeuronResponse { 'command' : [] | [Command_1] }
 export interface Motion { 'motion_text' : string }
 export interface NetworkEconomics {
@@ -151,24 +176,15 @@ export interface Neuron {
   'neuron_fees_e8s' : bigint,
   'transfer' : [] | [NeuronStakeTransfer],
 }
-export interface NeuronCommand {
+export type NeuronCommand = [
+  NeuronCommandRequest,
+  [] | [Array<NeuronCommandResponse>],
+];
+export interface NeuronCommandRequest {
   'command' : Command,
   'neuronIds' : [] | [Array<bigint>],
 }
-export interface NeuronCommandProposal {
-  'id' : bigint,
-  'status' : Status,
-  'creator' : Principal,
-  'ballots' : Array<Ballot>,
-  'timeStart' : bigint,
-  'proposal' : NeuronCommand,
-  'timeEnd' : bigint,
-  'policy' : [] | [Policy],
-}
-export type NeuronCommandProposalResult = {
-    'ok' : Array<NeuronCommandProposal>
-  } |
-  { 'err' : Error };
+export type NeuronCommandResponse = [bigint, Result_1];
 export interface NeuronId { 'id' : bigint }
 export interface NeuronInfo {
   'dissolve_delay_seconds' : bigint,
@@ -188,12 +204,6 @@ export interface NeuronStakeTransfer {
   'transfer_timestamp' : bigint,
   'block_height' : bigint,
 }
-export interface NewProposal {
-  'timeStart' : [] | [bigint],
-  'durationSeconds' : [] | [bigint],
-  'proposal' : NeuronCommand,
-  'execute' : [] | [boolean],
-}
 export interface NodeProvider { 'id' : [] | [Principal] }
 export type Operation = { 'RemoveHotKey' : RemoveHotKey } |
   { 'AddHotKey' : AddHotKey } |
@@ -204,18 +214,18 @@ export type Operation = { 'RemoveHotKey' : RemoveHotKey } |
 export interface Policy { 'total' : bigint, 'needed' : bigint }
 export interface Proposal {
   'url' : string,
-  'action' : [] | [Action],
+  'action' : [] | [Action__1],
   'summary' : string,
 }
 export interface RegisterVote { 'vote' : number, 'proposal' : [] | [NeuronId] }
 export interface RemoveHotKey { 'hot_key_to_remove' : [] | [Principal] }
-export type Result = { 'ok' : [] | [NeuronCommandProposal] } |
+export type Result = { 'ok' : [] | [Action] } |
   { 'err' : Error };
 export type Result_1 = { 'ok' : ManageNeuronResponse } |
   { 'err' : Error };
 export type Result_2 = { 'ok' : null } |
   { 'err' : Error };
-export type Result_3 = { 'ok' : NeuronCommandProposal } |
+export type Result_3 = { 'ok' : Action } |
   { 'err' : Error };
 export type RewardMode = { 'RewardToNeuron' : RewardToNeuron } |
   { 'RewardToAccount' : RewardToAccount };
@@ -233,11 +243,11 @@ export interface SetDissolveTimestamp { 'dissolve_timestamp_seconds' : bigint }
 export interface Spawn { 'new_controller' : [] | [Principal] }
 export interface SpawnResponse { 'created_neuron_id' : [] | [NeuronId] }
 export interface Split { 'amount_e8s' : bigint }
-export type Status = { 'Active' : null } |
-  { 'Rejected' : bigint } |
-  { 'Executed' : Execute } |
+export type Status = { 'Rejected' : bigint } |
+  { 'Executed' : bigint } |
   { 'Accepted' : bigint } |
-  { 'Expired' : bigint };
+  { 'Expired' : bigint } |
+  { 'Pending' : null };
 export type Visibility = { 'Private' : null } |
   { 'Public' : null };
 export type Vote = { 'No' : null } |

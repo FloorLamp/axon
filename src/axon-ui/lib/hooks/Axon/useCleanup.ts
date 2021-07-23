@@ -18,8 +18,8 @@ export default function useCleanup() {
     {
       onSuccess: async (data) => {
         console.log(data);
-        queryClient.refetchQueries(["activeProposals"]);
-        queryClient.refetchQueries(["allProposals"]);
+        queryClient.refetchQueries(["pendingActions"]);
+        queryClient.refetchQueries(["allActions"]);
       },
     }
   );

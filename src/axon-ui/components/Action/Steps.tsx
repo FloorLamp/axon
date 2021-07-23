@@ -7,17 +7,14 @@ import {
   FaPlusCircle,
   FaTimesCircle,
 } from "react-icons/fa";
-import {
-  Ballot,
-  NeuronCommandProposal,
-} from "../../declarations/Axon/Axon.did";
+import { Action, Ballot } from "../../declarations/Axon/Axon.did";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { StatusKey } from "../../lib/types";
 import { pluralize, shortPrincipal } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
+import { ActionResponseSummary } from "./ActionResponseSummary";
 import ApproveRejectButtons from "./ApproveRejectButtons";
 import ExecuteButton from "./ExecuteButton";
-import Results from "./Results";
 
 const CIRCLE_SIZE = 18;
 
@@ -70,23 +67,23 @@ function BallotsList({ ballots }: { ballots: Ballot[] }) {
 }
 
 export default function Steps({
-  proposal,
+  action,
   isEligibleToVote,
 }: {
-  proposal: NeuronCommandProposal;
+  action: Action;
   isEligibleToVote: boolean;
 }) {
   const isOwner = useIsOwner();
 
-  const ballots = proposal.ballots.filter(({ vote }) => !!vote[0]);
+  const ballots = action.ballots.filter(({ vote }) => !!vote[0]);
 
-  const status = Object.keys(proposal.status)[0] as StatusKey;
-  const policy = proposal.policy[0];
+  const status = Object.keys(action.status)[0] as StatusKey;
+  const policy = action.policy[0];
 
   let activeStep: JSX.Element;
-  if (status === "Active" || status === "Accepted") {
+  if (status === "Pending" || status === "Accepted") {
     let remaining: JSX.Element;
-    if (status === "Active" && policy) {
+    if (status === "Pending" && policy) {
       const neededMinusCurrent = Number(policy.needed) - ballots.length;
       remaining = (
         <span className="text-gray-400">
@@ -107,12 +104,8 @@ export default function Steps({
         {remaining}
         {showActions && (
           <div className="mt-2 border-t border-gray-300 pt-3">
-            {isEligibleToVote && (
-              <ApproveRejectButtons proposalId={proposal.id} />
-            )}
-            {status === "Accepted" && (
-              <ExecuteButton proposalId={proposal.id} />
-            )}
+            {isEligibleToVote && <ApproveRejectButtons id={action.id} />}
+            {status === "Accepted" && <ExecuteButton id={action.id} />}
           </div>
         )}
       </Step>
@@ -128,8 +121,8 @@ export default function Steps({
         circle={<FaPlusCircle size={CIRCLE_SIZE} className="text-gray-400" />}
         label={<span className="text-gray-800">Created</span>}
       >
-        <IdentifierLabelWithButtons type="Principal" id={proposal.creator}>
-          {shortPrincipal(proposal.creator)}
+        <IdentifierLabelWithButtons type="Principal" id={action.creator}>
+          {shortPrincipal(action.creator)}
         </IdentifierLabelWithButtons>
       </Step>
       {approves.length > 0 && (
@@ -156,7 +149,7 @@ export default function Steps({
         </Step>
       )}
       {activeStep}
-      {"Executed" in proposal.status && (
+      {"Executed" in action.status && (
         <Step
           circle={
             <FaCheckCircle size={CIRCLE_SIZE} className="text-green-400" />
@@ -164,7 +157,7 @@ export default function Steps({
           label={<span className="text-green-700">Executed</span>}
           showLine={false}
         >
-          <Results results={proposal.status.Executed} />
+          <ActionResponseSummary actionType={action.action} />
         </Step>
       )}
       {status === "Expired" && (

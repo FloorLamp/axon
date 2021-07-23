@@ -1,12 +1,15 @@
+import assert from "assert";
 import { DateTime } from "luxon";
 import {
+  ActionType,
   AddHotKey,
+  AxonCommandRequest,
   Configure,
   Disburse,
   DisburseToNeuron,
   Follow,
   IncreaseDissolveDelay,
-  NeuronCommand,
+  NeuronCommandRequest,
   RegisterVote,
   SetDissolveTimestamp,
   Spawn,
@@ -14,13 +17,21 @@ import {
 } from "../declarations/Axon/Axon.did";
 import { accountIdentifierToString } from "./account";
 import { Vote } from "./governance";
-import { CommandKey, OperationKey } from "./types";
+import { AxonCommandKey, CommandKey, OperationKey } from "./types";
 import { formatE8s, shortAccount, shortPrincipal, stringify } from "./utils";
+
+export const actionTypeToString = (action: ActionType) => {
+  if ("AxonCommand" in action) {
+    return axonCommandToString(action.AxonCommand[0]);
+  } else {
+    return neuronCommandToString(action.NeuronCommand[0]);
+  }
+};
 
 export const neuronCommandToString = ({
   command,
   neuronIds,
-}: NeuronCommand) => {
+}: NeuronCommandRequest) => {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
     case "RegisterVote": {
@@ -101,5 +112,35 @@ export const neuronCommandToString = ({
     }
     default:
       return stringify(command);
+  }
+};
+
+export const axonCommandToString = (command: AxonCommandRequest) => {
+  const key = Object.keys(command)[0] as AxonCommandKey;
+  switch (key) {
+    case "AddOwner": {
+      assert("AddOwner" in command);
+      const { principal, needed, total } = command.AddOwner;
+      return `Add owner ${shortPrincipal(
+        principal
+      )} (${needed.toString()} out of ${total[0]?.toString()} approvals)`;
+    }
+    case "RemoveOwner": {
+      assert("RemoveOwner" in command);
+      const { principal, needed, total } = command.RemoveOwner;
+      return `Remove owner ${shortPrincipal(
+        principal
+      )} (${needed.toString()} out of ${total[0]?.toString()} approvals)`;
+    }
+    case "SetPolicy": {
+      assert("SetPolicy" in command);
+      const { needed } = command.SetPolicy;
+      return `Set Policy (${needed.toString()} approvals)`;
+    }
+    case "UpdateVisibility": {
+      assert("UpdateVisibility" in command);
+      const visibility = Object.keys(command.UpdateVisibility)[0];
+      return `Set Visibility to ${visibility}`;
+    }
   }
 };

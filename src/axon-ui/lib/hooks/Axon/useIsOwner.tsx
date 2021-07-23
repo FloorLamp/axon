@@ -8,7 +8,5 @@ export const useIsOwner = () => {
     state: { principal },
   } = useGlobalContext();
 
-  return data?.operators.find((operator) =>
-    principalIsEqual(principal, operator)
-  );
+  return data?.owners.find((owner) => principalIsEqual(principal, owner));
 };

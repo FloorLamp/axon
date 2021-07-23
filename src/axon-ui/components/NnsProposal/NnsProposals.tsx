@@ -3,8 +3,10 @@ import { BiListUl } from "react-icons/bi";
 import { ProposalInfo } from "../../declarations/Governance/Governance.did.d";
 import { Action, Topic } from "../../lib/governance";
 import { useNnsPendingProposals } from "../../lib/hooks/useNnsPendingProposals";
+import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import ErrorAlert from "../Labels/ErrorAlert";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 
 const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
@@ -43,7 +45,7 @@ export default function NnsProposals() {
         />
       </div>
       <div>
-        {error}
+        {error && <ErrorAlert>{stringify(error)}</ErrorAlert>}
         {data && data.length > 0 ? (
           <ul className="divide-y divide-gray-300">
             {data.map((p) => (

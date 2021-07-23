@@ -7,8 +7,8 @@ export default function useExecute() {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async ({ proposalId }: { proposalId: bigint }) => {
-      const result = await axon.execute(proposalId);
+    async ({ id }: { id: bigint }) => {
+      const result = await axon.execute(id);
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -18,8 +18,8 @@ export default function useExecute() {
     {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.refetchQueries(["activeProposals"]);
-        queryClient.refetchQueries(["allProposals"]);
+        queryClient.refetchQueries(["pendingActions"]);
+        queryClient.refetchQueries(["allActions"]);
       },
     }
   );

@@ -16,79 +16,34 @@ import T "./Types";
 shared actor class Axon(init: T.Initialization) = this {
   let Governance = actor "rrkah-fqaaa-aaaaa-aaaaq-cai" : GT.Service;
   stable var visibility = init.visibility;
-  stable var operators: [Principal] = [init.owner];
-  // Default policy is null, so the owner has complete authority
+  stable var owners: [Principal] = [init.owner];
+  // Default policy is null - any owner has complete authority
   stable var policy: ?T.Policy = null;
-  stable var neuronIds: [Nat64] = [];
   stable var neurons: ?GT.ListNeuronsResponse = null;
-  stable var allProposals: [T.NeuronCommandProposal] = [];
-  stable var activeProposals: [T.NeuronCommandProposal] = [];
+  stable var allActions: [T.Action] = [];
+  stable var pendingActions: [T.Action] = [];
   stable var lastId: Nat = 0;
 
-  // Default voting period for active proposals, 1 day
+  // Default voting period for pending actions, 1 day
   let DEFAULT_DURATION_SEC = 24 * 60 * 60;
-  // Minimum voting period for active proposals, 4 hours
+  // Minimum voting period for pending actions, 4 hours
   let MINIMUM_DURATION_SEC = 4 * 60 * 60;
-
-  // Any operator can manage axon
-  public shared({ caller }) func manage(request: T.ManageAxon) : async T.Result<()> {
-    if (not isOperator(caller)) {
-      return #err(#Unauthorized)
-    };
-
-    switch(request.action) {
-      case (#SetPolicy({ needed })) {
-        if (needed > operators.size() or needed == 0) {
-          return #err(#InvalidAction);
-        };
-        policy := ?{ needed = needed; total = operators.size() };
-      };
-      case (#AddOperator({ principal; needed })) {
-        if (not isOperator(principal)) {
-          if (needed > operators.size() + 1 or needed == 0) {
-            return #err(#InvalidAction);
-          };
-          operators := Array.append(operators, [principal]);
-          policy := ?{ needed = needed; total = operators.size() };
-        };
-      };
-      case (#RemoveOperator({ principal; needed })) {
-        if (operators.size() == 1) {
-          return #err(#CannotRemoveOperator);
-        };
-        if (needed >= operators.size() or needed == 0) {
-          return #err(#InvalidAction);
-        };
-        operators := Array.filter<Principal>(operators, func(p) { p != principal });
-        policy := ?{ needed = needed; total = operators.size() };
-      };
-      case (#UpdateVisibility(visibility_)) {
-        visibility := visibility_;
-      };
-    };
-    #ok
-  };
 
   public query func info() : async T.Info {
     {
       visibility = visibility;
-      operators = operators;
+      owners = owners;
       policy = policy;
     }
   };
 
   public query func getNeuronIds() : async [Nat64] {
-    switch (neurons) {
-      case (?data) {
-        Array.map<(Nat64, GT.NeuronInfo), Nat64>(data.neuron_infos, func(i) { i.0 })
-      };
-      case _ { [] }
-    }
+    neuronIds()
   };
 
-  // Get all full neurons. If private, only operators can call
+  // Get all full neurons. If private, only owners can call
   public query({ caller }) func getNeurons() : async T.ListNeuronsResult {
-    if (visibility == #Private and not isOperator(caller)) {
+    if (visibility == #Private and not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
@@ -102,7 +57,7 @@ shared actor class Axon(init: T.Initialization) = this {
 
   // Call list_neurons() and save the list of neurons that this canister controls
   public shared({ caller }) func sync() : async T.ListNeuronsResult {
-    if (visibility == #Private and not isOperator(caller)) {
+    if (visibility == #Private and not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
@@ -118,51 +73,58 @@ shared actor class Axon(init: T.Initialization) = this {
     #ok(response)
   };
 
-  // Get all active proposals. If private, only operators can call
-  public query({ caller }) func getActiveProposals() : async T.NeuronCommandProposalResult {
-    if (visibility == #Private and not isOperator(caller)) {
+  // Get all pending actions. If private, only owners can call
+  public query({ caller }) func getPendingActions() : async T.ActionResult {
+    if (visibility == #Private and not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
-    #ok(activeProposals)
+    #ok(pendingActions)
   };
 
-  // Get last 100 proposals, optionally before the specified id. If private, only operators can call
-  public query({ caller }) func getAllProposals(before: ?Nat) : async T.NeuronCommandProposalResult {
-    if (visibility == #Private and not isOperator(caller)) {
+  // Get last 100 actions, optionally before the specified id. If private, only owners can call
+  public query({ caller }) func getAllActions(before: ?Nat) : async T.ActionResult {
+    if (visibility == #Private and not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
     let filtered = switch(before) {
       case (?before_) {
-        Array.filter<T.NeuronCommandProposal>(allProposals, func(p) {
+        Array.filter<T.Action>(allActions, func(p) {
           p.id < before_
         });
       };
-      case null { allProposals }
+      case null { allActions }
     };
     let size = filtered.size();
     if (size == 0) {
       return #ok([]);
     };
 
-    #ok(Prim.Array_tabulate<T.NeuronCommandProposal>(Nat.min(100, size), func (i) {
+    #ok(Prim.Array_tabulate<T.Action>(Nat.min(100, size), func (i) {
       filtered.get(size - i - 1);
     }));
   };
 
-  // Submit a new Command proposal
-  public shared({ caller }) func proposeCommand(request: T.NewProposal<T.NeuronCommand>) : async T.Result<()> {
-    if (not isOperator(caller)) {
+  // Submit a new Command action
+  public shared({ caller }) func initiate(request: T.InitiateAction) : async T.Result<()> {
+    if (not isAuthed(caller)) {
       return #err(#Unauthorized);
     };
 
-    if (neuronIds.size() == 0) {
-      return #err(#CannotPropose);
+    switch (request.action) {
+      case (#NeuronCommand((command,_))) {
+        if (neuronIds().size() == 0) {
+          return #err(#NoNeurons);
+        };
+      };
+      case (#AxonCommand((command,_))) {
+        // Can add other ACL logic for axon commands here
+      };
     };
 
     // Snapshot the voters at creation
-    let ballots = Array.map<Principal, T.Ballot>(operators, func(p) {
+    let ballots = Array.map<Principal, T.Ballot>(owners, func(p) {
       {
         principal = p;
         // Auto approve for caller
@@ -171,23 +133,37 @@ shared actor class Axon(init: T.Initialization) = this {
     });
     let now = Time.now();
     let timeStart = Option.get(request.timeStart, now);
-    let newProposal = {
+    let actionType: T.ActionType = switch (request.action) {
+      case (#AxonCommand((command,_))) {
+        switch (command) {
+          case (#AddOwner({ principal; needed })) {
+            #AxonCommand((#AddOwner({ principal; needed; total = ?(owners.size() + 1) }), null))
+          };
+          case (#RemoveOwner({ principal; needed })) {
+            #AxonCommand((#RemoveOwner({ principal; needed; total = ?(owners.size() - 1) }), null))
+          };
+          case _ request.action;
+        }
+      };
+      case _ request.action;
+    };
+    let newAction = {
       id = lastId;
       timeStart = timeStart;
       timeEnd = timeStart + secsToNanos(Nat.min(MINIMUM_DURATION_SEC, Option.get(request.durationSeconds, DEFAULT_DURATION_SEC)));
       ballots = ballots;
       creator = caller;
-      proposal = request.proposal;
-      status = Option.get(statusFromPolicy(policy, ballots), #Active);
+      action = actionType;
+      status = Option.get(statusFromPolicy(policy, ballots), #Pending);
       policy = policy;
     };
-    activeProposals := Array.append(activeProposals, [newProposal]);
+    pendingActions := Array.append(pendingActions, [newAction]);
     lastId += 1;
 
-    switch (newProposal.status, request.execute) {
+    switch (newAction.status, request.execute) {
       case (#Accepted(_), ?true) {
         if (timeStart == now) {
-          ignore await execute(newProposal.id);
+          ignore execute(newAction.id);
         };
       };
       case _ {};
@@ -196,16 +172,16 @@ shared actor class Axon(init: T.Initialization) = this {
     #ok
   };
 
-  // Vote on an active proposal
-  public shared({ caller }) func vote(request: T.VoteRequest) : async T.Result<?T.NeuronCommandProposal> {
-    if (not isOperator(caller)) {
+  // Vote on an pending action
+  public shared({ caller }) func vote(request: T.VoteRequest) : async T.Result<()> {
+    if (not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
     let now = Time.now();
-    var result: T.Result<?T.NeuronCommandProposal> = #err(#NotFound);
-    var proposal: ?T.NeuronCommandProposal = null;
-    activeProposals := Array.map<T.NeuronCommandProposal, T.NeuronCommandProposal>(activeProposals, func(p) {
+    var result: T.Result<()> = #err(#NotFound);
+    var action: ?T.Action = null;
+    pendingActions := Array.map<T.Action, T.Action>(pendingActions, func(p) {
       if (p.id != request.id) {
         return p;
       };
@@ -216,7 +192,7 @@ shared actor class Axon(init: T.Initialization) = this {
             result := #err(#AlreadyVoted);
             return b
           } else {
-            result := #ok(null);
+            result := #ok();
             return {
               principal = caller;
               vote = ?request.vote;
@@ -226,34 +202,33 @@ shared actor class Axon(init: T.Initialization) = this {
           return b;
         }
       });
-      proposal := ?{
+      action := ?{
         id = p.id;
         ballots = ballots;
         timeStart = p.timeStart;
         timeEnd = p.timeEnd;
         creator = p.creator;
-        proposal = p.proposal;
+        action = p.action;
         status = Option.get(statusFromPolicy(p.policy, ballots), p.status);
         policy = p.policy;
       };
-      Option.unwrap(proposal)
+      Option.unwrap(action)
     });
 
     if (Result.isOk(result)) {
-      let proposal_ = Option.unwrap(proposal);
-      switch (proposal_.status) {
+      let action_ = Option.unwrap(action);
+      switch (action_.status) {
         // Execute if accepted
         case (#Accepted(_)) {
           if (request.execute) {
-            let execution = await execute(request.id);
-            return Result.mapOk<T.NeuronCommandProposal, ?T.NeuronCommandProposal, T.Error>(execution, func(r) { ?r })
+            ignore execute(request.id);
           }
         };
-        // Remove from active list if rejected
+        // Remove from pending list if rejected
         case (#Rejected(_)) {
-          allProposals := Array.append(allProposals, [proposal_]);
-          activeProposals := Array.filter<T.NeuronCommandProposal>(activeProposals, func(p) {
-            p.id != proposal_.id
+          allActions := Array.append(allActions, [action_]);
+          pendingActions := Array.filter<T.Action>(pendingActions, func(p) {
+            p.id != action_.id
           });
         };
         case _ {};
@@ -263,51 +238,58 @@ shared actor class Axon(init: T.Initialization) = this {
     result
   };
 
-  // Execute accepted proposal
-  public shared({ caller }) func execute(id: Nat) : async T.Result<T.NeuronCommandProposal> {
-    if (not isOperator(caller)) {
+  // Execute accepted action
+  public shared({ caller }) func execute(id: Nat) : async T.Result<T.Action> {
+    if (not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
-    let found = Array.find<T.NeuronCommandProposal>(activeProposals, func(p) { p.id == id });
+    let found = Array.find<T.Action>(pendingActions, func(p) { p.id == id });
     if (Option.isNull(found)) {
       return #err(#NotFound);
     };
 
-    let proposal = Option.unwrap(found);
-    switch (proposal.status) {
+    let action = Option.unwrap(found);
+    switch (action.status) {
       case (#Accepted(_)) {
-        // Forward command to specified neurons, or all
-        let proposalResponses = Buffer.Buffer<T.ManageNeuronCall>(neuronIds.size());
-        let specifiedNeuronIds = Option.get(proposal.proposal.neuronIds, neuronIds);
-        for (id in specifiedNeuronIds.vals()) {
-          try {
-            let response = await Governance.manage_neuron({id = ?{id = id}; command = ?proposal.proposal.command});
-            proposalResponses.add((id, #ok(response)));
-          } catch (error) {
-            // TODO: Command failed to deliver, retry if possible?
-            proposalResponses.add((id, #err(makeError(error))));
+        let actionType = switch (action.action) {
+          case (#NeuronCommand((command,_))) {
+            // Forward command to specified neurons, or all
+            let neuronIds_ = neuronIds();
+            let actionResponses = Buffer.Buffer<T.NeuronCommandResponse>(neuronIds_.size());
+            let specifiedNeuronIds = Option.get(command.neuronIds, neuronIds_);
+            for (id in specifiedNeuronIds.vals()) {
+              try {
+                let response = await Governance.manage_neuron({id = ?{id = id}; command = ?command.command});
+                actionResponses.add((id, #ok(response)));
+              } catch (error) {
+                // TODO: Command failed to deliver, retry if possible?
+                actionResponses.add((id, #err(makeError(error))));
+              };
+            };
+            #NeuronCommand((command, ?actionResponses.toArray()))
+          };
+          case (#AxonCommand((command,_))) {
+            let response = _executeAxonCommand(command);
+            #AxonCommand((command, ?response))
           };
         };
 
-        // Save responses for this proposal
-        let newProposal = {
-          id = proposal.id;
-          ballots = proposal.ballots;
-          timeStart = proposal.timeStart;
-          timeEnd = proposal.timeEnd;
-          creator = proposal.creator;
-          proposal = proposal.proposal;
-          status = #Executed({
-            time = Time.now();
-            responses = proposalResponses.toArray();
-          });
-          policy = proposal.policy;
+        // Save responses for this action
+        let newAction: T.Action = {
+          id = action.id;
+          ballots = action.ballots;
+          timeStart = action.timeStart;
+          timeEnd = action.timeEnd;
+          creator = action.creator;
+          action = actionType;
+          status = #Executed(Time.now());
+          policy = action.policy;
         };
-        // Move executed proposal from active to all
-        allProposals := Array.append(allProposals, [newProposal]);
-        activeProposals := Array.filter<T.NeuronCommandProposal>(activeProposals, func(p) { p.id != id });
-        #ok(newProposal);
+        // Move executed action from pending to all
+        allActions := Array.append(allActions, [newAction]);
+        pendingActions := Array.filter<T.Action>(pendingActions, func(p) { p.id != id });
+        #ok(newAction);
       };
       case _ {
         #err(#CannotExecute);
@@ -315,40 +297,40 @@ shared actor class Axon(init: T.Initialization) = this {
     }
   };
 
-  // Remove expired proposals. Called by sync
+  // Remove expired actions. Called by sync
   public shared({ caller }) func cleanup() : async T.Result<()> {
-    if (not isOperator(caller)) {
+    if (not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
-    let expired = Buffer.Buffer<T.NeuronCommandProposal>(activeProposals.size());
+    let expired = Buffer.Buffer<T.Action>(pendingActions.size());
     let now = Time.now();
-    for (proposal in activeProposals.vals()) {
-      if (now >= proposal.timeEnd) {
+    for (action in pendingActions.vals()) {
+      if (now >= action.timeEnd) {
         expired.add({
-          id = proposal.id;
-          ballots = proposal.ballots;
-          timeStart = proposal.timeStart;
-          timeEnd = proposal.timeEnd;
-          creator = proposal.creator;
-          proposal = proposal.proposal;
+          id = action.id;
+          ballots = action.ballots;
+          timeStart = action.timeStart;
+          timeEnd = action.timeEnd;
+          creator = action.creator;
+          action = action.action;
           status = #Expired(now);
-          policy = proposal.policy;
+          policy = action.policy;
         });
       }
     };
 
-    // Move expired proposals from active to all
+    // Move expired actions from pending to all
     let expiredArr = expired.toArray();
-    allProposals := Array.append(allProposals, expiredArr);
-    activeProposals := Array.filter<T.NeuronCommandProposal>(activeProposals, func(r) {
-      not Arr.contains<T.NeuronCommandProposal>(expiredArr, r, func(a, b) { a.id == b.id })
+    allActions := Array.append(allActions, expiredArr);
+    pendingActions := Array.filter<T.Action>(pendingActions, func(r) {
+      not Arr.contains<T.Action>(expiredArr, r, func(a, b) { a.id == b.id })
     });
 
     #ok();
   };
 
-  func statusFromPolicy<R>(policy: ?T.Policy, ballots: [T.Ballot]): ?T.Status<R> {
+  func statusFromPolicy(policy: ?T.Policy, ballots: [T.Ballot]): ?T.Status {
     let now = Time.now();
     switch(policy) {
       case (?{ needed; total }) {
@@ -366,10 +348,10 @@ shared actor class Axon(init: T.Initialization) = this {
     };
   };
 
-  // Returns true if the principal is in the operators array OR if it's this canister
-  func isOperator(principal: Principal): Bool {
+  // Returns true if the principal is in the owners array OR if it's this canister
+  func isAuthed(principal: Principal): Bool {
     principal == Principal.fromActor(this) or
-    Arr.contains<Principal>(operators, principal, Principal.equal)
+    Arr.contains<Principal>(owners, principal, Principal.equal)
   };
 
   func secsToNanos(s: Nat): Nat { 1_000_000_000 * s };
@@ -379,5 +361,51 @@ shared actor class Axon(init: T.Initialization) = this {
       error_message = Error.message(e);
       error_type = Error.code(e);
     })
+  };
+
+  // Return neuron IDs from stored neuron_infos
+  func neuronIds() : [Nat64] {
+    switch (neurons) {
+      case (?data) {
+        Array.map<(Nat64, GT.NeuronInfo), Nat64>(data.neuron_infos, func(i) { i.0 })
+      };
+      case _ { [] }
+    }
+  };
+
+  func _executeAxonCommand(request: T.AxonCommandRequest) : T.AxonCommandResponse {
+    switch(request) {
+      case (#SetPolicy({ needed })) {
+        if (needed > owners.size() or needed == 0) {
+          return #err(#InvalidAction);
+        };
+        policy := ?{ needed = needed; total = owners.size() };
+      };
+      case (#AddOwner({ principal; needed })) {
+        if (not isAuthed(principal)) {
+          if (needed > owners.size() + 1 or needed == 0) {
+            return #err(#InvalidAction);
+          };
+          owners := Array.append(owners, [principal]);
+          policy := ?{ needed = needed; total = owners.size() };
+        } else {
+          return #err(#InvalidAction)
+        }
+      };
+      case (#RemoveOwner({ principal; needed })) {
+        if (owners.size() == 1) {
+          return #err(#CannotRemoveOwner);
+        };
+        if (needed >= owners.size() or needed == 0) {
+          return #err(#InvalidAction);
+        };
+        owners := Array.filter<Principal>(owners, func(p) { p != principal });
+        policy := ?{ needed = needed; total = owners.size() };
+      };
+      case (#UpdateVisibility(visibility_)) {
+        visibility := visibility_;
+      };
+    };
+    #ok
   };
 };

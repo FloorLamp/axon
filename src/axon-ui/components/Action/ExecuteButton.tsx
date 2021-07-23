@@ -3,10 +3,10 @@ import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 
 export default function ExecuteButton({
-  proposalId,
+  id,
   isDisabled,
 }: {
-  proposalId: bigint;
+  id: bigint;
   isDisabled?: boolean;
 }) {
   const { mutate, isLoading, isError, error } = useExecute();
@@ -20,7 +20,7 @@ export default function ExecuteButton({
           isDisabled={isDisabled}
           activeClassName="btn-cta"
           disabledClassName="btn-cta-disabled"
-          onClick={() => mutate({ proposalId })}
+          onClick={() => mutate({ id })}
         >
           Execute
         </SpinnerButton>

@@ -6,15 +6,16 @@
 
 ---
 
-Axon is a neuron management canister.
+Axon is a multi-user, multi-neuron management canister.
 
 ## Overview
 
 - An Axon canister controls one or more neurons
-- Axons have one or more Principals (operators) that manage its neurons
-- `ManageNeuron` commands are sent to Axon, which queues them for voting
-- A snapshot of operators is taken at time of submission
-- Once a majority of operators vote yes to a proposal, the command is forwarded to all controlled neurons
+- Axons can have one or more owners
+- An approval policy can be set, eg. 3 out of 5 owners required to approve an action
+- Requests like `ManageNeuron` are sent to Axon, which queues them for approval
+- A snapshot of owners and current policy is stored with each request
+- Once the policy conditions are met, the request is forwarded to all controlled neurons
 - Axons can be public and expose all neuron data
 
 ## Usage
@@ -25,4 +26,4 @@ Deploy an Axon canister:
 dfx deploy Axon --argument 'record {owner= (principal "your-principal-here"); visibility= variant{Public}}'
 ```
 
-Then, spawn a neuron and set the controller to the Axon canister.
+Currently, canisters cannot control neurons or hold ICP. It is only possible to add the Axon canister as a hot key for neurons, so only commands like `Follow` and `RegisterVote` will succeed.

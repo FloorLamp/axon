@@ -5,7 +5,7 @@ import GT "./GovernanceTypes";
 module {
   public type Info = {
     visibility: Visibility;
-    operators: [Principal];
+    owners: [Principal];
     policy: ?Policy;
   };
 
@@ -21,14 +21,13 @@ module {
     total: Nat;
   };
 
-  public type ManageAxon = {
-    action: {
-      #SetPolicy: {needed: Nat};
-      #AddOperator: {principal: Principal; needed: Nat};
-      #RemoveOperator: {principal: Principal; needed: Nat};
-      #UpdateVisibility: Visibility;
-    };
+  public type AxonCommandRequest = {
+    #SetPolicy: {needed: Nat};
+    #AddOwner: {principal: Principal; needed: Nat; total: ?Nat};
+    #RemoveOwner: {principal: Principal; needed: Nat; total: ?Nat};
+    #UpdateVisibility: Visibility;
   };
+  public type AxonCommandResponse = Result<()>;
 
   public type VoteRequest = {
     id: Nat;
@@ -40,18 +39,18 @@ module {
     #Unauthorized;
     #InvalidAction;
     #NotFound;
-    #CannotRemoveOperator;
-    #CannotPropose;
+    #CannotRemoveOwner;
+    #NoNeurons;
     #CannotExecute;
     #AlreadyVoted;
     #GovernanceError: GT.GovernanceError;
     #Error: { error_message : Text; error_type : Error.ErrorCode };
   };
 
-  public type NewProposal<P> = {
+  public type InitiateAction = {
     durationSeconds: ?Nat;
     timeStart: ?Int;
-    proposal: P;
+    action: ActionType;
     execute: ?Bool;
   };
 
@@ -65,40 +64,41 @@ module {
     vote: ?Vote;
   };
 
-  public type Execute<R> = {
-    time: Int;
-    responses: [R];
-  };
-
-  public type Status<R> = {
-    #Active;
+  public type Status = {
+    #Pending;
     #Accepted: Int;
-    #Executed: Execute<R>;
+    #Executed: Int;
     #Rejected: Int;
     #Expired: Int;
   };
 
-  public type Proposal<P, R> = {
+  public type Action = {
     id: Nat;
     ballots: [Ballot];
     timeStart: Int;
     timeEnd: Int;
     creator: Principal;
-    proposal: P;
-    status: Status<R>;
+    action: ActionType;
+    status: Status;
     policy: ?Policy;
   };
 
-  public type ManageNeuronCall = (Nat64, Result<GT.ManageNeuronResponse>);
+  public type AxonCommand = (AxonCommandRequest, ?AxonCommandResponse);
+  public type NeuronCommand = (NeuronCommandRequest, ?[NeuronCommandResponse]);
 
-  public type NeuronCommand = {
+  public type ActionType = {
+    #AxonCommand: AxonCommand;
+    #NeuronCommand: NeuronCommand;
+  };
+
+  public type NeuronCommandRequest = {
     neuronIds: ?[Nat64];
     command: GT.Command;
   };
-  public type NeuronCommandProposal = Proposal<NeuronCommand, ManageNeuronCall>;
+  public type NeuronCommandResponse = (Nat64, Result<GT.ManageNeuronResponse>);
 
   public type Result<T> = Result.Result<T, Error>;
   public type ListNeuronsResult = Result<GT.ListNeuronsResponse>;
-  public type NeuronCommandProposalResult = Result<[NeuronCommandProposal]>;
+  public type ActionResult = Result<[Action]>;
   public type SyncResult = Result<[Nat64]>;
 }

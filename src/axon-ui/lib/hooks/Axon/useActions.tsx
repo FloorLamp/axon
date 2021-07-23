@@ -3,13 +3,13 @@ import { useAxon } from "../../../components/Store/Store";
 import { ONE_MINUTES_MS } from "../../constants";
 import { errorToString } from "../../utils";
 
-export const useActiveProposals = () => {
+export const usePendingActions = () => {
   const axon = useAxon();
   return useQuery(
-    "activeProposals",
+    "pendingActions",
     async () => {
-      const result = await axon.getActiveProposals();
-      console.log("activeProposals", result);
+      const result = await axon.getPendingActions();
+      console.log("pendingActions", result);
 
       if ("ok" in result) {
         return result.ok;
@@ -25,12 +25,12 @@ export const useActiveProposals = () => {
   );
 };
 
-export const useAllProposals = () => {
+export const useAllActions = () => {
   const axon = useAxon();
   return useQuery(
-    "allProposals",
+    "allActions",
     async () => {
-      const result = await axon.getAllProposals([]);
+      const result = await axon.getAllActions([]);
       if ("ok" in result) {
         return result.ok;
       } else {

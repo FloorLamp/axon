@@ -3,11 +3,12 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import React from "react";
 import { useIsMutating } from "react-query";
-import { NeuronCommandProposal } from "../../declarations/Axon/Axon.did";
+import { Action } from "../../declarations/Axon/Axon.did";
+import { actionTypeToString } from "../../lib/actionTypes";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
-import { neuronCommandToString } from "../../lib/neuronCommandToString";
 import { StatusKey } from "../../lib/types";
-import NeuronCommandDescription from "../Commands/NeuronCommandDescription";
+import AxonCommandSummary from "../Axon/AxonCommandSummary";
+import NeuronCommandSummary from "../Commands/NeuronCommandSummary";
 import ListButton from "../ExpandableList/ListButton";
 import ListPanel from "../ExpandableList/ListPanel";
 import StatusLabel from "../Labels/StatusLabel";
@@ -16,11 +17,11 @@ import { useGlobalContext } from "../Store/Store";
 import ApproveRejectButtons from "./ApproveRejectButtons";
 import Steps from "./Steps";
 
-export const Proposal = ({
-  proposal,
+export const ActionDetails = ({
+  action,
   defaultOpen = false,
 }: {
-  proposal: NeuronCommandProposal;
+  action: Action;
   defaultOpen?: boolean;
 }) => {
   const {
@@ -28,14 +29,15 @@ export const Proposal = ({
   } = useGlobalContext();
   const isOwner = useIsOwner();
 
-  const status = Object.keys(proposal.status)[0] as StatusKey;
+  // const request = 'NeuronCommand' in action ? action.NeuronCommand : action.AxonCommand
+  const status = Object.keys(action.status)[0] as StatusKey;
 
-  const myVote = proposal.ballots.find(
+  const myVote = action.ballots.find(
     (ballot) => principal && ballot.principal.toHex() === principal.toHex()
   );
   const isEligibleToVote =
-    isOwner && status === "Active" && myVote && !myVote.vote[0];
-  const isMutating = !!useIsMutating({ mutationKey: ["vote", proposal.id] });
+    isOwner && status === "Pending" && myVote && !myVote.vote[0];
+  const isMutating = !!useIsMutating({ mutationKey: ["vote", action.id] });
 
   let actionTime: DateTime;
   if (
@@ -44,10 +46,7 @@ export const Proposal = ({
     status === "Accepted" ||
     status === "Expired"
   ) {
-    const ts =
-      "Executed" in proposal.status
-        ? proposal.status.Executed.time
-        : Object.values(proposal.status)[0];
+    const ts = Object.values(action.status)[0];
     actionTime = DateTime.fromSeconds(Number(ts / BigInt(1e9)));
   }
 
@@ -59,14 +58,12 @@ export const Proposal = ({
             <div className="flex">
               <div className="flex flex-col sm:flex-row">
                 <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 items-center">
-                  <span className="text-gray-500">
-                    #{proposal.id.toString()}
-                  </span>
-                  <span>{neuronCommandToString(proposal.proposal)}</span>
+                  <span className="text-gray-500">#{action.id.toString()}</span>
+                  <span>{actionTypeToString(action.action)}</span>
                 </div>
                 <div className="flex-1 flex items-center gap-2">
                   <StatusLabel status={status} />
-                  {status !== "Active" && (
+                  {status !== "Pending" && (
                     <span className="text-gray-500 text-xs">
                       {actionTime.toRelative()}
                     </span>
@@ -81,10 +78,7 @@ export const Proposal = ({
                         "hidden group-hover:block": !isMutating,
                       })}
                     >
-                      <ApproveRejectButtons
-                        proposalId={proposal.id}
-                        size="small"
-                      />
+                      <ApproveRejectButtons id={action.id} size="small" />
                     </div>
                     <span
                       className="w-2 h-2 relative"
@@ -102,7 +96,7 @@ export const Proposal = ({
             <div className="shadow-inner flex flex-col divide-y divide-gray-200 px-6 py-4">
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Action ID</div>
-                <div>{proposal.id.toString()}</div>
+                <div>{action.id.toString()}</div>
               </div>
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Status</div>
@@ -116,7 +110,7 @@ export const Proposal = ({
                 <div>
                   <TimestampLabel
                     dt={DateTime.fromSeconds(
-                      Number(proposal.timeStart / BigInt(1e9))
+                      Number(action.timeStart / BigInt(1e9))
                     )}
                   />
                 </div>
@@ -126,7 +120,7 @@ export const Proposal = ({
                 <div>
                   <TimestampLabel
                     dt={DateTime.fromSeconds(
-                      Number(proposal.timeEnd / BigInt(1e9))
+                      Number(action.timeEnd / BigInt(1e9))
                     )}
                   />
                 </div>
@@ -134,17 +128,17 @@ export const Proposal = ({
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Action</div>
                 <div>
-                  <NeuronCommandDescription neuronCommand={proposal.proposal} />
+                  <ActionSummary action={action} />
                 </div>
               </div>
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Policy</div>
                 <div>
-                  {proposal.policy[0] ? (
+                  {action.policy[0] ? (
                     <span>
-                      <strong>{proposal.policy[0].needed.toString()}</strong>
+                      <strong>{action.policy[0].needed.toString()}</strong>
                       {" out of "}
-                      <strong>{proposal.policy[0].total.toString()}</strong>
+                      <strong>{action.policy[0].total.toString()}</strong>
                     </span>
                   ) : (
                     <span>
@@ -156,10 +150,7 @@ export const Proposal = ({
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Progress</div>
                 <div className="flex-1">
-                  <Steps
-                    proposal={proposal}
-                    isEligibleToVote={isEligibleToVote}
-                  />
+                  <Steps action={action} isEligibleToVote={isEligibleToVote} />
                 </div>
               </div>
             </div>
@@ -168,4 +159,19 @@ export const Proposal = ({
       )}
     </Disclosure>
   );
+};
+
+const ActionSummary = ({ action }: { action: Action }) => {
+  if ("AxonCommand" in action.action) {
+    return (
+      <AxonCommandSummary
+        command={action.action.AxonCommand[0]}
+        action={action}
+      />
+    );
+  } else {
+    return (
+      <NeuronCommandSummary neuronCommand={action.action.NeuronCommand[0]} />
+    );
+  }
 };

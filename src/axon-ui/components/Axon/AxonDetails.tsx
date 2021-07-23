@@ -28,10 +28,10 @@ export default function AxonDetails() {
         {error && <ErrorAlert>{error}</ErrorAlert>}
 
         <div>
-          <h2 className="text-xl font-bold">Operators</h2>
+          <h2 className="text-xl font-bold">Owners</h2>
           <ul>
             {data &&
-              data.operators.map((p) => (
+              data.owners.map((p) => (
                 <li key={p.toText()}>
                   <IdentifierLabelWithButtons type="Principal" id={p}>
                     {p.toText()}
@@ -46,8 +46,8 @@ export default function AxonDetails() {
           {data && data.policy[0] ? (
             <span>
               <strong>{data.policy[0].needed.toString()}</strong> out of{" "}
-              <strong>{data.policy[0].total.toString()}</strong> operators need
-              to approve
+              <strong>{data.policy[0].total.toString()}</strong> owners need to
+              approve
             </span>
           ) : (
             <span>

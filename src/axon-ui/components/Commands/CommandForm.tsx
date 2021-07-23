@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import useProposeCommand from "../../lib/hooks/Axon/useProposeCommand";
+import useInitiate from "../../lib/hooks/Axon/useInitiate";
 import { stringify } from "../../lib/utils";
 import { ProposalOptionsForm } from "../Axon/ProposalOptionsForm";
 import SpinnerButton from "../Buttons/SpinnerButton";
@@ -30,7 +30,7 @@ export default function NeuronCommandForm() {
   const [options, setOptions] = useState({});
   const onChangeOptions = (opts) => setOptions(opts);
 
-  const { mutate, error, isError, isLoading } = useProposeCommand(options);
+  const { mutate, error, isError, isLoading } = useInitiate(options);
 
   const [commandName, setCommandName] = useState<CommandName>(commands[0]);
   const [command, setCommand] = useState(null);
@@ -59,8 +59,13 @@ export default function NeuronCommandForm() {
 
     if (command) {
       mutate({
-        command,
-        neuronIds: neuronIds.length > 0 ? [neuronIds.map(BigInt)] : [],
+        NeuronCommand: [
+          {
+            command,
+            neuronIds: neuronIds.length > 0 ? [neuronIds.map(BigInt)] : [],
+          },
+          [],
+        ],
       });
     }
   }

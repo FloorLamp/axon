@@ -4,7 +4,7 @@ import { StatusKey } from "../../lib/types";
 
 const colorOf = (status: StatusKey) => {
   switch (status) {
-    case "Active":
+    case "Pending":
     case "Accepted":
     case "Executed":
       return "bg-green-300 text-green-700";

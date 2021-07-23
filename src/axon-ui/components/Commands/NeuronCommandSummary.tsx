@@ -8,7 +8,7 @@ import {
   DisburseToNeuron,
   Follow,
   IncreaseDissolveDelay,
-  NeuronCommand,
+  NeuronCommandRequest,
   RegisterVote,
   SetDissolveTimestamp,
   Spawn,
@@ -22,14 +22,14 @@ import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 
-export default function NeuronCommandDescription({
+export default function NeuronCommandSummary({
   neuronCommand: { neuronIds, command },
 }: {
-  neuronCommand: NeuronCommand;
+  neuronCommand: NeuronCommandRequest;
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <CommandDescription command={command} />
+      <CommandSummary command={command} />
       <NeuronIds neuronIds={neuronIds} />
     </div>
   );
@@ -44,7 +44,7 @@ function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
   );
 }
 
-function CommandDescription({ command }: { command: Command }) {
+function CommandSummary({ command }: { command: Command }) {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
     case "RegisterVote": {

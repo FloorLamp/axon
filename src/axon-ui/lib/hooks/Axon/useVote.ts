@@ -2,15 +2,15 @@ import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { errorToString } from "../../utils";
 
-export default function useVote(proposalId: bigint) {
+export default function useVote(id: bigint) {
   const axon = useAxon();
   const queryClient = useQueryClient();
 
   return useMutation(
-    ["vote", proposalId],
+    ["vote", id],
     async ({ yesNo, execute }: { yesNo: boolean; execute: boolean }) => {
       const result = await axon.vote({
-        id: proposalId,
+        id: id,
         vote: yesNo ? { Yes: null } : { No: null },
         execute,
       });
@@ -23,8 +23,8 @@ export default function useVote(proposalId: bigint) {
     {
       onSuccess: (data) => {
         console.log("vote", data);
-        queryClient.refetchQueries(["activeProposals"]);
-        queryClient.refetchQueries(["allProposals"]);
+        queryClient.refetchQueries(["pendingActions"]);
+        queryClient.refetchQueries(["allActions"]);
       },
     }
   );
