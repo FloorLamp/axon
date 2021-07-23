@@ -3,6 +3,7 @@ import Axon, {
   AxonCommandRequest,
   Command,
   Command_1,
+  InitiateAction,
   Operation,
   Status,
 } from "../declarations/Axon/Axon.did";
@@ -19,3 +20,10 @@ export type CommandResponseKey = KeysOfUnion<Command_1>;
 export type AxonCommandKey = KeysOfUnion<AxonCommandRequest>;
 
 export type OperationKey = KeysOfUnion<Operation>;
+
+export type ActionOptions = {
+  [Property in keyof Omit<
+    InitiateAction,
+    "action"
+  >]?: InitiateAction[Property][0];
+};

@@ -9,11 +9,16 @@ export default function useVote(id: bigint) {
   return useMutation(
     ["vote", id],
     async ({ yesNo, execute }: { yesNo: boolean; execute: boolean }) => {
-      const result = await axon.vote({
-        id: id,
-        vote: yesNo ? { Yes: null } : { No: null },
-        execute,
-      });
+      let result;
+      try {
+        result = await axon.vote({
+          id: id,
+          vote: yesNo ? { Yes: null } : { No: null },
+          execute,
+        });
+      } catch (error) {
+        throw error.message;
+      }
       if ("ok" in result) {
         return result.ok;
       } else {

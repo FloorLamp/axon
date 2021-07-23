@@ -2,12 +2,13 @@ import classNames from "classnames";
 import React, { ReactNode } from "react";
 import {
   FaCheckCircle,
+  FaCircleNotch,
   FaDotCircle,
   FaExclamationCircle,
   FaPlusCircle,
   FaTimesCircle,
 } from "react-icons/fa";
-import { Action, Ballot } from "../../declarations/Axon/Axon.did";
+import { AxonAction, Ballot } from "../../declarations/Axon/Axon.did";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { StatusKey } from "../../lib/types";
 import { pluralize, shortPrincipal } from "../../lib/utils";
@@ -70,7 +71,7 @@ export default function Steps({
   action,
   isEligibleToVote,
 }: {
-  action: Action;
+  action: AxonAction;
   isEligibleToVote: boolean;
 }) {
   const isOwner = useIsOwner();
@@ -110,6 +111,19 @@ export default function Steps({
         )}
       </Step>
     );
+  } else if (status === "Executing") {
+    activeStep = (
+      <Step
+        circle={
+          <FaCircleNotch
+            size={CIRCLE_SIZE}
+            className="animate-spin text-blue-400"
+          />
+        }
+        label={<span className="text-blue-700">Execute</span>}
+        showLine={false}
+      />
+    );
   }
 
   const approves = ballots.filter(({ vote: [v] }) => "Yes" in v);
@@ -119,7 +133,7 @@ export default function Steps({
     <ul className="flex flex-col">
       <Step
         circle={<FaPlusCircle size={CIRCLE_SIZE} className="text-gray-400" />}
-        label={<span className="text-gray-800">Created</span>}
+        label={<span className="text-gray-700">Created</span>}
       >
         <IdentifierLabelWithButtons type="Principal" id={action.creator}>
           {shortPrincipal(action.creator)}

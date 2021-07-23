@@ -1,6 +1,6 @@
 import useExecute from "../../lib/hooks/Axon/useExecute";
 import SpinnerButton from "../Buttons/SpinnerButton";
-import ErrorAlert from "../Labels/ErrorAlert";
+import { ActionError } from "./ActionResponseSummary";
 
 export default function ExecuteButton({
   id,
@@ -25,7 +25,7 @@ export default function ExecuteButton({
           Execute
         </SpinnerButton>
       </div>
-      {isError && <ErrorAlert>{error}</ErrorAlert>}
+      {isError && <ActionError label="Error">{error}</ActionError>}
     </div>
   );
 }

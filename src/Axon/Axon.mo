@@ -20,8 +20,8 @@ shared actor class Axon(init: T.Initialization) = this {
   // Default policy is null - any owner has complete authority
   stable var policy: ?T.Policy = null;
   stable var neurons: ?GT.ListNeuronsResponse = null;
-  stable var allActions: [T.Action] = [];
-  stable var pendingActions: [T.Action] = [];
+  stable var allActions: [T.AxonAction] = [];
+  stable var pendingActions: [T.AxonAction] = [];
   stable var lastId: Nat = 0;
 
   // Default voting period for pending actions, 1 day
@@ -90,7 +90,7 @@ shared actor class Axon(init: T.Initialization) = this {
 
     let filtered = switch(before) {
       case (?before_) {
-        Array.filter<T.Action>(allActions, func(p) {
+        Array.filter<T.AxonAction>(allActions, func(p) {
           p.id < before_
         });
       };
@@ -101,7 +101,7 @@ shared actor class Axon(init: T.Initialization) = this {
       return #ok([]);
     };
 
-    #ok(Prim.Array_tabulate<T.Action>(Nat.min(100, size), func (i) {
+    #ok(Prim.Array_tabulate<T.AxonAction>(Nat.min(100, size), func (i) {
       filtered.get(size - i - 1);
     }));
   };
@@ -180,8 +180,8 @@ shared actor class Axon(init: T.Initialization) = this {
 
     let now = Time.now();
     var result: T.Result<()> = #err(#NotFound);
-    var action: ?T.Action = null;
-    pendingActions := Array.map<T.Action, T.Action>(pendingActions, func(p) {
+    var action: ?T.AxonAction = null;
+    pendingActions := Array.map<T.AxonAction, T.AxonAction>(pendingActions, func(p) {
       if (p.id != request.id) {
         return p;
       };
@@ -227,7 +227,7 @@ shared actor class Axon(init: T.Initialization) = this {
         // Remove from pending list if rejected
         case (#Rejected(_)) {
           allActions := Array.append(allActions, [action_]);
-          pendingActions := Array.filter<T.Action>(pendingActions, func(p) {
+          pendingActions := Array.filter<T.AxonAction>(pendingActions, func(p) {
             p.id != action_.id
           });
         };
@@ -239,19 +239,39 @@ shared actor class Axon(init: T.Initialization) = this {
   };
 
   // Execute accepted action
-  public shared({ caller }) func execute(id: Nat) : async T.Result<T.Action> {
+  public shared({ caller }) func execute(id: Nat) : async T.Result<T.AxonAction> {
     if (not isAuthed(caller)) {
       return #err(#Unauthorized)
     };
 
-    let found = Array.find<T.Action>(pendingActions, func(p) { p.id == id });
-    if (Option.isNull(found)) {
-      return #err(#NotFound);
-    };
+    // Set to Executing state
+    var found: ?T.AxonAction = null;
+    pendingActions := Array.map<T.AxonAction, T.AxonAction>(pendingActions, func(p) {
+      if (p.id != id) {
+        return p;
+      };
 
-    let action = Option.unwrap(found);
-    switch (action.status) {
-      case (#Accepted(_)) {
+      switch (p.status) {
+        case (#Accepted(_)) {
+          found := ?{
+            id = p.id;
+            ballots = p.ballots;
+            timeStart = p.timeStart;
+            timeEnd = p.timeEnd;
+            creator = p.creator;
+            action = p.action;
+            status = #Executing(Time.now());
+            policy = p.policy;
+          };
+        };
+        // Trap and revert if not accepted
+        case _ { assert(false) }
+      };
+      Option.unwrap(found)
+    });
+
+    switch (found) {
+      case (?action) {
         let actionType = switch (action.action) {
           case (#NeuronCommand((command,_))) {
             // Forward command to specified neurons, or all
@@ -276,7 +296,7 @@ shared actor class Axon(init: T.Initialization) = this {
         };
 
         // Save responses for this action
-        let newAction: T.Action = {
+        let newAction: T.AxonAction = {
           id = action.id;
           ballots = action.ballots;
           timeStart = action.timeStart;
@@ -288,11 +308,11 @@ shared actor class Axon(init: T.Initialization) = this {
         };
         // Move executed action from pending to all
         allActions := Array.append(allActions, [newAction]);
-        pendingActions := Array.filter<T.Action>(pendingActions, func(p) { p.id != id });
+        pendingActions := Array.filter<T.AxonAction>(pendingActions, func(p) { p.id != id });
         #ok(newAction);
       };
       case _ {
-        #err(#CannotExecute);
+        #err(#NotFound);
       };
     }
   };
@@ -303,10 +323,11 @@ shared actor class Axon(init: T.Initialization) = this {
       return #err(#Unauthorized)
     };
 
-    let expired = Buffer.Buffer<T.Action>(pendingActions.size());
+    let expired = Buffer.Buffer<T.AxonAction>(pendingActions.size());
     let now = Time.now();
-    for (action in pendingActions.vals()) {
-      if (now >= action.timeEnd) {
+    pendingActions := Array.filter<T.AxonAction>(pendingActions, func(action) {
+      let shouldKeep = now < action.timeEnd;
+      if (not shouldKeep) {
         expired.add({
           id = action.id;
           ballots = action.ballots;
@@ -317,15 +338,13 @@ shared actor class Axon(init: T.Initialization) = this {
           status = #Expired(now);
           policy = action.policy;
         });
-      }
-    };
+      };
+      shouldKeep
+    });
 
     // Move expired actions from pending to all
     let expiredArr = expired.toArray();
     allActions := Array.append(allActions, expiredArr);
-    pendingActions := Array.filter<T.Action>(pendingActions, func(r) {
-      not Arr.contains<T.Action>(expiredArr, r, func(a, b) { a.id == b.id })
-    });
 
     #ok();
   };

@@ -1,6 +1,34 @@
 import type { Principal } from '@dfinity/principal';
 export interface AccountIdentifier { 'hash' : Array<number> }
-export interface Action {
+export type Action = { 'ManageNeuron' : ManageNeuron } |
+  { 'ExecuteNnsFunction' : ExecuteNnsFunction } |
+  { 'RewardNodeProvider' : RewardNodeProvider } |
+  { 'SetDefaultFollowees' : SetDefaultFollowees } |
+  { 'ManageNetworkEconomics' : NetworkEconomics } |
+  { 'ApproveGenesisKyc' : ApproveGenesisKyc } |
+  { 'AddOrRemoveNodeProvider' : AddOrRemoveNodeProvider } |
+  { 'Motion' : Motion };
+export type ActionResult = { 'ok' : Array<AxonAction> } |
+  { 'err' : Error };
+export type ActionType = { 'NeuronCommand' : NeuronCommand } |
+  { 'AxonCommand' : AxonCommand };
+export interface AddHotKey { 'new_hot_key' : [] | [Principal] }
+export interface AddOrRemoveNodeProvider { 'change' : [] | [Change] }
+export interface Amount { 'e8s' : bigint }
+export interface ApproveGenesisKyc { 'principals' : Array<Principal> }
+export interface Axon {
+  'cleanup' : () => Promise<Result>,
+  'execute' : (arg_0: bigint) => Promise<Result_2>,
+  'getAllActions' : (arg_0: [] | [bigint]) => Promise<ActionResult>,
+  'getNeuronIds' : () => Promise<Array<bigint>>,
+  'getNeurons' : () => Promise<ListNeuronsResult>,
+  'getPendingActions' : () => Promise<ActionResult>,
+  'info' : () => Promise<Info>,
+  'initiate' : (arg_0: InitiateAction) => Promise<Result>,
+  'sync' : () => Promise<ListNeuronsResult>,
+  'vote' : (arg_0: VoteRequest) => Promise<Result>,
+}
+export interface AxonAction {
   'id' : bigint,
   'status' : Status,
   'creator' : Principal,
@@ -9,34 +37,6 @@ export interface Action {
   'timeStart' : bigint,
   'timeEnd' : bigint,
   'policy' : [] | [Policy],
-}
-export type ActionResult = { 'ok' : Array<Action> } |
-  { 'err' : Error };
-export type ActionType = { 'NeuronCommand' : NeuronCommand } |
-  { 'AxonCommand' : AxonCommand };
-export type Action__1 = { 'ManageNeuron' : ManageNeuron } |
-  { 'ExecuteNnsFunction' : ExecuteNnsFunction } |
-  { 'RewardNodeProvider' : RewardNodeProvider } |
-  { 'SetDefaultFollowees' : SetDefaultFollowees } |
-  { 'ManageNetworkEconomics' : NetworkEconomics } |
-  { 'ApproveGenesisKyc' : ApproveGenesisKyc } |
-  { 'AddOrRemoveNodeProvider' : AddOrRemoveNodeProvider } |
-  { 'Motion' : Motion };
-export interface AddHotKey { 'new_hot_key' : [] | [Principal] }
-export interface AddOrRemoveNodeProvider { 'change' : [] | [Change] }
-export interface Amount { 'e8s' : bigint }
-export interface ApproveGenesisKyc { 'principals' : Array<Principal> }
-export interface Axon {
-  'cleanup' : () => Promise<Result_2>,
-  'execute' : (arg_0: bigint) => Promise<Result_3>,
-  'getAllActions' : (arg_0: [] | [bigint]) => Promise<ActionResult>,
-  'getNeuronIds' : () => Promise<Array<bigint>>,
-  'getNeurons' : () => Promise<ListNeuronsResult>,
-  'getPendingActions' : () => Promise<ActionResult>,
-  'info' : () => Promise<Info>,
-  'initiate' : (arg_0: InitiateAction) => Promise<Result_2>,
-  'sync' : () => Promise<ListNeuronsResult>,
-  'vote' : (arg_0: VoteRequest) => Promise<Result>,
 }
 export type AxonCommand = [AxonCommandRequest, [] | [AxonCommandResponse]];
 export type AxonCommandRequest = {
@@ -214,18 +214,16 @@ export type Operation = { 'RemoveHotKey' : RemoveHotKey } |
 export interface Policy { 'total' : bigint, 'needed' : bigint }
 export interface Proposal {
   'url' : string,
-  'action' : [] | [Action__1],
+  'action' : [] | [Action],
   'summary' : string,
 }
 export interface RegisterVote { 'vote' : number, 'proposal' : [] | [NeuronId] }
 export interface RemoveHotKey { 'hot_key_to_remove' : [] | [Principal] }
-export type Result = { 'ok' : [] | [Action] } |
+export type Result = { 'ok' : null } |
   { 'err' : Error };
 export type Result_1 = { 'ok' : ManageNeuronResponse } |
   { 'err' : Error };
-export type Result_2 = { 'ok' : null } |
-  { 'err' : Error };
-export type Result_3 = { 'ok' : Action } |
+export type Result_2 = { 'ok' : AxonAction } |
   { 'err' : Error };
 export type RewardMode = { 'RewardToNeuron' : RewardToNeuron } |
   { 'RewardToAccount' : RewardToAccount };
@@ -243,7 +241,8 @@ export interface SetDissolveTimestamp { 'dissolve_timestamp_seconds' : bigint }
 export interface Spawn { 'new_controller' : [] | [Principal] }
 export interface SpawnResponse { 'created_neuron_id' : [] | [NeuronId] }
 export interface Split { 'amount_e8s' : bigint }
-export type Status = { 'Rejected' : bigint } |
+export type Status = { 'Executing' : bigint } |
+  { 'Rejected' : bigint } |
   { 'Executed' : bigint } |
   { 'Accepted' : bigint } |
   { 'Expired' : bigint } |

@@ -8,7 +8,17 @@ export default function useExecute() {
 
   return useMutation(
     async ({ id }: { id: bigint }) => {
-      const result = await axon.execute(id);
+      let result;
+      try {
+        result = await axon.execute(id);
+      } catch (error) {
+        if (/assertion failed/.test(error.message)) {
+          // Already executing, refetch
+          return;
+        } else {
+          throw error.message;
+        }
+      }
       if ("ok" in result) {
         return result.ok;
       } else {

@@ -1,6 +1,9 @@
 import assert from "assert";
 import React from "react";
-import { Action, AxonCommandRequest } from "../../declarations/Axon/Axon.did";
+import {
+  AxonAction,
+  AxonCommandRequest,
+} from "../../declarations/Axon/Axon.did";
 import { AxonCommandKey } from "../../lib/types";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 
@@ -9,7 +12,7 @@ export default function AxonCommandSummary({
   action,
 }: {
   command: AxonCommandRequest;
-  action: Action;
+  action: AxonAction;
 }) {
   const key = Object.keys(command)[0] as AxonCommandKey;
   switch (key) {

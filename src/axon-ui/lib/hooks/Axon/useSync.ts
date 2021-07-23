@@ -9,7 +9,12 @@ export default function useSync() {
   return useMutation(
     "sync",
     async () => {
-      const result = await axon.sync();
+      let result;
+      try {
+        result = await axon.sync();
+      } catch (error) {
+        throw error.message;
+      }
       if ("ok" in result) {
         return result.ok;
       } else {

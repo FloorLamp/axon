@@ -8,6 +8,8 @@ const colorOf = (status: StatusKey) => {
     case "Accepted":
     case "Executed":
       return "bg-green-300 text-green-700";
+    case "Executing":
+      return "bg-blue-200 text-blue-700";
     case "Rejected":
       return "bg-red-300 text-red-700";
     case "Expired":
@@ -19,7 +21,7 @@ export default function StatusLabel({ status }: { status: StatusKey }) {
   return (
     <label
       className={classNames(
-        "block w-16 text-center py-0.5 rounded text-xs uppercase",
+        "block w-20 text-center py-0.5 rounded text-xs uppercase",
         colorOf(status)
       )}
     >

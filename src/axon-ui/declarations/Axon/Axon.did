@@ -18,6 +18,7 @@ type Status =
  variant {
    Accepted: int;
    Executed: int;
+   Executing: int;
    Expired: int;
    Pending;
    Rejected: int;
@@ -44,15 +45,10 @@ type RewardMode =
    RewardToAccount: RewardToAccount;
    RewardToNeuron: RewardToNeuron;
  };
-type Result_3 = 
- variant {
-   err: Error;
-   ok: Action;
- };
 type Result_2 = 
  variant {
    err: Error;
-   ok;
+   ok: AxonAction;
  };
 type Result_1 = 
  variant {
@@ -62,7 +58,7 @@ type Result_1 =
 type Result = 
  variant {
    err: Error;
-   ok: opt Action;
+   ok;
  };
 type RemoveHotKey = record {hot_key_to_remove: opt principal;};
 type RegisterVote = 
@@ -72,7 +68,7 @@ type RegisterVote =
  };
 type Proposal = 
  record {
-   action: opt Action__1;
+   action: opt Action;
    summary: text;
    url: text;
  };
@@ -323,45 +319,7 @@ type AxonCommand =
    AxonCommandRequest;
    opt AxonCommandResponse;
  };
-type Axon = 
- service {
-   cleanup: () -> (Result_2);
-   execute: (nat) -> (Result_3);
-   getAllActions: (opt nat) -> (ActionResult) query;
-   getNeuronIds: () -> (vec nat64) query;
-   getNeurons: () -> (ListNeuronsResult) query;
-   getPendingActions: () -> (ActionResult) query;
-   info: () -> (Info) query;
-   initiate: (InitiateAction) -> (Result_2);
-   sync: () -> (ListNeuronsResult);
-   vote: (VoteRequest) -> (Result);
- };
-type ApproveGenesisKyc = record {principals: vec principal;};
-type Amount = record {e8s: nat64;};
-type AddOrRemoveNodeProvider = record {change: opt Change;};
-type AddHotKey = record {new_hot_key: opt principal;};
-type Action__1 = 
- variant {
-   AddOrRemoveNodeProvider: AddOrRemoveNodeProvider;
-   ApproveGenesisKyc: ApproveGenesisKyc;
-   ExecuteNnsFunction: ExecuteNnsFunction;
-   ManageNetworkEconomics: NetworkEconomics;
-   ManageNeuron: ManageNeuron;
-   Motion: Motion;
-   RewardNodeProvider: RewardNodeProvider;
-   SetDefaultFollowees: SetDefaultFollowees;
- };
-type ActionType = 
- variant {
-   AxonCommand: AxonCommand;
-   NeuronCommand: NeuronCommand;
- };
-type ActionResult = 
- variant {
-   err: Error;
-   ok: vec Action;
- };
-type Action = 
+type AxonAction = 
  record {
    action: ActionType;
    ballots: vec Ballot;
@@ -371,6 +329,44 @@ type Action =
    status: Status;
    timeEnd: int;
    timeStart: int;
+ };
+type Axon = 
+ service {
+   cleanup: () -> (Result);
+   execute: (nat) -> (Result_2);
+   getAllActions: (opt nat) -> (ActionResult) query;
+   getNeuronIds: () -> (vec nat64) query;
+   getNeurons: () -> (ListNeuronsResult) query;
+   getPendingActions: () -> (ActionResult) query;
+   info: () -> (Info) query;
+   initiate: (InitiateAction) -> (Result);
+   sync: () -> (ListNeuronsResult);
+   vote: (VoteRequest) -> (Result);
+ };
+type ApproveGenesisKyc = record {principals: vec principal;};
+type Amount = record {e8s: nat64;};
+type AddOrRemoveNodeProvider = record {change: opt Change;};
+type AddHotKey = record {new_hot_key: opt principal;};
+type ActionType = 
+ variant {
+   AxonCommand: AxonCommand;
+   NeuronCommand: NeuronCommand;
+ };
+type ActionResult = 
+ variant {
+   err: Error;
+   ok: vec AxonAction;
+ };
+type Action = 
+ variant {
+   AddOrRemoveNodeProvider: AddOrRemoveNodeProvider;
+   ApproveGenesisKyc: ApproveGenesisKyc;
+   ExecuteNnsFunction: ExecuteNnsFunction;
+   ManageNetworkEconomics: NetworkEconomics;
+   ManageNeuron: ManageNeuron;
+   Motion: Motion;
+   RewardNodeProvider: RewardNodeProvider;
+   SetDefaultFollowees: SetDefaultFollowees;
  };
 type AccountIdentifier = record {hash: vec nat8;};
 service : (Initialization) -> Axon

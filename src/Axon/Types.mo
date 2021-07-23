@@ -67,12 +67,13 @@ module {
   public type Status = {
     #Pending;
     #Accepted: Int;
+    #Executing: Int;
     #Executed: Int;
     #Rejected: Int;
     #Expired: Int;
   };
 
-  public type Action = {
+  public type AxonAction = {
     id: Nat;
     ballots: [Ballot];
     timeStart: Int;
@@ -99,6 +100,6 @@ module {
 
   public type Result<T> = Result.Result<T, Error>;
   public type ListNeuronsResult = Result<GT.ListNeuronsResponse>;
-  public type ActionResult = Result<[Action]>;
+  public type ActionResult = Result<[AxonAction]>;
   public type SyncResult = Result<[Nat64]>;
 }

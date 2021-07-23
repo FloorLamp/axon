@@ -31,8 +31,9 @@ export const idlFactory = ({ IDL }) => {
     'NoNeurons' : IDL.Null,
     'GovernanceError' : GovernanceError,
   });
-  const Result_2 = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const Status = IDL.Variant({
+    'Executing' : IDL.Int,
     'Rejected' : IDL.Int,
     'Executed' : IDL.Int,
     'Accepted' : IDL.Int,
@@ -122,7 +123,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const AddOrRemoveNodeProvider = IDL.Record({ 'change' : IDL.Opt(Change) });
   const Motion = IDL.Record({ 'motion_text' : IDL.Text });
-  const Action__1 = IDL.Variant({
+  const Action = IDL.Variant({
     'ManageNeuron' : ManageNeuron,
     'ExecuteNnsFunction' : ExecuteNnsFunction,
     'RewardNodeProvider' : RewardNodeProvider,
@@ -134,7 +135,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const Proposal = IDL.Record({
     'url' : IDL.Text,
-    'action' : IDL.Opt(Action__1),
+    'action' : IDL.Opt(Action),
     'summary' : IDL.Text,
   });
   const Amount = IDL.Record({ 'e8s' : IDL.Nat64 });
@@ -210,7 +211,7 @@ export const idlFactory = ({ IDL }) => {
     'vote' : IDL.Opt(Vote),
   });
   const Policy = IDL.Record({ 'total' : IDL.Nat, 'needed' : IDL.Nat });
-  const Action = IDL.Record({
+  const AxonAction = IDL.Record({
     'id' : IDL.Nat,
     'status' : Status,
     'creator' : IDL.Principal,
@@ -220,8 +221,11 @@ export const idlFactory = ({ IDL }) => {
     'timeEnd' : IDL.Int,
     'policy' : IDL.Opt(Policy),
   });
-  const Result_3 = IDL.Variant({ 'ok' : Action, 'err' : Error });
-  const ActionResult = IDL.Variant({ 'ok' : IDL.Vec(Action), 'err' : Error });
+  const Result_2 = IDL.Variant({ 'ok' : AxonAction, 'err' : Error });
+  const ActionResult = IDL.Variant({
+    'ok' : IDL.Vec(AxonAction),
+    'err' : Error,
+  });
   const BallotInfo = IDL.Record({
     'vote' : IDL.Int32,
     'proposal_id' : IDL.Opt(NeuronId),
@@ -289,16 +293,15 @@ export const idlFactory = ({ IDL }) => {
     'vote' : Vote,
     'execute' : IDL.Bool,
   });
-  const Result = IDL.Variant({ 'ok' : IDL.Opt(Action), 'err' : Error });
   const Axon = IDL.Service({
-    'cleanup' : IDL.Func([], [Result_2], []),
-    'execute' : IDL.Func([IDL.Nat], [Result_3], []),
+    'cleanup' : IDL.Func([], [Result], []),
+    'execute' : IDL.Func([IDL.Nat], [Result_2], []),
     'getAllActions' : IDL.Func([IDL.Opt(IDL.Nat)], [ActionResult], ['query']),
     'getNeuronIds' : IDL.Func([], [IDL.Vec(IDL.Nat64)], ['query']),
     'getNeurons' : IDL.Func([], [ListNeuronsResult], ['query']),
     'getPendingActions' : IDL.Func([], [ActionResult], ['query']),
     'info' : IDL.Func([], [Info], ['query']),
-    'initiate' : IDL.Func([InitiateAction], [Result_2], []),
+    'initiate' : IDL.Func([InitiateAction], [Result], []),
     'sync' : IDL.Func([], [ListNeuronsResult], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),
   });

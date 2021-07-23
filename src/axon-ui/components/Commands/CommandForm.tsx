@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useInitiate from "../../lib/hooks/Axon/useInitiate";
+import { ActionOptions } from "../../lib/types";
 import { stringify } from "../../lib/utils";
-import { ProposalOptionsForm } from "../Axon/ProposalOptionsForm";
+import { ActionOptionsForm } from "../Axon/ActionOptionsForm";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 import { ConfigureForm } from "./ConfigureForm";
@@ -25,12 +26,15 @@ const commands = [
 
 type CommandName = typeof commands[number];
 
-export default function NeuronCommandForm() {
+export default function NeuronCommandForm({
+  closeModal,
+}: {
+  closeModal: () => void;
+}) {
   const [neuronIds, setNeuronIds] = useState([]);
-  const [options, setOptions] = useState({});
-  const onChangeOptions = (opts) => setOptions(opts);
+  const [options, setOptions] = useState<ActionOptions>({});
 
-  const { mutate, error, isError, isLoading } = useInitiate(options);
+  const { mutate, error, isError, isLoading, isSuccess } = useInitiate(options);
 
   const [commandName, setCommandName] = useState<CommandName>(commands[0]);
   const [command, setCommand] = useState(null);
@@ -70,6 +74,12 @@ export default function NeuronCommandForm() {
     }
   }
 
+  useEffect(() => {
+    if (isSuccess) {
+      closeModal();
+    }
+  }, [isSuccess]);
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col divide-gray-300 divide-y">
@@ -94,7 +104,7 @@ export default function NeuronCommandForm() {
           setNeuronIds={setNeuronIds}
         />
 
-        <ProposalOptionsForm onChangeOptions={onChangeOptions} />
+        <ActionOptionsForm onChangeOptions={setOptions} />
 
         <div className="flex flex-col gap-2 py-4">
           <SpinnerButton

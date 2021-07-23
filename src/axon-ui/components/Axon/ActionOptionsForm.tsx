@@ -3,11 +3,12 @@ import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { FiChevronRight } from "react-icons/fi";
 import { FOUR_HOUR_SEC } from "../../lib/constants";
+import { ActionOptions } from "../../lib/types";
 
-export function ProposalOptionsForm({
+export function ActionOptionsForm({
   onChangeOptions,
 }: {
-  onChangeOptions: (any) => void;
+  onChangeOptions: (opts: ActionOptions) => void;
 }) {
   const [timeStart, setTimeStart] = useState("");
   const [durationSeconds, setDurationSeconds] = useState("");
@@ -15,7 +16,11 @@ export function ProposalOptionsForm({
 
   // Sync state with parent
   useEffect(() => {
-    onChangeOptions({ timeStart, durationSeconds, execute });
+    onChangeOptions({
+      timeStart: timeStart ? BigInt(timeStart) : undefined,
+      durationSeconds: durationSeconds ? BigInt(durationSeconds) : undefined,
+      execute,
+    });
   }, [timeStart, durationSeconds, execute]);
 
   return (
@@ -23,7 +28,7 @@ export function ProposalOptionsForm({
       {({ open }) => (
         <>
           <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer px-2 py-1">
-            Proposal Settings
+            Options
             <FiChevronRight
               className={classNames(
                 "transform transition-transform transition-100",

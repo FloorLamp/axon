@@ -30,7 +30,7 @@ export default function ManageNeuronModal() {
         closeModal={closeModal}
         title="Manage Neurons"
       >
-        <ActionsMenu />
+        <ActionsMenu closeModal={closeModal} />
       </Modal>
     </>
   );

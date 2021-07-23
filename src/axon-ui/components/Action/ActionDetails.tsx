@@ -3,7 +3,7 @@ import classNames from "classnames";
 import { DateTime } from "luxon";
 import React from "react";
 import { useIsMutating } from "react-query";
-import { Action } from "../../declarations/Axon/Axon.did";
+import { AxonAction } from "../../declarations/Axon/Axon.did";
 import { actionTypeToString } from "../../lib/actionTypes";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { StatusKey } from "../../lib/types";
@@ -21,7 +21,7 @@ export const ActionDetails = ({
   action,
   defaultOpen = false,
 }: {
-  action: Action;
+  action: AxonAction;
   defaultOpen?: boolean;
 }) => {
   const {
@@ -63,7 +63,7 @@ export const ActionDetails = ({
                 </div>
                 <div className="flex-1 flex items-center gap-2">
                   <StatusLabel status={status} />
-                  {status !== "Pending" && (
+                  {actionTime && (
                     <span className="text-gray-500 text-xs">
                       {actionTime.toRelative()}
                     </span>
@@ -161,7 +161,7 @@ export const ActionDetails = ({
   );
 };
 
-const ActionSummary = ({ action }: { action: Action }) => {
+const ActionSummary = ({ action }: { action: AxonAction }) => {
   if ("AxonCommand" in action.action) {
     return (
       <AxonCommandSummary
