@@ -1,5 +1,5 @@
 import { useQuery } from "react-query";
-import { useAxon } from "../../../components/Store";
+import { useAxon } from "../../../components/Store/Store";
 
 export const useNeuronIds = () => {
   const axon = useAxon();

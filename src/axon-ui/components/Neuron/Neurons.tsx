@@ -1,29 +1,29 @@
 import React from "react";
 import { BsInboxFill } from "react-icons/bs";
-import { useQueryClient } from "react-query";
-import { useNeuronIds } from "../lib/hooks/Axon/useNeuronIds";
-import { useNeurons } from "../lib/hooks/Axon/useNeurons";
-import { RefreshButton } from "./Buttons/RefreshButton";
-import ErrorAlert from "./Labels/ErrorAlert";
+import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
+import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
+import { RefreshButton } from "../Buttons/RefreshButton";
+import ErrorAlert from "../Labels/ErrorAlert";
 import ManageNeuronModal from "./ManageNeuronModal";
-import NeuronDetails from "./Neuron/NeuronDetails";
+import NeuronDetails from "./NeuronDetails";
 
 export default function Neurons() {
   const {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
     error: errorNeuronIds,
+    refetch: refetchNeuronIds,
   } = useNeuronIds();
   const {
     data: neurons,
     isFetching: isFetchingNeurons,
     error: errorNeurons,
+    refetch: refetchNeurons,
   } = useNeurons();
 
-  const queryClient = useQueryClient();
   const handleRefresh = () => {
-    queryClient.refetchQueries(["neuronIds"]);
-    queryClient.refetchQueries(["neurons"]);
+    refetchNeuronIds();
+    refetchNeurons();
   };
   const isFetching = isFetchingNeuronIds || isFetchingNeurons;
 

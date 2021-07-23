@@ -1,8 +1,8 @@
 import React from "react";
-import { shortPrincipal } from "../lib/utils";
-import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
-import LoginButton from "./Buttons/LoginButton";
-import { useGlobalContext } from "./Store";
+import { shortPrincipal } from "../../lib/utils";
+import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
+import LoginButton from "../Buttons/LoginButton";
+import { useGlobalContext } from "../Store/Store";
 
 export default function Nav() {
   const {

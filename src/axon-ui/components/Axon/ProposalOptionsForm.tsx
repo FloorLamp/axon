@@ -2,7 +2,7 @@ import { Disclosure } from "@headlessui/react";
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { FiChevronRight } from "react-icons/fi";
-import { FOUR_HOUR_SEC } from "../lib/constants";
+import { FOUR_HOUR_SEC } from "../../lib/constants";
 
 export function ProposalOptionsForm({
   onChangeOptions,

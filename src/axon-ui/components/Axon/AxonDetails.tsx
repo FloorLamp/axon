@@ -1,9 +1,9 @@
 import React from "react";
-import { canisterId } from "../declarations/Axon";
-import { useInfo } from "../lib/hooks/Axon/useInfo";
-import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
-import { RefreshButton } from "./Buttons/RefreshButton";
-import ErrorAlert from "./Labels/ErrorAlert";
+import { canisterId } from "../../declarations/Axon";
+import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
+import { RefreshButton } from "../Buttons/RefreshButton";
+import ErrorAlert from "../Labels/ErrorAlert";
 
 export default function AxonDetails() {
   const { data, error, isFetching, refetch } = useInfo();

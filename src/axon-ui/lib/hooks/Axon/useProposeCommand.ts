@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "react-query";
-import { useAxon } from "../../../components/Store";
+import { useAxon } from "../../../components/Store/Store";
 import { NeuronCommand } from "../../../declarations/Axon/Axon.did";
 import { errorToString } from "../../utils";
 

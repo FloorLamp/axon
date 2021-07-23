@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { BiListUl } from "react-icons/bi";
-import { useQueryClient } from "react-query";
 import {
   useActiveProposals,
   useAllProposals,
-} from "../lib/hooks/Axon/useProposals";
-import NavButtons from "./Buttons/NavButtons";
-import { RefreshButton } from "./Buttons/RefreshButton";
-import { Proposal } from "./Proposal/Proposal";
+} from "../../lib/hooks/Axon/useProposals";
+import NavButtons from "../Buttons/NavButtons";
+import { RefreshButton } from "../Buttons/RefreshButton";
+import { Proposal } from "./Proposal";
 
 const ProposalTypes = ["Queued", "All"] as const;
 type ProposalType = typeof ProposalTypes[number];
@@ -20,10 +19,9 @@ export default function Proposals() {
   const { data, error, isFetching } =
     type === "Queued" ? activeProposalsQuery : allProposalsQuery;
 
-  const queryClient = useQueryClient();
   const handleRefresh = () => {
-    queryClient.refetchQueries(["activeProposals"]);
-    queryClient.refetchQueries(["allProposals"]);
+    activeProposalsQuery.refetch();
+    allProposalsQuery.refetch();
   };
 
   const renderTabValue = (t: ProposalType) =>
@@ -37,7 +35,7 @@ export default function Proposals() {
         )}
       </span>
     ) : (
-      <>{t}</>
+      <div className="w-10 text-center">{t}</div>
     );
 
   return (

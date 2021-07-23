@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useIsOwner } from "../lib/hooks/Axon/useIsOwner";
-import ActionsMenu from "./Axon/ActionsMenu";
-import Modal from "./Modal";
+import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
+import Modal from "../Layout/Modal";
+import ActionsMenu from "./ActionsMenu";
 
 export default function ManageNeuronModal() {
   const isOwner = useIsOwner();

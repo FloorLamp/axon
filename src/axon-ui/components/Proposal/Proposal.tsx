@@ -12,7 +12,7 @@ import ListButton from "../ExpandableList/ListButton";
 import ListPanel from "../ExpandableList/ListPanel";
 import StatusLabel from "../Labels/StatusLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
-import { useGlobalContext } from "../Store";
+import { useGlobalContext } from "../Store/Store";
 import ApproveRejectButtons from "./ApproveRejectButtons";
 import Steps from "./Steps";
 

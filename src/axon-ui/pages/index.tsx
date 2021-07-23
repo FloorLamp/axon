@@ -1,11 +1,11 @@
 import Head from "next/head";
 import React from "react";
 import { FaGithub } from "react-icons/fa";
-import AxonDetails from "../components/AxonDetails";
-import Nav from "../components/Nav";
-import Neurons from "../components/Neurons";
-import NnsProposals from "../components/NnsProposals";
-import Proposals from "../components/Proposals";
+import AxonDetails from "../components/Axon/AxonDetails";
+import Nav from "../components/Layout/Nav";
+import Neurons from "../components/Neuron/Neurons";
+import NnsProposals from "../components/NnsProposal/NnsProposals";
+import Proposals from "../components/Proposal/Proposals";
 
 export default function Home() {
   return (

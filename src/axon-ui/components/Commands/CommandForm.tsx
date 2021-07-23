@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import useProposeCommand from "../../lib/hooks/Axon/useProposeCommand";
 import { stringify } from "../../lib/utils";
+import { ProposalOptionsForm } from "../Axon/ProposalOptionsForm";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
-import { ProposalOptionsForm } from "../ProposalOptionsForm";
 import { ConfigureForm } from "./ConfigureForm";
 import { DisburseForm } from "./DisburseForm";
 import { DisburseToNeuronForm } from "./DisburseToNeuronForm";

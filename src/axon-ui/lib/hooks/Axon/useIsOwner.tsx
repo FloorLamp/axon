@@ -1,4 +1,4 @@
-import { useGlobalContext } from "../../../components/Store";
+import { useGlobalContext } from "../../../components/Store/Store";
 import { principalIsEqual } from "../../utils";
 import { useInfo } from "./useInfo";
 

@@ -1,9 +1,9 @@
 import { HttpAgent } from "@dfinity/agent";
 import { Principal } from "@dfinity/principal";
 import React, { createContext, useContext, useReducer } from "react";
-import { canisterId, createActor } from "../declarations/Axon";
-import { defaultAgent } from "../lib/canisters";
-import { AxonService } from "../lib/types";
+import { canisterId, createActor } from "../../declarations/Axon";
+import { defaultAgent } from "../../lib/canisters";
+import { AxonService } from "../../lib/types";
 
 type Action =
   | {

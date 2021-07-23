@@ -2,7 +2,7 @@ import "react";
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
-import Store from "../components/Store";
+import Store from "../components/Store/Store";
 import { ONE_HOUR_MS } from "../lib/constants";
 import "../styles/globals.css";
 

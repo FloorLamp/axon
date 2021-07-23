@@ -2,7 +2,7 @@ import { HttpAgent, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
 import React, { useEffect, useState } from "react";
 import { ONE_WEEK_NS } from "../../lib/constants";
-import { useGlobalContext, useSetAgent } from "../Store";
+import { useGlobalContext, useSetAgent } from "../Store/Store";
 
 export default function Dropdown() {
   const {

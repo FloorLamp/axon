@@ -1,11 +1,11 @@
 import React from "react";
 import { BiListUl } from "react-icons/bi";
-import { ProposalInfo } from "../declarations/Governance/Governance.did.d";
-import { Action, Topic } from "../lib/governance";
-import { useNnsPendingProposals } from "../lib/hooks/useNnsPendingProposals";
-import IdentifierLabelWithButtons from "./Buttons/IdentifierLabelWithButtons";
-import { RefreshButton } from "./Buttons/RefreshButton";
-import AcceptRejectButtons from "./NnsProposal/AcceptRejectButtons";
+import { ProposalInfo } from "../../declarations/Governance/Governance.did.d";
+import { Action, Topic } from "../../lib/governance";
+import { useNnsPendingProposals } from "../../lib/hooks/useNnsPendingProposals";
+import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
+import { RefreshButton } from "../Buttons/RefreshButton";
+import AcceptRejectButtons from "./AcceptRejectButtons";
 
 const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
   const id = proposal.id[0].id;
