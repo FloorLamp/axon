@@ -311,7 +311,10 @@ type AxonCommandRequest =
                   "principal": principal;
                   total: opt nat;
                 };
-   SetPolicy: record {needed: nat;};
+   SetPolicy: record {
+                needed: nat;
+                total: opt nat;
+              };
    UpdateVisibility: Visibility;
  };
 type AxonCommand = 

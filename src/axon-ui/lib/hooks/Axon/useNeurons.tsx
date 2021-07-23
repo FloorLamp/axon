@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { FIVE_MINUTES_MS } from "../../constants";
@@ -5,7 +6,7 @@ import { errorToString } from "../../utils";
 
 export const useNeurons = () => {
   const axon = useAxon();
-  return useQuery(
+  const queryResult = useQuery(
     "neurons",
     async () => {
       const neurons = await axon.getNeurons();
@@ -23,4 +24,10 @@ export const useNeurons = () => {
       refetchInterval: FIVE_MINUTES_MS,
     }
   );
+
+  useEffect(() => {
+    queryResult.remove();
+  }, [axon]);
+
+  return queryResult;
 };

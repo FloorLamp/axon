@@ -136,6 +136,9 @@ shared actor class Axon(init: T.Initialization) = this {
     let actionType: T.ActionType = switch (request.action) {
       case (#AxonCommand((command,_))) {
         switch (command) {
+          case (#SetPolicy({ needed })) {
+            #AxonCommand((#SetPolicy({ needed; total = ?(owners.size()) }), null))
+          };
           case (#AddOwner({ principal; needed })) {
             #AxonCommand((#AddOwner({ principal; needed; total = ?(owners.size() + 1) }), null))
           };

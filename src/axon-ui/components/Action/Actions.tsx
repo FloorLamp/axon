@@ -6,6 +6,7 @@ import {
 } from "../../lib/hooks/Axon/useActions";
 import NavButtons from "../Buttons/NavButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import ErrorAlert from "../Labels/ErrorAlert";
 import { ActionDetails } from "./ActionDetails";
 
 const ProposalTypes = ["Pending", "All"] as const;
@@ -28,7 +29,7 @@ export default function Actions() {
     t === "Pending" ? (
       <span>
         {t}
-        {activeActionsQuery.data.length > 0 && (
+        {activeActionsQuery.data?.length > 0 && (
           <span className="ml-2 bg-gray-200 rounded-full text-xs px-2 py-0.5 leading-none text-indigo-500">
             {activeActionsQuery.data.length}
           </span>
@@ -58,29 +59,28 @@ export default function Actions() {
           />
         </div>
       </div>
-      <div>
-        {error}
-        {data && data.length > 0 ? (
-          <ul className="divide-y divide-gray-300">
-            {data.map((action) => (
-              <li key={action.id.toString()}>
-                <ActionDetails
-                  action={action}
-                  defaultOpen={type === "Pending"}
-                />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="h-64 flex flex-col items-center justify-center">
-            <BiListUl size={48} className="" />
-            <p className="py-2">No actions</p>
-            {type === "Pending" && (
-              <p className="text-gray-500">Pending actions will appear here</p>
-            )}
-          </div>
-        )}
-      </div>
+      {error && (
+        <div className="px-4">
+          <ErrorAlert>{error}</ErrorAlert>
+        </div>
+      )}
+      {data && data.length > 0 ? (
+        <ul className="divide-y divide-gray-300">
+          {data.map((action) => (
+            <li key={action.id.toString()}>
+              <ActionDetails action={action} defaultOpen={type === "Pending"} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="h-64 flex flex-col items-center justify-center">
+          <BiListUl size={48} className="" />
+          <p className="py-2">No actions</p>
+          {type === "Pending" && (
+            <p className="text-gray-500">Pending actions will appear here</p>
+          )}
+        </div>
+      )}
     </section>
   );
 }

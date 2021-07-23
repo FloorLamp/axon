@@ -22,7 +22,7 @@ module {
   };
 
   public type AxonCommandRequest = {
-    #SetPolicy: {needed: Nat};
+    #SetPolicy: {needed: Nat; total: ?Nat};
     #AddOwner: {principal: Principal; needed: Nat; total: ?Nat};
     #RemoveOwner: {principal: Principal; needed: Nat; total: ?Nat};
     #UpdateVisibility: Visibility;

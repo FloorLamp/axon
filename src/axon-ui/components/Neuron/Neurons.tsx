@@ -39,6 +39,14 @@ export default function Neurons() {
         </div>
         <ManageNeuronModal />
       </div>
+      {(errorNeuronIds || errorNeurons) && (
+        <div className="px-4">
+          <ErrorAlert>
+            {errorNeuronIds}
+            {errorNeurons}
+          </ErrorAlert>
+        </div>
+      )}
       {neuronIds.length > 0 ? (
         <ul className="divide-y divide-gray-300">
           {neuronIds.map((neuronId) => {
@@ -63,14 +71,6 @@ export default function Neurons() {
               <p className="text-gray-500">Add your first neuron!</p>
             </>
           )}
-        </div>
-      )}
-      {(errorNeuronIds || errorNeurons) && (
-        <div className="px-4">
-          <ErrorAlert>
-            {errorNeuronIds}
-            {errorNeurons}
-          </ErrorAlert>
         </div>
       )}
     </section>

@@ -54,7 +54,7 @@ export type AxonCommandRequest = {
       'needed' : bigint,
     }
   } |
-  { 'SetPolicy' : { 'needed' : bigint } };
+  { 'SetPolicy' : { 'total' : [] | [bigint], 'needed' : bigint } };
 export type AxonCommandResponse = { 'ok' : null } |
   { 'err' : Error };
 export interface Ballot { 'principal' : Principal, 'vote' : [] | [Vote] }

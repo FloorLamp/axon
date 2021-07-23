@@ -194,7 +194,10 @@ export const idlFactory = ({ IDL }) => {
       'total' : IDL.Opt(IDL.Nat),
       'needed' : IDL.Nat,
     }),
-    'SetPolicy' : IDL.Record({ 'needed' : IDL.Nat }),
+    'SetPolicy' : IDL.Record({
+      'total' : IDL.Opt(IDL.Nat),
+      'needed' : IDL.Nat,
+    }),
   });
   const AxonCommandResponse = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const AxonCommand = IDL.Tuple(

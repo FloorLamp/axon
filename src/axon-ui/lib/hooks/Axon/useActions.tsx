@@ -27,7 +27,7 @@ export const usePendingActions = () => {
   const queryClient = useQueryClient();
   const [isExecuting, setIsExecuting] = useState(false);
   useEffect(() => {
-    if (queryResult.data.find((action) => "Executing" in action.status)) {
+    if (queryResult.data?.find((action) => "Executing" in action.status)) {
       setIsExecuting(true);
       setTimeout(queryResult.refetch, 2000);
     } else {
@@ -41,12 +41,16 @@ export const usePendingActions = () => {
     }
   }, [isExecuting]);
 
+  useEffect(() => {
+    queryResult.remove();
+  }, [axon]);
+
   return queryResult;
 };
 
 export const useAllActions = () => {
   const axon = useAxon();
-  return useQuery(
+  const queryResult = useQuery(
     "allActions",
     async () => {
       const result = await axon.getAllActions([]);
@@ -62,4 +66,10 @@ export const useAllActions = () => {
       refetchInterval: ONE_MINUTES_MS,
     }
   );
+
+  useEffect(() => {
+    queryResult.remove();
+  }, [axon]);
+
+  return queryResult;
 };

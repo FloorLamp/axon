@@ -1,5 +1,6 @@
 import { ActorSubclass } from "@dfinity/agent";
 import Axon, {
+  ActionType,
   AxonCommandRequest,
   Command,
   Command_1,
@@ -20,6 +21,8 @@ export type CommandResponseKey = KeysOfUnion<Command_1>;
 export type AxonCommandKey = KeysOfUnion<AxonCommandRequest>;
 
 export type OperationKey = KeysOfUnion<Operation>;
+
+export type ActionTypeKey = KeysOfUnion<ActionType>;
 
 export type ActionOptions = {
   [Property in keyof Omit<
