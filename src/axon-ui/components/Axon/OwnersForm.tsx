@@ -65,6 +65,7 @@ export function AddOwnerForm({
             name="approvers"
             className="w-full mt-1"
             onChange={(e) => setNeeded(e.target.value)}
+            value={needed}
           >
             {numSigners.map((i) => (
               <option key={i} value={i}>
@@ -108,6 +109,7 @@ export function RemoveOwnerForm({
           <select
             className="w-full overflow-hidden overflow-ellipsis"
             onChange={(e) => setUser(e.target.value)}
+            value={user}
           >
             {data?.owners.map((owner) => {
               const principal = owner.toText();
@@ -126,6 +128,7 @@ export function RemoveOwnerForm({
             name="approvers"
             className="w-full mt-1"
             onChange={(e) => setNeeded(e.target.value)}
+            value={needed}
           >
             {numSigners.map((i) => (
               <option key={i} value={i}>

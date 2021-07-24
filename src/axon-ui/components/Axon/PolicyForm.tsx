@@ -31,6 +31,7 @@ export function PolicyForm({
             name="approvers"
             className="w-full mt-1"
             onChange={(e) => setNeeded(e.target.value)}
+            value={needed}
           >
             {numSigners.map((i) => (
               <option key={i} value={i}>

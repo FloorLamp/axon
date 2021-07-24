@@ -7,8 +7,12 @@ export const useNeuronIds = () => {
   return useQuery(
     "neuronIds",
     async () => {
-      const ids = await axon.getNeuronIds();
-      return ids.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+      try {
+        const ids = await axon.getNeuronIds();
+        return ids.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+      } catch (error) {
+        throw error.message;
+      }
     },
     {
       keepPreviousData: true,

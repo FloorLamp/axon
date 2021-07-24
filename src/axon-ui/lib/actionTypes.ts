@@ -134,8 +134,8 @@ export const axonCommandToString = (command: AxonCommandRequest) => {
     }
     case "SetPolicy": {
       assert("SetPolicy" in command);
-      const { needed } = command.SetPolicy;
-      return `Set Policy (${needed.toString()} approvals)`;
+      const { needed, total } = command.SetPolicy;
+      return `Set Policy (${needed.toString()} out of ${total[0]?.toString()} approvals)`;
     }
     case "UpdateVisibility": {
       assert("UpdateVisibility" in command);

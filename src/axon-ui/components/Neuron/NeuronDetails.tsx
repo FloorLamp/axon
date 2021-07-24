@@ -2,6 +2,7 @@ import { Principal } from "@dfinity/principal";
 import { Disclosure } from "@headlessui/react";
 import { DateTime } from "luxon";
 import React from "react";
+import { canisterId as AxonCanisterId } from "../../declarations/Axon";
 import { Neuron } from "../../declarations/Axon/Axon.did";
 import { canisterId as governanceCanisterId } from "../../declarations/Governance";
 import { subaccountToAccount } from "../../lib/account";
@@ -10,6 +11,7 @@ import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import ListButton from "../ExpandableList/ListButton";
 import ListPanel from "../ExpandableList/ListPanel";
 import BalanceLabel from "../Labels/BalanceLabel";
+import ControllerTypeLabel from "../Labels/ControllerTypeLabel";
 import { DissolveStateLabel } from "../Labels/DissolveStateLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 
@@ -129,7 +131,16 @@ export default function NeuronDetails({
         <>
           <ListButton open={open} disabled={!neuron}>
             <div className="flex flex-col sm:flex-row">
-              <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 items-center">
+              <div className="flex-1 sm:flex-none sm:w-64 md:w-96 xs:flex gap-2 items-center">
+                {neuron && (
+                  <ControllerTypeLabel
+                    type={
+                      neuron.controller[0].toText() === AxonCanisterId
+                        ? "Controller"
+                        : "Hot Key"
+                    }
+                  />
+                )}
                 <IdentifierLabelWithButtons type="Neuron" id={id}>
                   {id}
                 </IdentifierLabelWithButtons>

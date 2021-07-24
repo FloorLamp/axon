@@ -9,11 +9,14 @@ export const useNeurons = () => {
   const queryResult = useQuery(
     "neurons",
     async () => {
-      const neurons = await axon.getNeurons();
+      let neurons;
+      try {
+        neurons = await axon.getNeurons();
+      } catch (error) {
+        throw error.message;
+      }
 
       if ("ok" in neurons) {
-        console.log("neurons", neurons.ok);
-
         return neurons.ok;
       } else {
         throw errorToString(neurons.err);

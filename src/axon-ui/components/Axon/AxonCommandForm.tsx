@@ -8,12 +8,12 @@ import { AddOwnerForm, RemoveOwnerForm } from "./OwnersForm";
 import { PolicyForm } from "./PolicyForm";
 import { VisibilityForm } from "./VisibilityForm";
 
-const commands: Record<AxonCommandName, string> = {
-  AddOwner: "Add Owner",
-  RemoveOwner: "Remove Owner",
-  UpdateVisibility: "Update Visibility",
-  SetPolicy: "Set Policy",
-};
+const commands: [AxonCommandName, string][] = [
+  ["AddOwner", "Add Owner"],
+  ["RemoveOwner", "Remove Owner"],
+  ["UpdateVisibility", "Update Visibility"],
+  ["SetPolicy", "Set Policy"],
+];
 
 type AxonCommandName = KeysOfUnion<AxonCommandRequest>;
 
@@ -22,7 +22,9 @@ export default function AxonCommandForm({
 }: {
   setAction: (at: ActionType) => void;
 }) {
-  const [commandName, setCommandName] = useState<AxonCommandName>("AddOwner");
+  const [commandName, setCommandName] = useState<AxonCommandName>(
+    commands[0][0]
+  );
 
   function setCommand(command: AxonCommandRequest) {
     if (!command) {
@@ -54,8 +56,9 @@ export default function AxonCommandForm({
         <select
           className="w-full mt-1"
           onChange={(e) => setCommandName(e.target.value as AxonCommandName)}
+          value={commandName}
         >
-          {Object.entries(commands).map(([value, label]) => (
+          {commands.map(([value, label]) => (
             <option key={value} value={value}>
               {label}
             </option>

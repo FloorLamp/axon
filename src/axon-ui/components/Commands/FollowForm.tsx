@@ -62,6 +62,7 @@ export default function FollowForm({
           <select
             className="w-full mt-1"
             onChange={(e) => setTopic(e.target.value as unknown as Topic)}
+            value={topic}
           >
             {enumEntries(Topic).map(([name, id]) => (
               <option key={id} value={id}>

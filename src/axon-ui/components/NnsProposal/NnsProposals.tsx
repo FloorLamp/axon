@@ -2,6 +2,7 @@ import React from "react";
 import { BiListUl } from "react-icons/bi";
 import { ProposalInfo } from "../../declarations/Governance/Governance.did.d";
 import { Action, Topic } from "../../lib/governance";
+import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { useNnsPendingProposals } from "../../lib/hooks/useNnsPendingProposals";
 import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -12,8 +13,10 @@ import AcceptRejectButtons from "./AcceptRejectButtons";
 const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
   const id = proposal.id[0].id;
   const actionKey = Object.keys(proposal.proposal[0].action[0])[0];
+  const isOwner = useIsOwner();
+
   return (
-    <div className="flex flex-col sm:flex-row p-2">
+    <div className="flex flex-col gap-1 sm:flex-row p-2">
       <div className="w-36">
         <IdentifierLabelWithButtons type="Proposal" id={id}>
           #{id.toString()}
@@ -22,11 +25,13 @@ const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
       <div className="flex-1">
         <div>{Topic[proposal.topic]}</div>
         <div>{Action[actionKey]}</div>
-        <div className="text-xs">{proposal.proposal[0].summary}</div>
+        <div className="text-xs break-all">{proposal.proposal[0].summary}</div>
       </div>
-      <div>
-        <AcceptRejectButtons proposalId={id} />
-      </div>
+      {isOwner && (
+        <div>
+          <AcceptRejectButtons proposalId={id} />
+        </div>
+      )}
     </div>
   );
 };

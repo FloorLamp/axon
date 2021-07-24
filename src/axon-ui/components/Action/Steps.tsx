@@ -77,6 +77,8 @@ export default function Steps({
   const isOwner = useIsOwner();
 
   const ballots = action.ballots.filter(({ vote }) => !!vote[0]);
+  const approves = ballots.filter(({ vote: [v] }) => "Yes" in v);
+  const rejects = ballots.filter(({ vote: [v] }) => "No" in v);
 
   const status = Object.keys(action.status)[0] as StatusKey;
   const policy = action.policy[0];
@@ -85,7 +87,7 @@ export default function Steps({
   if (status === "Pending" || status === "Accepted") {
     let remaining: JSX.Element;
     if (status === "Pending" && policy) {
-      const neededMinusCurrent = Number(policy.needed) - ballots.length;
+      const neededMinusCurrent = Number(policy.needed) - approves.length;
       remaining = (
         <span className="text-gray-400">
           <strong>{neededMinusCurrent}</strong> more{" "}
@@ -125,9 +127,6 @@ export default function Steps({
       />
     );
   }
-
-  const approves = ballots.filter(({ vote: [v] }) => "Yes" in v);
-  const rejects = ballots.filter(({ vote: [v] }) => "No" in v);
 
   return (
     <ul className="flex flex-col">

@@ -34,10 +34,6 @@ export function ConfigureForm({
 
   useEffect(() => {
     setError("");
-  }, [operation]);
-
-  useEffect(() => {
-    setError("");
 
     let op: Operation;
     if (operation === "Add Hot Key" || operation === "Remove Hot Key") {
@@ -95,6 +91,7 @@ export function ConfigureForm({
           <select
             className="w-full mt-1"
             onChange={(e) => setOperation(e.target.value as OperationName)}
+            value={operation}
           >
             {operations.map((operation) => (
               <option key={operation} value={operation}>

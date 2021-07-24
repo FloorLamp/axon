@@ -69,6 +69,7 @@ export default function NeuronCommandForm({
         <select
           className="w-full mt-1"
           onChange={(e) => setCommandName(e.target.value as CommandName)}
+          value={commandName}
         >
           {commands.map((command) => (
             <option key={command} value={command}>

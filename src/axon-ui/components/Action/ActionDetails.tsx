@@ -57,7 +57,7 @@ export const ActionDetails = ({
           <ListButton open={open}>
             <div className="flex">
               <div className="flex flex-col sm:flex-row">
-                <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 items-center">
+                <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 leading-tight">
                   <span className="text-gray-500">#{action.id.toString()}</span>
                   <span>{actionTypeToString(action.action)}</span>
                 </div>
@@ -100,7 +100,7 @@ export const ActionDetails = ({
               </div>
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Status</div>
-                <div className="flex items-center gap-1">
+                <div className="xs:flex items-center gap-1">
                   <StatusLabel status={status} />
                   {!!actionTime && <TimestampLabel dt={actionTime} />}
                 </div>
