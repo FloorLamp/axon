@@ -34,7 +34,7 @@ export default function IdentifierLabelWithButtons({
       break;
   }
   return (
-    <span className="flex items-center gap-1 break-all">
+    <span className="break-all leading-tight">
       {children}
       <CopyButton text={str} title={`Copy ${type}`} />
       {!!link && <ExternalLinkButton link={link} title="View on ic.rocks" />}

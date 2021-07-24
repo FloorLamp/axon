@@ -14,17 +14,9 @@ export default function SyncForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col py-4 gap-2">
-        <div className="flex flex-col">
-          <label>Sync Neurons</label>
-          <p className="text-sm text-gray-500">
-            Syncs the list of controlled neurons with the NNS.
-          </p>
-          <div className="pt-2">
-            <SpinnerButton className="w-16 p-2" isLoading={isLoading}>
-              Sync
-            </SpinnerButton>
-          </div>
-        </div>
+        <SpinnerButton className="w-16 p-2" isLoading={isLoading}>
+          Sync
+        </SpinnerButton>
 
         {error && <ErrorAlert>{error}</ErrorAlert>}
       </div>

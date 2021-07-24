@@ -3,19 +3,14 @@ import { useQuery, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { AxonAction } from "../../../declarations/Axon/Axon.did";
 import { ONE_MINUTES_MS } from "../../constants";
-import { errorToString } from "../../utils";
+import { errorToString, tryCall } from "../../utils";
 
 export const usePendingActions = () => {
   const axon = useAxon();
   const queryResult = useQuery(
     "pendingActions",
     async () => {
-      let result;
-      try {
-        result = await axon.getPendingActions();
-      } catch (error) {
-        throw error.message;
-      }
+      const result = await tryCall(axon.getPendingActions);
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -59,12 +54,7 @@ export const useAllActions = () => {
   const queryResult = useQuery(
     "allActions",
     async () => {
-      let result;
-      try {
-        result = await axon.getAllActions([]);
-      } catch (error) {
-        throw error.message;
-      }
+      const result = await tryCall(() => axon.getAllActions([]));
       if ("ok" in result) {
         return result.ok;
       } else {

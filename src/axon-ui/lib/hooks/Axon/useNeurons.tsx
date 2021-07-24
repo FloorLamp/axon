@@ -2,24 +2,19 @@ import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { FIVE_MINUTES_MS } from "../../constants";
-import { errorToString } from "../../utils";
+import { errorToString, tryCall } from "../../utils";
 
 export const useNeurons = () => {
   const axon = useAxon();
   const queryResult = useQuery(
     "neurons",
     async () => {
-      let neurons;
-      try {
-        neurons = await axon.getNeurons();
-      } catch (error) {
-        throw error.message;
-      }
+      const result = await tryCall(axon.getNeurons);
 
-      if ("ok" in neurons) {
-        return neurons.ok;
+      if ("ok" in result) {
+        return result.ok;
       } else {
-        throw errorToString(neurons.err);
+        throw errorToString(result.err);
       }
     },
     {

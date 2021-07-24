@@ -77,3 +77,13 @@ export const principalIsEqual = (p1: Principal, p2: Principal) => {
     a1.length === a2.length && a1.every((value, index) => value === a2[index])
   );
 };
+
+export async function tryCall<T extends (...args: any) => any>(
+  f: T
+): Promise<ReturnType<T>> {
+  try {
+    return await f();
+  } catch (error) {
+    throw error.message;
+  }
+}

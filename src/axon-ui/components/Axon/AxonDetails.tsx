@@ -40,7 +40,9 @@ export default function AxonDetails() {
               data.owners.map((p) => (
                 <li key={p.toText()}>
                   <IdentifierLabelWithButtons type="Principal" id={p}>
-                    <span className="hidden xs:block">{p.toText()}</span>
+                    <span className="hidden xs:inline leading-tight">
+                      {p.toText()}
+                    </span>
                     <span className="xs:hidden">{shortPrincipal(p)}</span>
                   </IdentifierLabelWithButtons>
                 </li>

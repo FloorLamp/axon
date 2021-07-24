@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import ActionForm from "../Action/ActionForm";
 import NavButtons from "../Buttons/NavButtons";
-import SettingsForm from "./SettingsForm";
+import AddNeuronForm from "./AddNeuronForm";
 
-const ACTIONS = ["Manage", "Settings"] as const;
+const ACTIONS = ["Manage", "Add Neuron"] as const;
 
 export default function ActionsMenu({
   closeModal,
@@ -18,7 +18,7 @@ export default function ActionsMenu({
       {action === "Manage" && (
         <ActionForm actionType="NeuronCommand" closeModal={closeModal} />
       )}
-      {action === "Settings" && <SettingsForm />}
+      {action === "Add Neuron" && <AddNeuronForm />}
     </div>
   );
 }

@@ -21,7 +21,7 @@ export default function CopyButton({
   return (
     <button
       onClick={handleClick}
-      className="cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all"
+      className="ml-2 inline-block align-middle cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all"
       title={title}
     >
       {clipboard.copied ? <BsCheck /> : <MdContentCopy />}

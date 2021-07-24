@@ -12,7 +12,7 @@ export default function ExternalLinkButton({
     <a
       href={link}
       target="_blank"
-      className="cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all"
+      className="ml-2 inline-block align-middle cursor-pointer filter hover:drop-shadow opacity-50 hover:opacity-100 transition-all"
       title={title}
     >
       <FiExternalLink />

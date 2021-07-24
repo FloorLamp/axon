@@ -28,5 +28,5 @@ input[type="checkbox"] {
   @apply bg-indigo-200 hover:bg-indigo-100 transition-colors text-indigo-800;
 }
 .btn-secondary-disabled {
-  @apply bg-indigo-100 text-indigo-500;
+  @apply bg-indigo-100 text-indigo-300;
 }

@@ -14,6 +14,7 @@ import BalanceLabel from "../Labels/BalanceLabel";
 import ControllerTypeLabel from "../Labels/ControllerTypeLabel";
 import { DissolveStateLabel } from "../Labels/DissolveStateLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
+import TopupNeuronModal from "./TopupNeuronModal";
 
 const governanceCanister = Principal.fromText(governanceCanisterId);
 
@@ -24,7 +25,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
   return (
     <ListPanel>
       <div className="shadow-inner px-6 flex flex-col divide-y divide-gray-200 py-4">
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Account</div>
           <div>
             <IdentifierLabelWithButtons type="Account" id={account}>
@@ -32,7 +33,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             </IdentifierLabelWithButtons>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Controller</div>
           <div>
             <IdentifierLabelWithButtons type="Principal" id={controller}>
@@ -40,7 +41,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             </IdentifierLabelWithButtons>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Hot Keys</div>
           <div>
             <ul>
@@ -54,7 +55,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Following</div>
           <div>
             <ul>
@@ -69,7 +70,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             </ul>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Created</div>
           <div>
             <TimestampLabel
@@ -79,7 +80,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Aging Since</div>
           <div>
             {neuron.aging_since_timestamp_seconds < BigInt("2000000000") ? (
@@ -93,22 +94,28 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             )}
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Stake</div>
           <div>
             <BalanceLabel value={neuron.cached_neuron_stake_e8s} />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Maturity</div>
           <div>
             <BalanceLabel value={neuron.maturity_e8s_equivalent} />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row leading-tight py-2">
+        <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">State</div>
           <div>
             <DissolveStateLabel state={neuron.dissolve_state[0]} />
+          </div>
+        </div>
+        <div className="md:flex leading-tight py-2">
+          <div className="w-32 font-bold">Actions</div>
+          <div>
+            <TopupNeuronModal account={account} controller={controller} />
           </div>
         </div>
       </div>

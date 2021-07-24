@@ -1,5 +1,6 @@
 import React from "react";
 import { BsInboxFill } from "react-icons/bs";
+import { useIsMutating } from "react-query";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import useSync from "../../lib/hooks/Axon/useSync";
@@ -24,7 +25,8 @@ export default function Neurons() {
   const handleRefresh = () => {
     sync.mutate();
   };
-  const isFetching = sync.isLoading || isFetchingNeuronIds || isFetchingNeurons;
+  const isSyncing = !!useIsMutating({ mutationKey: ["sync"] });
+  const isFetching = isSyncing || isFetchingNeuronIds || isFetchingNeurons;
 
   return (
     <section className="py-4 bg-gray-50 rounded-lg shadow-lg">

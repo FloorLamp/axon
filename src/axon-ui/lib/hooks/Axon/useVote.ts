@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { errorToString } from "../../utils";
+import { errorToString, tryCall } from "../../utils";
 
 export default function useVote(id: bigint) {
   const axon = useAxon();
@@ -9,16 +9,13 @@ export default function useVote(id: bigint) {
   return useMutation(
     ["vote", id],
     async ({ yesNo, execute }: { yesNo: boolean; execute: boolean }) => {
-      let result;
-      try {
-        result = await axon.vote({
+      const result = await tryCall(() =>
+        axon.vote({
           id: id,
           vote: yesNo ? { Yes: null } : { No: null },
           execute,
-        });
-      } catch (error) {
-        throw error.message;
-      }
+        })
+      );
       if ("ok" in result) {
         return result.ok;
       } else {

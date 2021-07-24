@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useInitiate from "../../lib/hooks/Axon/useInitiate";
 import { ActionOptions, ActionTypeKey } from "../../lib/types";
 import { ActionOptionsForm } from "../Axon/ActionOptionsForm";
@@ -17,21 +17,17 @@ export default function ActionForm({
   const [options, setOptions] = useState<ActionOptions>({});
   const [action, setAction] = useState(null);
 
-  const { mutate, error, isError, isLoading, isSuccess } = useInitiate(options);
+  const { mutate, error, isError, isLoading } = useInitiate(options);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (action) {
-      mutate(action);
+      mutate(action, {
+        onSuccess: closeModal,
+      });
     }
   }
-
-  useEffect(() => {
-    if (isSuccess) {
-      closeModal();
-    }
-  }, [isSuccess]);
 
   return (
     <form onSubmit={handleSubmit}>
