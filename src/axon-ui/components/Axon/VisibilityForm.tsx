@@ -24,7 +24,7 @@ export function VisibilityForm({
   }, [isPublic]);
 
   return (
-    <div className="flex flex-col py-4 gap-2 leading-tight">
+    <div className="pt-2 flex flex-col gap-2 leading-tight">
       <label className="flex">
         <div className="w-6">
           <input

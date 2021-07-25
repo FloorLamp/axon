@@ -50,8 +50,8 @@ export default function AxonCommandForm({
   };
 
   return (
-    <>
-      <div className="py-4">
+    <div className="flex flex-col gap-2 py-4">
+      <div>
         <label>Command</label>
         <select
           className="w-full mt-1"
@@ -67,6 +67,6 @@ export default function AxonCommandForm({
       </div>
 
       {renderForm()}
-    </>
+    </div>
   );
 }

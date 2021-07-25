@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import { DateTime, Duration } from "luxon";
+import { DateTime } from "luxon";
 import React from "react";
 import { DissolveState } from "../../declarations/Axon/Axon.did";
-import { formatDuration } from "../../lib/datetime";
+import { secondsToDuration } from "../../lib/datetime";
 
 export function DissolveStateLabel({ state }: { state: DissolveState }) {
   let label: string, info: string;
@@ -10,12 +10,8 @@ export function DissolveStateLabel({ state }: { state: DissolveState }) {
     if (state.DissolveDelaySeconds === BigInt(0)) {
       label = "Dissolved";
     } else {
-      const dur = Duration.fromObject({
-        seconds: Number(state.DissolveDelaySeconds),
-      }).shiftTo("years", "months", "days", "hours", "minutes");
-
       label = "Locked";
-      info = formatDuration(dur);
+      info = secondsToDuration(state.DissolveDelaySeconds);
     }
   } else {
     label = "Dissolving";

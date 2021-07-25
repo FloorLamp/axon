@@ -84,65 +84,63 @@ export function ConfigureForm({
   }, [operation, debouncedHotKey, debouncedDissolveDelay, debouncedTimestamp]);
 
   return (
-    <>
-      <div className="flex flex-col py-4 gap-2">
-        <div>
-          <label>Operation</label>
-          <select
-            className="w-full mt-1"
-            onChange={(e) => setOperation(e.target.value as OperationName)}
-            value={operation}
-          >
-            {operations.map((operation) => (
-              <option key={operation} value={operation}>
-                {operation}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {(operation === "Add Hot Key" || operation === "Remove Hot Key") && (
-          <div>
-            <label>Hot Key</label>
-            <input
-              type="text"
-              placeholder="Hot Key"
-              className="w-full mt-1"
-              value={hotKey}
-              onChange={(e) => setHotKey(e.target.value)}
-              maxLength={64}
-            />
-          </div>
-        )}
-
-        {operation === "Increase Dissolve Delay" && (
-          <div>
-            <label>Additional Dissolve Delay</label>
-            <DissolveDelayInput
-              value={dissolveDelay}
-              onChange={setDissolveDelay}
-              required
-            />
-          </div>
-        )}
-
-        {operation === "Set Dissolve Timestamp" && (
-          <div>
-            <label>Dissolve Timestamp</label>
-            <input
-              type="number"
-              placeholder="Dissolve Timestamp"
-              className="w-full mt-1"
-              value={timestamp}
-              onChange={(e) => setTimestamp(e.target.value)}
-              maxLength={20}
-              required
-            />
-          </div>
-        )}
-
-        {!!error && <ErrorAlert>{error}</ErrorAlert>}
+    <div className="flex flex-col gap-2">
+      <div>
+        <label>Operation</label>
+        <select
+          className="w-full mt-1"
+          onChange={(e) => setOperation(e.target.value as OperationName)}
+          value={operation}
+        >
+          {operations.map((operation) => (
+            <option key={operation} value={operation}>
+              {operation}
+            </option>
+          ))}
+        </select>
       </div>
-    </>
+
+      {(operation === "Add Hot Key" || operation === "Remove Hot Key") && (
+        <div>
+          <label>Hot Key</label>
+          <input
+            type="text"
+            placeholder="Hot Key"
+            className="w-full mt-1"
+            value={hotKey}
+            onChange={(e) => setHotKey(e.target.value)}
+            maxLength={64}
+          />
+        </div>
+      )}
+
+      {operation === "Increase Dissolve Delay" && (
+        <div>
+          <label>Additional Dissolve Delay</label>
+          <DissolveDelayInput
+            value={dissolveDelay}
+            onChange={setDissolveDelay}
+            required
+          />
+        </div>
+      )}
+
+      {operation === "Set Dissolve Timestamp" && (
+        <div>
+          <label>Dissolve Timestamp</label>
+          <input
+            type="number"
+            placeholder="Dissolve Timestamp"
+            className="w-full mt-1"
+            value={timestamp}
+            onChange={(e) => setTimestamp(e.target.value)}
+            maxLength={20}
+            required
+          />
+        </div>
+      )}
+
+      {!!error && <ErrorAlert>{error}</ErrorAlert>}
+    </div>
   );
 }

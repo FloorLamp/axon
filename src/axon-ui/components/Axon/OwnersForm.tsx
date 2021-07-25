@@ -43,39 +43,37 @@ export function AddOwnerForm({
   const numSigners = Array.from({ length: maxSigners }).map((_, i) => i + 1);
 
   return (
-    <>
-      <div className="flex flex-col py-4 gap-2">
-        <label className="block">
-          <span>User</span>
-          <input
-            type="text"
-            placeholder="User"
-            className="w-full mt-1"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-            maxLength={64}
-          />
-        </label>
+    <div className="flex flex-col gap-2">
+      <label className="block">
+        <span>User</span>
+        <input
+          type="text"
+          placeholder="User"
+          className="w-full mt-1"
+          value={user}
+          onChange={(e) => setUser(e.target.value)}
+          maxLength={64}
+        />
+      </label>
 
-        {!!inputError && <ErrorAlert>{inputError}</ErrorAlert>}
+      {!!inputError && <ErrorAlert>{inputError}</ErrorAlert>}
 
-        <label className="block">
-          <span>Approvers</span>
-          <select
-            name="approvers"
-            className="w-full mt-1"
-            onChange={(e) => setNeeded(e.target.value)}
-            value={needed}
-          >
-            {numSigners.map((i) => (
-              <option key={i} value={i}>
-                {i}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-    </>
+      <label className="block">
+        <span>Approvers</span>
+        <select
+          name="approvers"
+          className="w-full mt-1"
+          onChange={(e) => setNeeded(e.target.value)}
+          value={needed}
+        >
+          {numSigners.map((i) => (
+            <option key={i} value={i}>
+              {i}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
   );
 }
 
@@ -102,42 +100,40 @@ export function RemoveOwnerForm({
   const numSigners = Array.from({ length: maxSigners }).map((_, i) => i + 1);
 
   return (
-    <>
-      <div className="flex flex-col py-4 gap-2">
-        <label className="block">
-          <span>User</span>
-          <select
-            className="w-full overflow-hidden overflow-ellipsis"
-            onChange={(e) => setUser(e.target.value)}
-            value={user}
-          >
-            {data?.owners.map((owner) => {
-              const principal = owner.toText();
-              return (
-                <option key={principal} value={principal}>
-                  {principal}
-                </option>
-              );
-            })}
-          </select>
-        </label>
-
-        <label className="block">
-          <span>Approvers</span>
-          <select
-            name="approvers"
-            className="w-full mt-1"
-            onChange={(e) => setNeeded(e.target.value)}
-            value={needed}
-          >
-            {numSigners.map((i) => (
-              <option key={i} value={i}>
-                {i}
+    <div className="flex flex-col gap-2">
+      <label className="block">
+        <span>User</span>
+        <select
+          className="w-full overflow-hidden overflow-ellipsis"
+          onChange={(e) => setUser(e.target.value)}
+          value={user}
+        >
+          {data?.owners.map((owner) => {
+            const principal = owner.toText();
+            return (
+              <option key={principal} value={principal}>
+                {principal}
               </option>
-            ))}
-          </select>
-        </label>
-      </div>
-    </>
+            );
+          })}
+        </select>
+      </label>
+
+      <label className="block">
+        <span>Approvers</span>
+        <select
+          name="approvers"
+          className="w-full mt-1"
+          onChange={(e) => setNeeded(e.target.value)}
+          value={needed}
+        >
+          {numSigners.map((i) => (
+            <option key={i} value={i}>
+              {i}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
   );
 }

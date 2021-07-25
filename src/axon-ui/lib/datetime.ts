@@ -1,6 +1,18 @@
 import { Duration } from "luxon";
 import { pluralize } from "./utils";
 
+export const secondsToDuration = (n: number | bigint) => {
+  let seconds = n;
+  if (typeof seconds === "bigint") {
+    seconds = Number(n);
+  }
+  return formatDuration(
+    Duration.fromObject({
+      seconds,
+    }).shiftTo("years", "months", "days", "hours", "minutes")
+  );
+};
+
 export const formatDuration = (d: Duration) => {
   const parts = [];
   if (d.years > 0) {

@@ -15,9 +15,13 @@ import {
   Spawn,
   Split,
 } from "../declarations/Axon/Axon.did";
+import {
+  ManageNeuron,
+  Proposal,
+} from "../declarations/Governance/Governance.did.d";
 import { accountIdentifierToString } from "./account";
-import { Vote } from "./governance";
-import { AxonCommandKey, CommandKey, OperationKey } from "./types";
+import { Topic, Vote } from "./governance";
+import { ActionKey, AxonCommandKey, CommandKey, OperationKey } from "./types";
 import { formatE8s, shortAccount, shortPrincipal, stringify } from "./utils";
 
 export const actionTypeToString = (action: ActionType) => {
@@ -40,7 +44,7 @@ export const neuronCommandToString = ({
     }
     case "Follow": {
       const { followees, topic } = command[key] as Follow;
-      return `Set Following for Topic ${topic}`;
+      return `Set Following for ${Topic[topic]}`;
     }
     case "Spawn": {
       const controller = (command[key] as Spawn).new_controller[0];
@@ -108,6 +112,20 @@ export const neuronCommandToString = ({
             Number(dissolve_timestamp_seconds / BigInt(1e9))
           ).toLocaleString(DateTime.DATETIME_SHORT);
           return `Set Dissolve to ${dt}`;
+      }
+    }
+    case "MakeProposal": {
+      const {
+        action: [action],
+      } = command[key] as Proposal;
+      const actionKey = Object.keys(action)[0] as ActionKey;
+      switch (actionKey) {
+        case "ManageNeuron": {
+          const { id, command } = action[actionKey] as ManageNeuron;
+          return `Manage Neuron ${id[0]?.id.toString()}: ${
+            command[0] ? Object.keys(command[0])[0] : ""
+          }`;
+        }
       }
     }
     default:

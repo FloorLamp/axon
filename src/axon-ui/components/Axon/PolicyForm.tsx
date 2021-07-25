@@ -23,24 +23,22 @@ export function PolicyForm({
   const numSigners = Array.from({ length: maxSigners }).map((_, i) => i + 1);
 
   return (
-    <>
-      <div className="flex flex-col py-4 gap-2">
-        <label className="block">
-          <span>Approvers</span>
-          <select
-            name="approvers"
-            className="w-full mt-1"
-            onChange={(e) => setNeeded(e.target.value)}
-            value={needed}
-          >
-            {numSigners.map((i) => (
-              <option key={i} value={i}>
-                {i} out of {maxSigners}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-    </>
+    <div className="flex flex-col gap-2">
+      <label className="block">
+        <span>Approvers</span>
+        <select
+          name="approvers"
+          className="w-full mt-1"
+          onChange={(e) => setNeeded(e.target.value)}
+          value={needed}
+        >
+          {numSigners.map((i) => (
+            <option key={i} value={i}>
+              {i} out of {maxSigners}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
   );
 }

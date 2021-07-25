@@ -33,7 +33,7 @@ export function SpawnForm({
   }, [debouncedController]);
 
   return (
-    <div className="flex flex-col py-4 gap-2">
+    <div className="flex flex-col gap-2">
       <div>
         <label className="block">
           <div className="flex justify-between">

@@ -60,7 +60,7 @@ export function DisburseToNeuronForm({
 
   return (
     <>
-      <div className="flex flex-col py-4 gap-2">
+      <div className="flex flex-col gap-2">
         <div>
           <label>Amount</label>
           <input

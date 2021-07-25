@@ -38,7 +38,7 @@ export default function FollowForm({
       followees = neurons.map((id) => ({ id: BigInt(id) }));
     } catch (error) {
       setError(`Invalid Neuron ID: ${error.message}`);
-      return;
+      return makeCommand(null);
     }
 
     makeCommand({
@@ -55,34 +55,32 @@ export default function FollowForm({
     .sort((a: any, b: any) => a.value - b.value);
 
   return (
-    <>
-      <div className="flex flex-col py-4 gap-2">
-        <div>
-          <label>Topic</label>
-          <select
-            className="w-full mt-1"
-            onChange={(e) => setTopic(e.target.value as unknown as Topic)}
-            value={topic}
-          >
-            {enumEntries(Topic).map(([name, id]) => (
-              <option key={id} value={id}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </div>
+    <div className="flex flex-col gap-2">
+      <div>
+        <label>Topic</label>
+        <select
+          className="w-full mt-1"
+          onChange={(e) => setTopic(e.target.value as unknown as Topic)}
+          value={topic}
+        >
+          {enumEntries(Topic).map(([name, id]) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        <div>
-          <label>Neuron</label>
-          <CreatableSelect
-            isMulti
-            onChange={handleChangeNeurons}
-            options={DEFAULT_NEURONS.concat(myNeurons)}
-          />
-        </div>
+      <div>
+        <label>Neuron</label>
+        <CreatableSelect
+          isMulti
+          onChange={handleChangeNeurons}
+          options={DEFAULT_NEURONS.concat(myNeurons)}
+        />
       </div>
 
       {!!error && <ErrorAlert>{error}</ErrorAlert>}
-    </>
+    </div>
   );
 }

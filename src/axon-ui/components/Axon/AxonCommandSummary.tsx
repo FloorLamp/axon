@@ -5,6 +5,7 @@ import {
   AxonCommandRequest,
 } from "../../declarations/Axon/Axon.did";
 import { AxonCommandKey } from "../../lib/types";
+import { DataRow, DataTable } from "../Action/ActionSummary";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 
 export default function AxonCommandSummary({
@@ -27,44 +28,37 @@ export default function AxonCommandSummary({
       }
 
       return (
-        <div>
-          <strong>Add owner</strong>
-          <div className="flex">
-            <span className="w-20">Principal</span>
+        <DataTable label="Add owner">
+          <DataRow labelClassName="w-20" label="Principal">
             <IdentifierLabelWithButtons id={principal} type="Principal">
               {principal.toString()}
             </IdentifierLabelWithButtons>
-          </div>
-          <div className="flex">
-            <span className="w-20">Approvals</span>
-            <div>
-              <strong>{needed.toString()}</strong> out of{" "}
-              <strong>{total}</strong>
-            </div>
-          </div>
-        </div>
+          </DataRow>
+          <DataRow labelClassName="w-20" label="Approvals">
+            <strong>{needed.toString()}</strong> out of <strong>{total}</strong>
+          </DataRow>
+        </DataTable>
       );
     }
     case "SetPolicy": {
       assert("SetPolicy" in command);
       const { needed } = command.SetPolicy;
       return (
-        <div>
-          <strong>Set Policy</strong>
+        <DataTable label="Set Policy">
           <div>
             <strong>{needed.toString()}</strong> out of{" "}
             <strong>{action.ballots.length}</strong>
           </div>
-        </div>
+        </DataTable>
       );
     }
     case "UpdateVisibility": {
       assert("UpdateVisibility" in command);
       const visibility = Object.keys(command.UpdateVisibility)[0];
       return (
-        <span>
+        <div>
           Set Visibility to <strong>{visibility}</strong>
-        </span>
+        </div>
       );
     }
   }

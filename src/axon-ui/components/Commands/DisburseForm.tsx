@@ -49,41 +49,39 @@ export function DisburseForm({
   }, [debouncedAccount, debouncedAmount]);
 
   return (
-    <>
-      <div className="flex flex-col py-4 gap-2">
-        <div>
-          <div className="flex justify-between">
-            <span>Account</span>
-            <span className="text-gray-400">Optional</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Account"
-            className="w-full mt-1"
-            value={account}
-            onChange={(e) => setAccount(e.target.value)}
-            maxLength={64}
-          />
+    <div className="flex flex-col gap-2">
+      <div>
+        <div className="flex justify-between">
+          <span>Account</span>
+          <span className="text-gray-400">Optional</span>
         </div>
+        <input
+          type="text"
+          placeholder="Account"
+          className="w-full mt-1"
+          value={account}
+          onChange={(e) => setAccount(e.target.value)}
+          maxLength={64}
+        />
+      </div>
 
-        <div>
-          <div className="flex justify-between">
-            <span>Amount</span>
-            <span className="text-gray-400">Optional</span>
-          </div>
-          <input
-            type="text"
-            placeholder="Amount"
-            className="w-full mt-1"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            min={0}
-            max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
-          />
+      <div>
+        <div className="flex justify-between">
+          <span>Amount</span>
+          <span className="text-gray-400">Optional</span>
         </div>
+        <input
+          type="text"
+          placeholder="Amount"
+          className="w-full mt-1"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          min={0}
+          max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
+        />
       </div>
 
       {!!error && <ErrorAlert>{error}</ErrorAlert>}
-    </>
+    </div>
   );
 }

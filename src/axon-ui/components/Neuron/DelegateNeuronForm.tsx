@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
 import { useClipboard } from "use-clipboard-copy";
-import { canisterId as AxonCanisterId } from "../../declarations/Axon";
-import SyncForm from "./SyncForm";
+import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 
-export default function AddNeuronForm() {
+export default function DelegateNeuronForm() {
+  const { data } = useNeuronIds();
+  const ids = data.map((id) => `record{id=${id.toString()}:nat64}`).join("; ");
   const [neuronId, setNeuronId] = useState("");
   const dfxCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
     neuronId || "$NEURON_ID"
-  }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {AddHotKey=record {new_hot_key=opt principal \\"${AxonCanisterId}\\"}})})})})"`;
+  }:nat64}); command=opt (variant {Follow=record {topic=1:int32; followees=vec {${ids}}}})})"`;
 
   const clipboard = useClipboard({
     copiedTimeout: 1000,
@@ -22,7 +23,7 @@ export default function AddNeuronForm() {
     <div className="flex flex-col divide-gray-300 divide-y">
       <div className="flex flex-col gap-2 py-4">
         <label className="block">
-          Add existing Neuron
+          Delegate Neuron
           <input
             type="number"
             placeholder="Neuron ID"
@@ -34,7 +35,7 @@ export default function AddNeuronForm() {
           />
         </label>
         <p className="leading-tight">
-          You can add Axon as a hot key for an existing neuron by running the
+          You can delegate control of an existing neuron to Axon by running the
           following{" "}
           <code className="px-1 py-0.5 bg-gray-200 rounded text-xs">dfx</code>{" "}
           command:
@@ -50,11 +51,9 @@ export default function AddNeuronForm() {
           <code>{dfxCommand}</code>
         </div>
         <p className="leading-tight">
-          Then, click the button to sync Axon with the new neuron.
+          Axon will then be able to use NNS proposals to control that neuron.
         </p>
       </div>
-
-      <SyncForm />
     </div>
   );
 }

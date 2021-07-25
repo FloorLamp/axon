@@ -24,7 +24,7 @@ export default function NeuronSelectionForm({
   };
 
   return (
-    <Disclosure as="div" className="py-4">
+    <Disclosure as="div">
       {({ open }) => (
         <>
           <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer px-2 py-1">

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ActionType } from "../../declarations/Axon/Axon.did";
 import useInitiate from "../../lib/hooks/Axon/useInitiate";
 import { ActionOptions, ActionTypeKey } from "../../lib/types";
 import { ActionOptionsForm } from "../Axon/ActionOptionsForm";
@@ -15,7 +16,7 @@ export default function ActionForm({
   actionType: ActionTypeKey;
 }) {
   const [options, setOptions] = useState<ActionOptions>({});
-  const [action, setAction] = useState(null);
+  const [action, setAction] = useState<ActionType>(null);
 
   const { mutate, error, isError, isLoading } = useInitiate(options);
 
