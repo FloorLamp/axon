@@ -1,7 +1,6 @@
 import React from "react";
 import { canisterId } from "../../declarations/Axon";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
-import { shortPrincipal } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -27,9 +26,7 @@ export default function AxonDetails() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <IdentifierLabelWithButtons type="Principal" id={canisterId}>
-          {canisterId}
-        </IdentifierLabelWithButtons>
+        <IdentifierLabelWithButtons type="Principal" id={canisterId} />
 
         {error && <ErrorAlert>{error}</ErrorAlert>}
 
@@ -39,12 +36,21 @@ export default function AxonDetails() {
             {data &&
               data.owners.map((p) => (
                 <li key={p.toText()}>
-                  <IdentifierLabelWithButtons type="Principal" id={p}>
-                    <span className="hidden xs:inline leading-tight">
-                      {p.toText()}
-                    </span>
-                    <span className="xs:hidden">{shortPrincipal(p)}</span>
-                  </IdentifierLabelWithButtons>
+                  <IdentifierLabelWithButtons
+                    type="Principal"
+                    id={p}
+                    forceShowId={true}
+                    render={({ rawId, name }) => (
+                      <>
+                        {name && (
+                          <label className="mr-2 px-2 py-0.5 bg-blue-200 rounded uppercase text-xs">
+                            {name}
+                          </label>
+                        )}
+                        {rawId}
+                      </>
+                    )}
+                  />
                 </li>
               ))}
           </ul>

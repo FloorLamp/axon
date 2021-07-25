@@ -4,18 +4,16 @@ import {
   NeuronCommandResponse,
 } from "../../declarations/Axon/Axon.did";
 import { errorToString, governanceErrorToString } from "../../lib/utils";
+import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { ActionError, ActionSuccess } from "./ActionResponseSummary";
 
-const Result = ({
-  neuronId,
-  result,
-}: {
-  neuronId: string;
-  result: Command_1;
-}) => {
+const Result = ({ id, result }: { id: string; result: Command_1 }) => {
+  const label = (
+    <IdentifierLabelWithButtons id={id} type="Neuron" showButtons={false} />
+  );
   if ("Error" in result) {
     return (
-      <ActionError label={neuronId}>
+      <ActionError label={label}>
         {governanceErrorToString(result.Error)}
       </ActionError>
     );
@@ -26,7 +24,7 @@ const Result = ({
     message = "Successfully set followees";
   }
 
-  return <ActionSuccess label={neuronId}>{message}</ActionSuccess>;
+  return <ActionSuccess label={label}>{message}</ActionSuccess>;
 };
 
 export default function NeuronCommandResponseList({
@@ -44,7 +42,7 @@ export default function NeuronCommandResponseList({
             <ActionError label={id}>{errorToString(res.err)}</ActionError>
           );
         } else {
-          display = <Result neuronId={id} result={res.ok.command[0]} />;
+          display = <Result id={id} result={res.ok.command[0]} />;
         }
         return <li key={id}>{display}</li>;
       })}

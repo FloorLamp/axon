@@ -45,13 +45,26 @@ function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
   return (
     <div>
       <strong>Neurons</strong>
-      <div>{ids ? ids.map(String).join(", ") : "All"}</div>
+      <div>
+        {ids ? (
+          <ul>
+            {ids.map((id) => (
+              <li key={id.toString()}>
+                <IdentifierLabelWithButtons type="Neuron" id={id} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          "All"
+        )}
+      </div>
     </div>
   );
 }
 
 function CommandSummary({ command }: { command: Command }) {
   const key = Object.keys(command)[0] as CommandKey;
+
   switch (key) {
     case "RegisterVote": {
       const { vote, proposal } = command[key] as RegisterVote;
@@ -72,9 +85,7 @@ function CommandSummary({ command }: { command: Command }) {
             )}
           </DataRow>
           <DataRow labelClassName="w-20" label="Proposal">
-            <IdentifierLabelWithButtons id={proposal[0].id} type="Proposal">
-              {proposal[0].id.toString()}
-            </IdentifierLabelWithButtons>
+            <IdentifierLabelWithButtons id={proposal[0].id} type="Proposal" />
           </DataRow>
         </DataTable>
       );
@@ -93,9 +104,7 @@ function CommandSummary({ command }: { command: Command }) {
                   const nid = id.toString();
                   return (
                     <li key={nid}>
-                      <IdentifierLabelWithButtons id={nid} type="Neuron">
-                        {nid}
-                      </IdentifierLabelWithButtons>
+                      <IdentifierLabelWithButtons id={nid} type="Neuron" />
                     </li>
                   );
                 })}
@@ -111,9 +120,7 @@ function CommandSummary({ command }: { command: Command }) {
         <DataTable label="Spawn">
           <DataRow labelClassName="w-20" label="Account">
             {controller && (
-              <IdentifierLabelWithButtons id={controller} type="Principal">
-                {controller.toText()}
-              </IdentifierLabelWithButtons>
+              <IdentifierLabelWithButtons id={controller} type="Principal" />
             )}
           </DataRow>
         </DataTable>
@@ -134,17 +141,14 @@ function CommandSummary({ command }: { command: Command }) {
         to_account: [aid],
         amount: [amt],
       } = command[key] as Disburse;
-      let accountId;
-      if (aid) {
-        accountId = accountIdentifierToString(aid);
-      }
       return (
         <DataTable label="Disburse">
           <DataRow labelClassName="w-20" label="Account">
-            {accountId && (
-              <IdentifierLabelWithButtons id={accountId} type="Account">
-                {accountId}
-              </IdentifierLabelWithButtons>
+            {aid && (
+              <IdentifierLabelWithButtons
+                id={accountIdentifierToString(aid)}
+                type="Account"
+              />
             )}
           </DataRow>
           <DataRow labelClassName="w-20" label="Amount">
@@ -165,9 +169,7 @@ function CommandSummary({ command }: { command: Command }) {
         <DataTable label="Disburse">
           <DataRow labelClassName="w-20" label="Controller">
             {controller && (
-              <IdentifierLabelWithButtons id={controller} type="Principal">
-                {controller.toText()}
-              </IdentifierLabelWithButtons>
+              <IdentifierLabelWithButtons id={controller} type="Principal" />
             )}
           </DataRow>
           <DataRow labelClassName="w-20" label="Amount">
@@ -198,9 +200,7 @@ function CommandSummary({ command }: { command: Command }) {
             <DataTable
               label={`${opKey === "AddHotKey" ? "Add" : "Remove"} Hot Key`}
             >
-              <IdentifierLabelWithButtons id={id} type="Principal">
-                {id.toText()}
-              </IdentifierLabelWithButtons>
+              <IdentifierLabelWithButtons id={id} type="Principal" />
             </DataTable>
           );
         case "StartDissolving":
@@ -266,6 +266,7 @@ function CommandSummary({ command }: { command: Command }) {
 
 const ActionSummary = ({ action }: { action: Action }) => {
   const key = Object.keys(action)[0] as ActionKey;
+
   switch (key) {
     case "ManageNeuron":
       const {
@@ -276,16 +277,12 @@ const ActionSummary = ({ action }: { action: Action }) => {
         <div>
           <div className="xs:flex items-center">
             <DataRow labelClassName="w-32" label="Manage Neuron">
-              {id && (
-                <IdentifierLabelWithButtons id={id.id} type="Neuron">
-                  {id.id.toString()}
-                </IdentifierLabelWithButtons>
-              )}
+              {id && <IdentifierLabelWithButtons id={id} type="Neuron" />}
             </DataRow>
           </div>
           <div>
             <div className="flex gap-1">
-              <BsArrowReturnRight className="text-gray-500 pointer-events-none" />
+              <BsArrowReturnRight className="text-gray-500 pointer-events-none mt-0.5" />
               {command ? (
                 <CommandSummary command={command} />
               ) : (

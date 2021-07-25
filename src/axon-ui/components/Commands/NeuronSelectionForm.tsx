@@ -3,6 +3,7 @@ import classNames from "classnames";
 import React from "react";
 import { FiChevronRight } from "react-icons/fi";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
+import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 
 export default function NeuronSelectionForm({
   neuronIds,
@@ -54,7 +55,11 @@ export default function NeuronSelectionForm({
                       onChange={(e) => toggle(id.toString())}
                       checked={set.has(id.toString())}
                     />
-                    {id}
+                    <IdentifierLabelWithButtons
+                      type="Neuron"
+                      id={id}
+                      showButtons={false}
+                    />
                   </label>
                 </li>
               );

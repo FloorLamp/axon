@@ -10,7 +10,7 @@ export const ActionError = ({
   label,
   children,
 }: {
-  label: string;
+  label: ReactNode;
   children?: ReactNode;
 }) => {
   return (
@@ -33,7 +33,7 @@ export const ActionSuccess = ({
   label,
   children,
 }: {
-  label: string;
+  label: ReactNode;
   children?: ReactNode;
 }) => {
   return (

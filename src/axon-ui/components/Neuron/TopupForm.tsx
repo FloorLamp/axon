@@ -43,9 +43,9 @@ export default function TopupForm({
         </label>
         <label>Send ICP to:</label>
 
-        <IdentifierLabelWithButtons type="Account" id={account}>
-          <strong className="leading-tight">{account}</strong>
-        </IdentifierLabelWithButtons>
+        <strong className="leading-tight">
+          <IdentifierLabelWithButtons type="Account" id={account} />
+        </strong>
         <p className="leading-tight">
           Then, click the button to refresh the neuron.
         </p>

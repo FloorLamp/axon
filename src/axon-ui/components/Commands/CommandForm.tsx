@@ -14,7 +14,8 @@ const commands: [CommandKey, string][] = [
   ["Split", "Split"],
   ["Follow", "Follow"],
   ["Configure", "Configure"],
-  ["RegisterVote", "Register Vote"],
+  // Voting is done from the NNS Proposals section
+  // ["RegisterVote", "Register Vote"],
   ["DisburseToNeuron", "Disburse To Neuron"],
   ["MakeProposal", "Make Proposal"],
   ["Disburse", "Disburse"],
@@ -43,6 +44,8 @@ export default function CommandForm({
         return <DisburseToNeuronForm makeCommand={setCommand} />;
       case "MakeProposal":
         return <MakeProposalForm makeCommand={setCommand} />;
+      case "RegisterVote":
+        return null;
     }
   };
 

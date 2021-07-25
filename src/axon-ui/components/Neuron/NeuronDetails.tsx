@@ -1,7 +1,7 @@
 import { Principal } from "@dfinity/principal";
 import { Disclosure } from "@headlessui/react";
 import { DateTime } from "luxon";
-import React from "react";
+import React, { Fragment } from "react";
 import { canisterId as AxonCanisterId } from "../../declarations/Axon";
 import { Neuron } from "../../declarations/Axon/Axon.did";
 import { canisterId as governanceCanisterId } from "../../declarations/Governance";
@@ -28,17 +28,13 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
         <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Account</div>
           <div>
-            <IdentifierLabelWithButtons type="Account" id={account}>
-              {account}
-            </IdentifierLabelWithButtons>
+            <IdentifierLabelWithButtons type="Account" id={account} />
           </div>
         </div>
         <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Controller</div>
           <div>
-            <IdentifierLabelWithButtons type="Principal" id={controller}>
-              {controller.toText()}
-            </IdentifierLabelWithButtons>
+            <IdentifierLabelWithButtons type="Principal" id={controller} />
           </div>
         </div>
         <div className="md:flex leading-tight py-2">
@@ -47,9 +43,7 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
             <ul>
               {neuron.hot_keys.map((hotkey) => (
                 <li key={hotkey.toText()}>
-                  <IdentifierLabelWithButtons type="Principal" id={hotkey}>
-                    {hotkey.toText()}
-                  </IdentifierLabelWithButtons>
+                  <IdentifierLabelWithButtons type="Principal" id={hotkey} />
                 </li>
               ))}
             </ul>
@@ -58,16 +52,26 @@ const NeuronPanel = ({ neuron }: { neuron: Neuron }) => {
         <div className="md:flex leading-tight py-2">
           <div className="w-32 font-bold">Following</div>
           <div>
-            <ul>
+            <div className="xs:grid grid-cols-label">
               {neuron.followees.map(([topic, followee]) => (
-                <li key={topic} className="divide-x divide-gray-400">
-                  <label className="pr-2">{Topic[topic]}</label>
-                  <span className="pl-2">
-                    {followee.followees.map((f) => f.id).join(", ")}
-                  </span>
-                </li>
+                <Fragment key={topic}>
+                  <div className="pr-4">
+                    <div className="flex h-4 items-end">
+                      <span className="uppercase text-xs text-gray-500 leading-none">
+                        {Topic[topic]}
+                      </span>
+                    </div>
+                  </div>
+                  <ul>
+                    {followee.followees.map((f) => (
+                      <li key={f.id.toString()}>
+                        <IdentifierLabelWithButtons type="Neuron" id={f.id} />
+                      </li>
+                    ))}
+                  </ul>
+                </Fragment>
               ))}
-            </ul>
+            </div>
           </div>
         </div>
         <div className="md:flex leading-tight py-2">
@@ -138,7 +142,7 @@ export default function NeuronDetails({
         <>
           <ListButton open={open} disabled={!neuron}>
             <div className="flex flex-col sm:flex-row">
-              <div className="flex-1 sm:flex-none sm:w-64 md:w-96 xs:flex gap-2 items-center">
+              <div className="flex-1 sm:flex-none sm:w-72 md:w-96 xs:flex gap-2 items-center">
                 {neuron && (
                   <ControllerTypeLabel
                     type={
@@ -148,9 +152,7 @@ export default function NeuronDetails({
                     }
                   />
                 )}
-                <IdentifierLabelWithButtons type="Neuron" id={id}>
-                  {id}
-                </IdentifierLabelWithButtons>
+                <IdentifierLabelWithButtons type="Neuron" id={id} />
               </div>
               <div className="flex-1 flex flex-col sm:flex-row sm:items-center">
                 {neuron && (

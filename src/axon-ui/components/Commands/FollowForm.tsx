@@ -2,34 +2,23 @@ import React, { useEffect, useState } from "react";
 import CreatableSelect from "react-select/creatable";
 import { Command } from "../../declarations/Axon/Axon.did";
 import { Topic } from "../../lib/governance";
-import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import useDebounce from "../../lib/hooks/useDebounce";
+import useNeuronOptions from "../../lib/hooks/useNeuronOptions";
 import { enumEntries } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
-
-const DEFAULT_NEURONS = [
-  {
-    value: "27",
-    label: "27 - DFINITY Foundation",
-  },
-  {
-    value: "28",
-    label: "28 - Internet Computer Association",
-  },
-];
 
 export default function FollowForm({
   makeCommand,
 }: {
   makeCommand: (cmd: Command | null) => void;
 }) {
-  const { data } = useNeuronIds();
   const [topic, setTopic] = useState(Topic["All Topics"]);
   const [neurons, setNeurons] = useState<string[]>([]);
   const [error, setError] = useState("");
 
-  const debouncedTopic = useDebounce(topic);
+  const neuronOptions = useNeuronOptions();
 
+  const debouncedTopic = useDebounce(topic);
   useEffect(() => {
     setError("");
 
@@ -49,10 +38,6 @@ export default function FollowForm({
   const handleChangeNeurons = (values: { value: string; label: string }[]) => {
     setNeurons(values.map(({ value }) => value));
   };
-
-  const myNeurons = data
-    .map((id) => ({ value: id.toString(), label: id.toString() }))
-    .sort((a: any, b: any) => a.value - b.value);
 
   return (
     <div className="flex flex-col gap-2">
@@ -76,7 +61,7 @@ export default function FollowForm({
         <CreatableSelect
           isMulti
           onChange={handleChangeNeurons}
-          options={DEFAULT_NEURONS.concat(myNeurons)}
+          options={neuronOptions}
         />
       </div>
 

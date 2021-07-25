@@ -12,6 +12,9 @@ module.exports = {
       fontFamily: {
         sans: ["Source Sans Pro", ...defaultTheme.fontFamily.sans],
       },
+      gridTemplateColumns: {
+        label: "auto 1fr",
+      },
     },
   },
   variants: {

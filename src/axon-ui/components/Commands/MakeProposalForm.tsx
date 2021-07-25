@@ -70,6 +70,7 @@ export default function MakeProposalForm({
           </div>
           <input
             type="url"
+            name="url"
             placeholder="URL"
             className="w-full mt-1"
             value={url}

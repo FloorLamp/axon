@@ -11,7 +11,7 @@ import {
 import { AxonAction, Ballot } from "../../declarations/Axon/Axon.did";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { StatusKey } from "../../lib/types";
-import { pluralize, shortPrincipal } from "../../lib/utils";
+import { pluralize } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { ActionResponseSummary } from "./ActionResponseSummary";
 import ApproveRejectButtons from "./ApproveRejectButtons";
@@ -55,11 +55,11 @@ function BallotsList({ ballots }: { ballots: Ballot[] }) {
         const principalText = ballot.principal.toText();
         return (
           <li key={principalText + i} className="flex gap-1">
-            <IdentifierLabelWithButtons type="Principal" id={ballot.principal}>
-              <span title={principalText}>
-                {shortPrincipal(ballot.principal)}
-              </span>
-            </IdentifierLabelWithButtons>
+            <IdentifierLabelWithButtons
+              type="Principal"
+              id={ballot.principal}
+              isShort={true}
+            />
           </li>
         );
       })}
@@ -134,9 +134,11 @@ export default function Steps({
         circle={<FaPlusCircle size={CIRCLE_SIZE} className="text-gray-400" />}
         label={<span className="text-gray-700">Created</span>}
       >
-        <IdentifierLabelWithButtons type="Principal" id={action.creator}>
-          {shortPrincipal(action.creator)}
-        </IdentifierLabelWithButtons>
+        <IdentifierLabelWithButtons
+          type="Principal"
+          id={action.creator}
+          isShort={true}
+        />
       </Step>
       {approves.length > 0 && (
         <Step

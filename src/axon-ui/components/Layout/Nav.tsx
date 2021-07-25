@@ -1,5 +1,4 @@
 import React from "react";
-import { shortPrincipal } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import LoginButton from "../Buttons/LoginButton";
 import { useGlobalContext } from "../Store/Store";
@@ -14,9 +13,12 @@ export default function Nav() {
       <img src="/img/axon-full-logo.svg" className="h-14" />
       <div className="flex items-center gap-4">
         {principal && !principal.isAnonymous() && (
-          <IdentifierLabelWithButtons type="Principal" id={principal}>
-            <span title={principal.toText()}>{shortPrincipal(principal)}</span>
-          </IdentifierLabelWithButtons>
+          <IdentifierLabelWithButtons
+            type="Principal"
+            id={principal}
+            isShort={true}
+            showName={false}
+          />
         )}
         <LoginButton />
       </div>

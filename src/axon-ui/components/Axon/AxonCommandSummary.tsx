@@ -30,9 +30,7 @@ export default function AxonCommandSummary({
       return (
         <DataTable label="Add owner">
           <DataRow labelClassName="w-20" label="Principal">
-            <IdentifierLabelWithButtons id={principal} type="Principal">
-              {principal.toString()}
-            </IdentifierLabelWithButtons>
+            <IdentifierLabelWithButtons id={principal} type="Principal" />
           </DataRow>
           <DataRow labelClassName="w-20" label="Approvals">
             <strong>{needed.toString()}</strong> out of <strong>{total}</strong>

@@ -18,9 +18,7 @@ const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
   return (
     <div className="flex flex-col gap-1 sm:flex-row p-2">
       <div className="w-36">
-        <IdentifierLabelWithButtons type="Proposal" id={id}>
-          #{id.toString()}
-        </IdentifierLabelWithButtons>
+        <IdentifierLabelWithButtons type="Proposal" id={id} />
       </div>
       <div className="flex-1">
         <div>{Topic[proposal.topic]}</div>
