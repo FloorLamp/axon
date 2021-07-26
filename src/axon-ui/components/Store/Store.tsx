@@ -20,6 +20,13 @@ const reducer = (state: State, action: Action) => {
   switch (action.type) {
     case "SET_AGENT":
       const agent = action.agent || defaultAgent;
+      // // Fetch root key for certificate validation during development
+      // if (process.env.NEXT_PUBLIC_DFX_NETWORK === "local") {
+      //   console.log("old rootKey", agent.rootKey.toString("hex"));
+      //   agent.fetchRootKey();
+      //   console.log("new rootKey", agent.rootKey.toString("hex"));
+      // }
+
       return {
         ...state,
         agent,

@@ -56,6 +56,20 @@ export const formatNumber = (number: any, digits?: number) => {
   }).format(n);
 };
 
+type SignDisplay = "auto" | "never" | "always" | "exceptZero";
+export const formatPercent = (
+  number: number,
+  signDisplay: SignDisplay = "auto",
+  digits: number = 2
+) => {
+  return Intl.NumberFormat("en-US", {
+    style: "percent",
+    signDisplay,
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(number);
+};
+
 export const shortAccount = (accountId: string) =>
   `${accountId.slice(0, 4)}...${accountId.slice(-4)}`;
 

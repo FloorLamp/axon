@@ -22,8 +22,7 @@ export function SplitForm({
 
   return (
     <div className="flex flex-col gap-2">
-      <div>
-        <label>Amount</label>
+      <label className="block">
         <input
           type="number"
           placeholder="Amount"
@@ -34,7 +33,7 @@ export function SplitForm({
           max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
           required
         />
-      </div>
+      </label>
     </div>
   );
 }

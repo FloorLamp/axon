@@ -14,13 +14,20 @@ export default function Dropdown() {
   const handleAuthenticated = async (authClient: AuthClient) => {
     const identity: Identity = authClient.getIdentity();
     setAgent({
-      agent: new HttpAgent({ identity, host: "https://ic0.app" }),
+      agent: new HttpAgent({
+        identity,
+        host:
+          process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
+            ? "http://localhost:8000"
+            : "https://ic0.app",
+      }),
       isAuthed: true,
     });
   };
 
   const handleLogin = () =>
     authClient.login({
+      identityProvider: "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000",
       maxTimeToLive: ONE_WEEK_NS,
       onSuccess: () => handleAuthenticated(authClient),
     });

@@ -5,7 +5,7 @@ import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import useSync from "../../lib/hooks/Axon/useSync";
 import { RefreshButton } from "../Buttons/RefreshButton";
-import ErrorAlert from "../Labels/ErrorAlert";
+import ResponseError from "../Labels/ResponseError";
 import ManageNeuronModal from "./ManageNeuronModal";
 import NeuronDetails from "./NeuronDetails";
 
@@ -14,6 +14,7 @@ export default function Neurons() {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
     error: errorNeuronIds,
+    isSuccess,
   } = useNeuronIds();
   const {
     data: neurons,
@@ -43,13 +44,13 @@ export default function Neurons() {
       </div>
       {(errorNeuronIds || errorNeurons) && (
         <div className="px-4">
-          <ErrorAlert>
+          <ResponseError>
             {errorNeuronIds}
             {errorNeurons}
-          </ErrorAlert>
+          </ResponseError>
         </div>
       )}
-      {neuronIds.length > 0 ? (
+      {neuronIds?.length > 0 ? (
         <ul className="divide-y divide-gray-300">
           {neuronIds.map((neuronId) => {
             const id = neuronId.toString();
@@ -65,15 +66,13 @@ export default function Neurons() {
           })}
         </ul>
       ) : (
-        <div className="h-32 flex flex-col items-center justify-center">
-          {!isFetching && (
-            <>
-              <BsInboxFill size={48} />
-              <p className="py-2">No neurons</p>
-              <p className="text-gray-500">Add your first neuron!</p>
-            </>
-          )}
-        </div>
+        isSuccess && (
+          <div className="h-32 flex flex-col items-center justify-center">
+            <BsInboxFill size={48} />
+            <p className="py-2">No neurons</p>
+            <p className="text-gray-500">Add your first neuron!</p>
+          </div>
+        )
       )}
     </section>
   );

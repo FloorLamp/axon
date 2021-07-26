@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
-import ActionForm from "../Action/ActionForm";
 import Modal from "../Layout/Modal";
+import ProposalForm from "../Proposal/ProposalForm";
 
 export default function ManageAxonModal() {
   const isOwner = useIsOwner();
@@ -30,7 +30,7 @@ export default function ManageAxonModal() {
         closeModal={closeModal}
         title="Manage Axon"
       >
-        <ActionForm actionType="AxonCommand" closeModal={closeModal} />
+        <ProposalForm proposalType="AxonCommand" closeModal={closeModal} />
       </Modal>
     </>
   );

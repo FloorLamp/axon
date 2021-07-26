@@ -1,7 +1,6 @@
 import assert from "assert";
 import { DateTime } from "luxon";
 import {
-  ActionType,
   AddHotKey,
   AxonCommandRequest,
   Configure,
@@ -10,6 +9,7 @@ import {
   Follow,
   IncreaseDissolveDelay,
   NeuronCommandRequest,
+  ProposalType,
   RegisterVote,
   SetDissolveTimestamp,
   Spawn,
@@ -22,20 +22,24 @@ import {
 import { accountIdentifierToString } from "./account";
 import { Topic, Vote } from "./governance";
 import { ActionKey, AxonCommandKey, CommandKey, OperationKey } from "./types";
-import { formatE8s, shortAccount, shortPrincipal, stringify } from "./utils";
+import {
+  formatE8s,
+  formatNumber,
+  formatPercent,
+  shortAccount,
+  shortPrincipal,
+  stringify,
+} from "./utils";
 
-export const actionTypeToString = (action: ActionType) => {
-  if ("AxonCommand" in action) {
-    return axonCommandToString(action.AxonCommand[0]);
+export const proposalTypeToString = (proposal: ProposalType) => {
+  if ("AxonCommand" in proposal) {
+    return axonCommandToString(proposal.AxonCommand[0]);
   } else {
-    return neuronCommandToString(action.NeuronCommand[0]);
+    return neuronCommandToString(proposal.NeuronCommand[0]);
   }
 };
 
-export const neuronCommandToString = ({
-  command,
-  neuronIds,
-}: NeuronCommandRequest) => {
+export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
     case "RegisterVote": {
@@ -43,7 +47,7 @@ export const neuronCommandToString = ({
       return `Vote ${Vote[vote]} on Proposal ${proposal[0].id.toString()}`;
     }
     case "Follow": {
-      const { followees, topic } = command[key] as Follow;
+      const { topic } = command[key] as Follow;
       return `Set Following for ${Topic[topic]}`;
     }
     case "Spawn": {
@@ -62,12 +66,8 @@ export const neuronCommandToString = ({
         to_account: [aid],
         amount: [amt],
       } = command[key] as Disburse;
-      let accountId;
-      if (aid) {
-        accountId = shortAccount(accountIdentifierToString(aid));
-      }
       return `Disburse${amt ? ` ${formatE8s(amt.e8s)} ICP` : ""}${
-        accountId ? " to " + accountId : ""
+        aid ? " to " + shortAccount(accountIdentifierToString(aid)) : ""
       }`;
     }
     case "DisburseToNeuron": {
@@ -75,12 +75,8 @@ export const neuronCommandToString = ({
         new_controller: [controller],
         amount_e8s,
       } = command[key] as DisburseToNeuron;
-      let cid;
-      if (controller) {
-        cid = shortPrincipal(controller);
-      }
       return `Disburse to Neuron, ${formatE8s(amount_e8s)} ICP${
-        cid ? " to " + cid : ""
+        controller ? " to " + shortPrincipal(controller) : ""
       }`;
     }
     case "Configure": {
@@ -136,28 +132,50 @@ export const neuronCommandToString = ({
 export const axonCommandToString = (command: AxonCommandRequest) => {
   const key = Object.keys(command)[0] as AxonCommandKey;
   switch (key) {
-    case "AddOwner": {
-      assert("AddOwner" in command);
-      const { principal, needed, total } = command.AddOwner;
-      return `Add owner ${shortPrincipal(
-        principal
-      )} (${needed.toString()} out of ${total[0]?.toString()} approvals)`;
+    case "AddMembers": {
+      assert("AddMembers" in command);
+      const principals = command.AddMembers;
+      const display =
+        principals.length <= 2
+          ? principals.map(shortPrincipal).join(", ")
+          : `${principals.length} principals`;
+      return `Add Members: ${display}`;
     }
-    case "RemoveOwner": {
-      assert("RemoveOwner" in command);
-      const { principal, needed, total } = command.RemoveOwner;
-      return `Remove owner ${shortPrincipal(
-        principal
-      )} (${needed.toString()} out of ${total[0]?.toString()} approvals)`;
+    case "RemoveMembers": {
+      assert("RemoveMembers" in command);
+      const principals = command.RemoveMembers;
+      const display =
+        principals.length <= 2
+          ? principals.map(shortPrincipal).join(", ")
+          : `${principals.length} principals`;
+      return `Remove Members: ${display}`;
     }
     case "SetPolicy": {
       assert("SetPolicy" in command);
-      const { needed, total } = command.SetPolicy;
-      return `Set Policy (${needed.toString()} out of ${total[0]?.toString()} approvals)`;
+      const { proposeThreshold, proposers, acceptanceThreshold } =
+        command.SetPolicy;
+      const membership = Object.keys(proposers)[0];
+      let threshold: string;
+      if ("Percent" in acceptanceThreshold) {
+        const percent = formatPercent(
+          Number(acceptanceThreshold.Percent.percent) / 1e8
+        );
+        const quorum = acceptanceThreshold.Percent.quorum[0]
+          ? `${formatPercent(
+              Number(acceptanceThreshold.Percent.quorum[0]) / 1e8
+            )} quorum`
+          : "";
+        threshold = `${percent}${quorum ? " " + quorum : ""}`;
+      } else {
+        threshold = formatNumber(acceptanceThreshold.Absolute);
+      }
+      return `Set Policy: ${membership} membership, ${formatNumber(
+        proposeThreshold
+      )} to propose, ${threshold} to accept)`;
     }
-    case "UpdateVisibility": {
-      assert("UpdateVisibility" in command);
-      const visibility = Object.keys(command.UpdateVisibility)[0];
+    case "SetVisibility": {
+      assert("SetVisibility" in command);
+      const visibility = Object.keys(command.SetVisibility)[0];
       return `Set Visibility to ${visibility}`;
     }
   }

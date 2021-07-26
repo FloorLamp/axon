@@ -8,13 +8,13 @@ import {
   FaPlusCircle,
   FaTimesCircle,
 } from "react-icons/fa";
-import { AxonAction, Ballot } from "../../declarations/Axon/Axon.did";
+import { AxonProposal, Ballot } from "../../declarations/Axon/Axon.did";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { StatusKey } from "../../lib/types";
 import { pluralize } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
-import { ActionResponseSummary } from "./ActionResponseSummary";
 import ApproveRejectButtons from "./ApproveRejectButtons";
+import { CommandResponseSummary } from "./CommandResponseSummary";
 import ExecuteButton from "./ExecuteButton";
 
 const CIRCLE_SIZE = 18;
@@ -68,20 +68,20 @@ function BallotsList({ ballots }: { ballots: Ballot[] }) {
 }
 
 export default function Steps({
-  action,
+  proposal,
   isEligibleToVote,
 }: {
-  action: AxonAction;
+  proposal: AxonProposal;
   isEligibleToVote: boolean;
 }) {
   const isOwner = useIsOwner();
 
-  const ballots = action.ballots.filter(({ vote }) => !!vote[0]);
+  const ballots = proposal.ballots.filter(({ vote }) => !!vote[0]);
   const approves = ballots.filter(({ vote: [v] }) => "Yes" in v);
   const rejects = ballots.filter(({ vote: [v] }) => "No" in v);
 
-  const status = Object.keys(action.status)[0] as StatusKey;
-  const policy = action.policy[0];
+  const status = Object.keys(proposal.status)[0] as StatusKey;
+  const policy = proposal.policy[0];
 
   let activeStep: JSX.Element;
   if (status === "Pending" || status === "Accepted") {
@@ -107,8 +107,8 @@ export default function Steps({
         {remaining}
         {showActions && (
           <div className="mt-2 border-t border-gray-300 pt-3">
-            {isEligibleToVote && <ApproveRejectButtons id={action.id} />}
-            {status === "Accepted" && <ExecuteButton id={action.id} />}
+            {isEligibleToVote && <ApproveRejectButtons id={proposal.id} />}
+            {status === "Accepted" && <ExecuteButton id={proposal.id} />}
           </div>
         )}
       </Step>
@@ -136,7 +136,7 @@ export default function Steps({
       >
         <IdentifierLabelWithButtons
           type="Principal"
-          id={action.creator}
+          id={proposal.creator}
           isShort={true}
         />
       </Step>
@@ -164,7 +164,7 @@ export default function Steps({
         </Step>
       )}
       {activeStep}
-      {"Executed" in action.status && (
+      {"Executed" in proposal.status && (
         <Step
           circle={
             <FaCheckCircle size={CIRCLE_SIZE} className="text-green-400" />
@@ -172,7 +172,7 @@ export default function Steps({
           label={<span className="text-green-700">Executed</span>}
           showLine={false}
         >
-          <ActionResponseSummary actionType={action.action} />
+          <CommandResponseSummary proposalType={proposal.proposal} />
         </Step>
       )}
       {status === "Expired" && (

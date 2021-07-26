@@ -1,30 +1,30 @@
 import React, { useState } from "react";
-import { ActionType } from "../../declarations/Axon/Axon.did";
-import useInitiate from "../../lib/hooks/Axon/useInitiate";
-import { ActionOptions, ActionTypeKey } from "../../lib/types";
-import { ActionOptionsForm } from "../Axon/ActionOptionsForm";
+import { ProposalType } from "../../declarations/Axon/Axon.did";
+import usePropose from "../../lib/hooks/Axon/usePropose";
+import { ProposalOptions, ProposalTypeKey } from "../../lib/types";
 import AxonCommandForm from "../Axon/AxonCommandForm";
+import { ProposalOptionsForm } from "../Axon/ProposalOptionsForm";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import NeuronCommandForm from "../Commands/NeuronCommandForm";
 import ErrorAlert from "../Labels/ErrorAlert";
 
-export default function ActionForm({
+export default function ProposalForm({
   closeModal,
-  actionType,
+  proposalType,
 }: {
   closeModal: () => void;
-  actionType: ActionTypeKey;
+  proposalType: ProposalTypeKey;
 }) {
-  const [options, setOptions] = useState<ActionOptions>({});
-  const [action, setAction] = useState<ActionType>(null);
+  const [options, setOptions] = useState<ProposalOptions>({});
+  const [proposal, setProposal] = useState<ProposalType>(null);
 
-  const { mutate, error, isError, isLoading } = useInitiate(options);
+  const { mutate, error, isError, isLoading } = usePropose(options);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (action) {
-      mutate(action, {
+    if (proposal) {
+      mutate(proposal, {
         onSuccess: closeModal,
       });
     }
@@ -33,14 +33,14 @@ export default function ActionForm({
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col divide-gray-300 divide-y">
-        {actionType === "AxonCommand" && (
-          <AxonCommandForm setAction={setAction} />
+        {proposalType === "AxonCommand" && (
+          <AxonCommandForm setProposal={setProposal} />
         )}
-        {actionType === "NeuronCommand" && (
-          <NeuronCommandForm setAction={setAction} />
+        {proposalType === "NeuronCommand" && (
+          <NeuronCommandForm setProposal={setProposal} />
         )}
 
-        <ActionOptionsForm onChangeOptions={setOptions} />
+        <ProposalOptionsForm onChangeOptions={setOptions} />
 
         <div className="flex flex-col gap-2 py-4">
           <SpinnerButton
@@ -48,7 +48,7 @@ export default function ActionForm({
             activeClassName="btn-cta"
             disabledClassName="btn-cta-disabled"
             isLoading={isLoading}
-            isDisabled={!action}
+            isDisabled={!proposal}
           >
             Submit
           </SpinnerButton>

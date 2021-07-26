@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
 import { useClipboard } from "use-clipboard-copy";
-import { canisterId as AxonCanisterId } from "../../declarations/Axon";
+import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import SyncForm from "./SyncForm";
 
 export default function AddHotKeyForm() {
+  const { data } = useInfo();
   const [neuronId, setNeuronId] = useState("");
   const dfxCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
     neuronId || "$NEURON_ID"
-  }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {AddHotKey=record {new_hot_key=opt principal \\"${AxonCanisterId}\\"}})})})})"`;
+  }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {AddHotKey=record {new_hot_key=opt principal \\"${
+    data?.proxy
+  }\\"}})})})})"`;
 
   const clipboard = useClipboard({
     copiedTimeout: 1000,

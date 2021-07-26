@@ -2,8 +2,8 @@ import React from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { AxonCommandResponse } from "../../declarations/Axon/Axon.did";
 import { errorToString } from "../../lib/utils";
-import { ActionError } from "../Action/ActionResponseSummary";
 import SuccessAlert from "../Labels/SuccessAlert";
+import { CommandError } from "../Proposal/CommandResponseSummary";
 
 export const AxonCommandResponseSummary = ({
   response,
@@ -21,7 +21,7 @@ export const AxonCommandResponseSummary = ({
     );
   } else {
     return (
-      <ActionError label="Error">{errorToString(response.err)}</ActionError>
+      <CommandError label="Error">{errorToString(response.err)}</CommandError>
     );
   }
 };

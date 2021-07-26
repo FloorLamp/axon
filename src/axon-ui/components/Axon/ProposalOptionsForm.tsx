@@ -3,12 +3,12 @@ import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { FiChevronRight } from "react-icons/fi";
 import { FOUR_HOUR_SEC } from "../../lib/constants";
-import { ActionOptions } from "../../lib/types";
+import { ProposalOptions } from "../../lib/types";
 
-export function ActionOptionsForm({
+export function ProposalOptionsForm({
   onChangeOptions,
 }: {
-  onChangeOptions: (opts: ActionOptions) => void;
+  onChangeOptions: (opts: ProposalOptions) => void;
 }) {
   const [timeStart, setTimeStart] = useState("");
   const [durationSeconds, setDurationSeconds] = useState("");

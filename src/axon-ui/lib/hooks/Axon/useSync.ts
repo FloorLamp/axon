@@ -1,13 +1,15 @@
 import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { errorToString, tryCall } from "../../utils";
+import useAxonId from "../useAxonId";
 
 export default function useSync() {
+  const id = useAxonId();
   const axon = useAxon();
   const queryClient = useQueryClient();
 
   return useMutation(
-    "sync",
+    ["sync", id],
     async () => {
       const result = await tryCall(axon.sync);
       if ("ok" in result) {
@@ -19,8 +21,8 @@ export default function useSync() {
     {
       onSuccess: async (data) => {
         console.log(data);
-        queryClient.refetchQueries(["neuronIds"]);
-        queryClient.refetchQueries(["neurons"]);
+        queryClient.refetchQueries(["neuronIds", id]);
+        queryClient.refetchQueries(["neurons", id]);
       },
     }
   );

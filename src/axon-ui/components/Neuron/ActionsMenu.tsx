@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import ActionForm from "../Action/ActionForm";
 import NavButtons from "../Buttons/NavButtons";
+import ProposalForm from "../Proposal/ProposalForm";
 import AddHotKeyForm from "./AddHotKeyForm";
 import DelegateNeuronForm from "./DelegateNeuronForm";
 
@@ -17,7 +17,7 @@ export default function ActionsMenu({
       <NavButtons values={ACTIONS} selected={action} onChange={setAction} />
 
       {action === "Manage" && (
-        <ActionForm actionType="NeuronCommand" closeModal={closeModal} />
+        <ProposalForm proposalType="NeuronCommand" closeModal={closeModal} />
       )}
       {action === "Add Hot Key" && <AddHotKeyForm />}
       {action === "Delegate Neuron" && <DelegateNeuronForm />}

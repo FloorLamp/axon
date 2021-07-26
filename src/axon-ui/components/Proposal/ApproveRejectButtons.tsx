@@ -16,7 +16,7 @@ export default function ApproveRejectButtons({
   const { mutate, isError, error } = useVote(id);
   const handleVote = (e: MouseEvent, yesNo: boolean) => {
     e.stopPropagation();
-    mutate({ yesNo, execute: true });
+    mutate({ yesNo });
   };
   const isLoading = !!useIsMutating({ mutationKey: ["vote", id] });
 

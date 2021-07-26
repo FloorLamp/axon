@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { AxonAction } from "../../../declarations/Axon/Axon.did";
+import { AxonProposal } from "../../../declarations/Axon/Axon.did";
 import { ONE_MINUTES_MS } from "../../constants";
 import { errorToString, tryCall } from "../../utils";
+import useAxonId from "../useAxonId";
 import useSync from "./useSync";
 
-export const usePendingActions = () => {
+export const usePendingProposals = () => {
+  const id = useAxonId();
   const axon = useAxon();
   const queryResult = useQuery(
-    "pendingActions",
+    ["pendingProposals", id],
     async () => {
-      const result = await tryCall(axon.getPendingActions);
+      const result = await tryCall(() => axon.getPendingProposals(BigInt(id)));
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -29,9 +31,11 @@ export const usePendingActions = () => {
   const queryClient = useQueryClient();
   const [isExecuting, setIsExecuting] = useState(false);
   useEffect(() => {
+    console.log("got pending proposals", queryResult.data);
+
     if (queryResult.data?.find((action) => "Executing" in action.status)) {
       setIsExecuting(true);
-      setTimeout(queryResult.refetch, 2000);
+      setTimeout(queryResult.refetch, 1000);
     } else {
       setIsExecuting(false);
     }
@@ -39,7 +43,7 @@ export const usePendingActions = () => {
 
   useEffect(() => {
     if (!isExecuting) {
-      queryClient.refetchQueries(["allActions"]);
+      queryClient.refetchQueries(["allProposals", id]);
     }
   }, [isExecuting]);
 
@@ -50,12 +54,13 @@ export const usePendingActions = () => {
   return queryResult;
 };
 
-export const useAllActions = () => {
+export const useAllProposals = () => {
+  const id = useAxonId();
   const axon = useAxon();
   const queryResult = useQuery(
-    "allActions",
+    ["allProposals", id],
     async () => {
-      const result = await tryCall(() => axon.getAllActions([]));
+      const result = await tryCall(() => axon.getAllProposals(BigInt(id), []));
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -75,7 +80,7 @@ export const useAllActions = () => {
 
   const sync = useSync();
   const queryClient = useQueryClient();
-  const [previousData, setPreviousData] = useState<AxonAction[]>(null);
+  const [previousData, setPreviousData] = useState<AxonProposal[]>(null);
   // Check for any new actions that moved out of pending state
   useEffect(() => {
     if (
@@ -83,21 +88,23 @@ export const useAllActions = () => {
       queryResult.data &&
       queryResult.data.length > previousData.length
     ) {
-      const newActions = queryResult.data.filter(
+      const newProposals = queryResult.data.filter(
         (d) => !previousData.find((p) => p.id === d.id)
       );
       // If there are new AxonCommands, refetch info
-      if (newActions.find((a) => "AxonCommand" in a.action)) {
-        queryClient.refetchQueries(["info"]);
+      if (newProposals.find((a) => "AxonCommand" in a.proposal)) {
+        console.log("new AxonCommand found");
+
+        queryClient.refetchQueries(["info", id]);
       }
 
       // If there are new successfully executed NeuronCommands, sync neurons
       if (
-        newActions.find(
+        newProposals.find(
           (a) =>
-            "NeuronCommand" in a.action &&
-            a.action.NeuronCommand[1][0] &&
-            a.action.NeuronCommand[1][0].find((r) => "ok" in r[1])
+            "NeuronCommand" in a.proposal &&
+            a.proposal.NeuronCommand[1][0] &&
+            a.proposal.NeuronCommand[1][0].find((r) => "ok" in r[1])
         )
       ) {
         sync.mutate();

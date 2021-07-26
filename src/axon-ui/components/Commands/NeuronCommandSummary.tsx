@@ -23,10 +23,10 @@ import { accountIdentifierToString } from "../../lib/account";
 import { secondsToDuration } from "../../lib/datetime";
 import { Topic, Vote } from "../../lib/governance";
 import { ActionKey, CommandKey, OperationKey } from "../../lib/types";
-import { DataRow, DataTable } from "../Action/ActionSummary";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
+import { DataRow, DataTable } from "../Proposal/DataTable";
 
 export default function NeuronCommandSummary({
   neuronCommand: { neuronIds, command },

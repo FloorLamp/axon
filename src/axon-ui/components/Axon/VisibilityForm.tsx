@@ -17,7 +17,7 @@ export function VisibilityForm({
 
   useEffect(() => {
     makeCommand({
-      UpdateVisibility: {
+      SetVisibility: {
         [isPublic ? "Public" : "Private"]: null,
       } as Visibility,
     });

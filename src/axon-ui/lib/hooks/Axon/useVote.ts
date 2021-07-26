@@ -1,19 +1,21 @@
 import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { errorToString, tryCall } from "../../utils";
+import useAxonId from "../useAxonId";
 
-export default function useVote(id: bigint) {
+export default function useVote(proposalId: bigint) {
+  const axonId = useAxonId();
   const axon = useAxon();
   const queryClient = useQueryClient();
 
   return useMutation(
-    ["vote", id],
-    async ({ yesNo, execute }: { yesNo: boolean; execute: boolean }) => {
+    ["vote", axonId, proposalId],
+    async ({ yesNo }: { yesNo: boolean }) => {
       const result = await tryCall(() =>
         axon.vote({
-          id: id,
+          axonId: BigInt(axonId),
+          proposalId,
           vote: yesNo ? { Yes: null } : { No: null },
-          execute,
         })
       );
       if ("ok" in result) {
@@ -25,8 +27,8 @@ export default function useVote(id: bigint) {
     {
       onSuccess: (data) => {
         console.log("vote", data);
-        queryClient.refetchQueries(["pendingActions"]);
-        queryClient.refetchQueries(["allActions"]);
+        queryClient.refetchQueries(["pendingProposals", axonId]);
+        queryClient.refetchQueries(["allProposals", axonId]);
       },
     }
   );

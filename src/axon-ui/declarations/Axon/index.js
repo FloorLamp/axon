@@ -3,7 +3,12 @@ import { idlFactory } from "./Axon.did.js";
 
 import CanisterIds from "../../../../canister_ids.json";
 
-export const canisterId = CanisterIds.Axon.ic;
+console.log({ NEXT_PUBLIC_DFX_NETWORK: process.env.NEXT_PUBLIC_DFX_NETWORK });
+
+export const canisterId =
+  process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
+    ? require("../../../../.dfx/local/canister_ids.json").Axon.local
+    : CanisterIds.Axon.ic;
 
 /**
  *
@@ -13,7 +18,12 @@ export const canisterId = CanisterIds.Axon.ic;
  */
 export const createActor = (canisterId, agent) => {
   // Fetch root key for certificate validation during development
-  if (process.env.NODE_ENV !== "production") agent.fetchRootKey();
+  if (process.env.NEXT_PUBLIC_DFX_NETWORK === "local") {
+    console.log("old rootKey", agent.rootKey.toString("hex"));
+    agent.fetchRootKey().then((rootKey) => {
+      console.log("new rootKey", rootKey.toString("hex"));
+    });
+  }
 
   // Creates an actor with using the candid interface and the HttpAgent
   return Actor.createActor(idlFactory, {

@@ -1,27 +1,33 @@
 import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { ActionType } from "../../../declarations/Axon/Axon.did";
-import { ActionOptions } from "../../types";
+import { NewProposal, ProposalType } from "../../../declarations/Axon/Axon.did";
+import { ProposalOptions } from "../../types";
 import { errorToString, tryCall } from "../../utils";
+import useAxonId from "../useAxonId";
 
-export default function useInitiate({
+export default function usePropose({
   timeStart,
   durationSeconds,
   execute,
-}: ActionOptions) {
+}: ProposalOptions) {
   const axon = useAxon();
+  const id = useAxonId();
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (action: ActionType) => {
-      const result = await tryCall(() =>
-        axon.initiate({
+    async (proposal: ProposalType) => {
+      const result = await tryCall(() => {
+        const args = {
+          axonId: BigInt(id),
           timeStart: timeStart ? [timeStart] : [],
           durationSeconds: durationSeconds ? [durationSeconds] : [],
-          action,
+          proposal,
           execute: execute ? [true] : [],
-        })
-      );
+        } as NewProposal;
+        console.log({ args });
+
+        return axon.propose(args);
+      });
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -31,7 +37,7 @@ export default function useInitiate({
     {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.refetchQueries(["pendingActions"]);
+        queryClient.refetchQueries(["pendingProposals", id]);
       },
     }
   );

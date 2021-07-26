@@ -1,7 +1,13 @@
+type Votes = 
+ record {
+   no: nat;
+   notVoted: nat;
+   yes: nat;
+ };
 type VoteRequest = 
  record {
-   execute: bool;
-   id: nat;
+   axonId: nat;
+   proposalId: nat;
    vote: Vote;
  };
 type Vote = 
@@ -13,6 +19,14 @@ type Visibility =
  variant {
    Private;
    Public;
+ };
+type Threshold = 
+ variant {
+   Absolute: nat;
+   Percent: record {
+              percent: nat;
+              quorum: opt nat;
+            };
  };
 type Status = 
  variant {
@@ -48,7 +62,7 @@ type RewardMode =
 type Result_2 = 
  variant {
    err: Error;
-   ok: AxonAction;
+   ok: AxonProposal;
  };
 type Result_1 = 
  variant {
@@ -66,6 +80,21 @@ type RegisterVote =
    proposal: opt NeuronId;
    vote: int32;
  };
+type Proxy = 
+ service {
+   list_neurons: () -> (ListNeuronsResponse);
+   manage_neuron: (ManageNeuron) -> (ManageNeuronResponse);
+ };
+type ProposalType = 
+ variant {
+   AxonCommand: AxonCommand;
+   NeuronCommand: NeuronCommand;
+ };
+type ProposalResult = 
+ variant {
+   err: Error;
+   ok: vec AxonProposal;
+ };
 type Proposal = 
  record {
    action: opt Action;
@@ -74,8 +103,12 @@ type Proposal =
  };
 type Policy = 
  record {
-   needed: nat;
-   total: nat;
+   acceptanceThreshold: Threshold;
+   proposeThreshold: nat;
+   proposers: variant {
+                Closed: vec principal;
+                Open;
+              };
  };
 type Operation = 
  variant {
@@ -87,6 +120,14 @@ type Operation =
    StopDissolving: record {};
  };
 type NodeProvider = record {id: opt principal;};
+type NewProposal = 
+ record {
+   axonId: nat;
+   durationSeconds: opt nat;
+   execute: opt bool;
+   proposal: ProposalType;
+   timeStart: opt int;
+ };
 type NeuronStakeTransfer = 
  record {
    block_height: nat64;
@@ -176,22 +217,16 @@ type ListNeuronsResponse =
                        NeuronInfo;
                      };
  };
-type InitiateAction = 
+type LedgerEntry = 
  record {
-   action: ActionType;
-   durationSeconds: opt nat;
-   execute: opt bool;
-   timeStart: opt int;
+   principal;
+   nat;
  };
 type Initialization = 
  record {
-   owner: principal;
-   visibility: Visibility;
- };
-type Info = 
- record {
-   owners: vec principal;
-   policy: opt Policy;
+   ledgerEntries: vec LedgerEntry;
+   name: text;
+   policy: Policy;
    visibility: Visibility;
  };
 type IncreaseDissolveDelay = record {
@@ -225,15 +260,17 @@ type Error =
  variant {
    AlreadyVoted;
    CannotExecute;
-   CannotRemoveOwner;
    Error: record {
             error_message: text;
             error_type: ErrorCode;
           };
    GovernanceError: GovernanceError;
-   InvalidAction;
+   InsufficientBalance;
+   InsufficientBalanceToPropose;
+   InvalidProposal;
    NoNeurons;
    NotFound;
+   NotProposer;
    Unauthorized;
  };
 type DissolveState = 
@@ -293,6 +330,36 @@ type Ballot =
  record {
    "principal": principal;
    vote: opt Vote;
+   votingPower: nat;
+ };
+type AxonService = 
+ service {
+   axonById: (nat) -> (Axon) query;
+   balanceOf: (nat) -> (nat) query;
+   cleanup: (nat) -> (Result);
+   count: () -> (nat) query;
+   create: (Initialization) -> (Axon);
+   execute: (nat, nat) -> (Result_2);
+   getAllProposals: (nat, opt nat) -> (ProposalResult) query;
+   getNeuronIds: (nat) -> (vec nat64) query;
+   getNeurons: (nat) -> (ListNeuronsResult) query;
+   getPendingProposals: (nat) -> (ProposalResult) query;
+   propose: (NewProposal) -> (Result);
+   sync: (nat) -> (ListNeuronsResult);
+   transfer: (nat, principal, nat) -> (Result);
+   vote: (VoteRequest) -> (Result);
+ };
+type AxonProposal = 
+ record {
+   ballots: vec Ballot;
+   creator: principal;
+   id: nat;
+   policy: Policy;
+   proposal: ProposalType;
+   status: Status;
+   timeEnd: int;
+   timeStart: int;
+   totalVotes: Votes;
  };
 type AxonCommandResponse = 
  variant {
@@ -301,65 +368,33 @@ type AxonCommandResponse =
  };
 type AxonCommandRequest = 
  variant {
-   AddOwner: record {
-               needed: nat;
-               "principal": principal;
-               total: opt nat;
-             };
-   RemoveOwner: record {
-                  needed: nat;
-                  "principal": principal;
-                  total: opt nat;
-                };
-   SetPolicy: record {
-                needed: nat;
-                total: opt nat;
-              };
-   UpdateVisibility: Visibility;
+   AddMembers: vec principal;
+   Redenominate: variant {
+                   from: nat;
+                   to: nat;
+                 };
+   RemoveMembers: vec principal;
+   SetPolicy: Policy;
+   SetVisibility: Visibility;
  };
 type AxonCommand = 
  record {
    AxonCommandRequest;
    opt AxonCommandResponse;
  };
-type AxonAction = 
- record {
-   action: ActionType;
-   ballots: vec Ballot;
-   creator: principal;
-   id: nat;
-   policy: opt Policy;
-   status: Status;
-   timeEnd: int;
-   timeStart: int;
- };
 type Axon = 
- service {
-   cleanup: () -> (Result);
-   execute: (nat) -> (Result_2);
-   getAllActions: (opt nat) -> (ActionResult) query;
-   getNeuronIds: () -> (vec nat64) query;
-   getNeurons: () -> (ListNeuronsResult) query;
-   getPendingActions: () -> (ActionResult) query;
-   info: () -> (Info) query;
-   initiate: (InitiateAction) -> (Result);
-   sync: () -> (ListNeuronsResult);
-   vote: (VoteRequest) -> (Result);
+ record {
+   id: nat;
+   name: text;
+   policy: Policy;
+   proxy: Proxy;
+   supply: nat;
+   visibility: Visibility;
  };
 type ApproveGenesisKyc = record {principals: vec principal;};
 type Amount = record {e8s: nat64;};
 type AddOrRemoveNodeProvider = record {change: opt Change;};
 type AddHotKey = record {new_hot_key: opt principal;};
-type ActionType = 
- variant {
-   AxonCommand: AxonCommand;
-   NeuronCommand: NeuronCommand;
- };
-type ActionResult = 
- variant {
-   err: Error;
-   ok: vec AxonAction;
- };
 type Action = 
  variant {
    AddOrRemoveNodeProvider: AddOrRemoveNodeProvider;
@@ -372,4 +407,4 @@ type Action =
    SetDefaultFollowees: SetDefaultFollowees;
  };
 type AccountIdentifier = record {hash: vec nat8;};
-service : (Initialization) -> Axon
+service : () -> AxonService

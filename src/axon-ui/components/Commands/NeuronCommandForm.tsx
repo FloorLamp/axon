@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { ActionType } from "../../declarations/Axon/Axon.did";
+import { ProposalType } from "../../declarations/Axon/Axon.did";
 import CommandForm from "./CommandForm";
 import NeuronSelectionForm from "./NeuronSelectionForm";
 
 export default function NeuronCommandForm({
-  setAction,
+  setProposal,
 }: {
-  setAction: (at: ActionType) => void;
+  setProposal: (at: ProposalType) => void;
 }) {
   const [neuronIds, setNeuronIds] = useState([]);
   const [command, setCommand] = useState(null);
 
   useEffect(() => {
-    setAction(
+    setProposal(
       command
         ? {
             NeuronCommand: [

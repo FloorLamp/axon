@@ -4,10 +4,9 @@ import { ProposalInfo } from "../../declarations/Governance/Governance.did.d";
 import { Action, Topic } from "../../lib/governance";
 import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
 import { useNnsPendingProposals } from "../../lib/hooks/useNnsPendingProposals";
-import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
-import ErrorAlert from "../Labels/ErrorAlert";
+import ResponseError from "../Labels/ResponseError";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 
 const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
@@ -35,7 +34,8 @@ const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
 };
 
 export default function NnsProposals() {
-  const { data, error, isFetching, refetch } = useNnsPendingProposals();
+  const { data, error, isFetching, refetch, isSuccess } =
+    useNnsPendingProposals();
 
   return (
     <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
@@ -48,7 +48,7 @@ export default function NnsProposals() {
         />
       </div>
       <div>
-        {error && <ErrorAlert>{stringify(error)}</ErrorAlert>}
+        {error && <ResponseError>{error}</ResponseError>}
         {data && data.length > 0 ? (
           <ul className="divide-y divide-gray-300">
             {data.map((p) => (
@@ -58,10 +58,12 @@ export default function NnsProposals() {
             ))}
           </ul>
         ) : (
-          <div className="h-40 flex flex-col items-center justify-center">
-            <BiListUl size={48} className="" />
-            <p className="py-2">No open NNS proposals</p>
-          </div>
+          isSuccess && (
+            <div className="h-40 flex flex-col items-center justify-center">
+              <BiListUl size={48} className="" />
+              <p className="py-2">No open NNS proposals</p>
+            </div>
+          )
         )}
       </div>
     </section>

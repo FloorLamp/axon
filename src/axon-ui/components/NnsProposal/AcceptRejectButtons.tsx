@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React, { MouseEvent } from "react";
 import { BsCheck, BsX } from "react-icons/bs";
 import { Vote } from "../../lib/governance";
-import useInitiate from "../../lib/hooks/Axon/useInitiate";
+import usePropose from "../../lib/hooks/Axon/usePropose";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 
@@ -13,7 +13,7 @@ export default function AcceptRejectButtons({
   proposalId: bigint;
   size?: "small" | "large";
 }) {
-  const { mutate, isError, isLoading, error } = useInitiate({
+  const { mutate, isError, isLoading, error } = usePropose({
     execute: true,
   });
   const handleVote = (e: MouseEvent, yesNo: boolean) => {

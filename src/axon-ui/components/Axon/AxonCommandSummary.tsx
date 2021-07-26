@@ -1,58 +1,45 @@
+import { Principal } from "@dfinity/principal";
 import assert from "assert";
 import React from "react";
-import {
-  AxonAction,
-  AxonCommandRequest,
-} from "../../declarations/Axon/Axon.did";
+import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
 import { AxonCommandKey } from "../../lib/types";
-import { DataRow, DataTable } from "../Action/ActionSummary";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
+import { DataRow, DataTable } from "../Proposal/DataTable";
+import PolicySummary from "./PolicySummary";
 
 export default function AxonCommandSummary({
   command,
-  action,
 }: {
   command: AxonCommandRequest;
-  action: AxonAction;
 }) {
   const key = Object.keys(command)[0] as AxonCommandKey;
   switch (key) {
-    case "AddOwner":
-    case "RemoveOwner": {
-      const { principal, needed } = command[key];
-      let total = action.ballots.length;
-      if (key === "AddOwner") {
-        total += 1;
-      } else {
-        total -= 1;
-      }
+    case "AddMembers":
+    case "RemoveMembers": {
+      const principals = command[key] as Array<Principal>;
 
       return (
-        <DataTable label="Add owner">
+        <DataTable label={`${key === "AddMembers" ? "Add" : "Remove"} Members`}>
           <DataRow labelClassName="w-20" label="Principal">
-            <IdentifierLabelWithButtons id={principal} type="Principal" />
-          </DataRow>
-          <DataRow labelClassName="w-20" label="Approvals">
-            <strong>{needed.toString()}</strong> out of <strong>{total}</strong>
+            {principals.map((principal) => (
+              <IdentifierLabelWithButtons
+                key={principal.toText()}
+                id={principal}
+                type="Principal"
+              />
+            ))}
           </DataRow>
         </DataTable>
       );
     }
     case "SetPolicy": {
       assert("SetPolicy" in command);
-      const { needed } = command.SetPolicy;
-      return (
-        <DataTable label="Set Policy">
-          <div>
-            <strong>{needed.toString()}</strong> out of{" "}
-            <strong>{action.ballots.length}</strong>
-          </div>
-        </DataTable>
-      );
+      const payload = command.SetPolicy;
+      return <PolicySummary label="Set Policy" policy={payload} />;
     }
-    case "UpdateVisibility": {
-      assert("UpdateVisibility" in command);
-      const visibility = Object.keys(command.UpdateVisibility)[0];
+    case "SetVisibility": {
+      assert("SetVisibility" in command);
+      const visibility = Object.keys(command.SetVisibility)[0];
       return (
         <div>
           Set Visibility to <strong>{visibility}</strong>

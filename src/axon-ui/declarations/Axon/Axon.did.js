@@ -1,48 +1,56 @@
 export const idlFactory = ({ IDL }) => {
-  const Command = IDL.Rec();
-  const Visibility = IDL.Variant({ 'Private' : IDL.Null, 'Public' : IDL.Null });
-  const Initialization = IDL.Record({
-    'owner' : IDL.Principal,
-    'visibility' : Visibility,
+  const ManageNeuron = IDL.Rec();
+  const NeuronId = IDL.Record({ 'id' : IDL.Nat64 });
+  const BallotInfo = IDL.Record({
+    'vote' : IDL.Int32,
+    'proposal_id' : IDL.Opt(NeuronId),
   });
-  const ErrorCode = IDL.Variant({
-    'canister_error' : IDL.Null,
-    'system_transient' : IDL.Null,
-    'future' : IDL.Nat32,
-    'canister_reject' : IDL.Null,
-    'destination_invalid' : IDL.Null,
-    'system_fatal' : IDL.Null,
+  const NeuronInfo = IDL.Record({
+    'dissolve_delay_seconds' : IDL.Nat64,
+    'recent_ballots' : IDL.Vec(BallotInfo),
+    'created_timestamp_seconds' : IDL.Nat64,
+    'state' : IDL.Int32,
+    'retrieved_at_timestamp_seconds' : IDL.Nat64,
+    'voting_power' : IDL.Nat64,
+    'age_seconds' : IDL.Nat64,
   });
-  const GovernanceError = IDL.Record({
-    'error_message' : IDL.Text,
-    'error_type' : IDL.Int32,
+  const DissolveState = IDL.Variant({
+    'DissolveDelaySeconds' : IDL.Nat64,
+    'WhenDissolvedTimestampSeconds' : IDL.Nat64,
   });
-  const Error = IDL.Variant({
-    'AlreadyVoted' : IDL.Null,
-    'Error' : IDL.Record({
-      'error_message' : IDL.Text,
-      'error_type' : ErrorCode,
-    }),
-    'CannotExecute' : IDL.Null,
-    'InvalidAction' : IDL.Null,
-    'NotFound' : IDL.Null,
-    'CannotRemoveOwner' : IDL.Null,
-    'Unauthorized' : IDL.Null,
-    'NoNeurons' : IDL.Null,
-    'GovernanceError' : GovernanceError,
+  const Followees = IDL.Record({ 'followees' : IDL.Vec(NeuronId) });
+  const NeuronStakeTransfer = IDL.Record({
+    'to_subaccount' : IDL.Vec(IDL.Nat8),
+    'neuron_stake_e8s' : IDL.Nat64,
+    'from' : IDL.Opt(IDL.Principal),
+    'memo' : IDL.Nat64,
+    'from_subaccount' : IDL.Vec(IDL.Nat8),
+    'transfer_timestamp' : IDL.Nat64,
+    'block_height' : IDL.Nat64,
   });
-  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
-  const Status = IDL.Variant({
-    'Executing' : IDL.Int,
-    'Rejected' : IDL.Int,
-    'Executed' : IDL.Int,
-    'Accepted' : IDL.Int,
-    'Expired' : IDL.Int,
-    'Pending' : IDL.Null,
+  const Neuron = IDL.Record({
+    'id' : IDL.Opt(NeuronId),
+    'controller' : IDL.Opt(IDL.Principal),
+    'recent_ballots' : IDL.Vec(BallotInfo),
+    'kyc_verified' : IDL.Bool,
+    'not_for_profit' : IDL.Bool,
+    'maturity_e8s_equivalent' : IDL.Nat64,
+    'cached_neuron_stake_e8s' : IDL.Nat64,
+    'created_timestamp_seconds' : IDL.Nat64,
+    'aging_since_timestamp_seconds' : IDL.Nat64,
+    'hot_keys' : IDL.Vec(IDL.Principal),
+    'account' : IDL.Vec(IDL.Nat8),
+    'dissolve_state' : IDL.Opt(DissolveState),
+    'followees' : IDL.Vec(IDL.Tuple(IDL.Int32, Followees)),
+    'neuron_fees_e8s' : IDL.Nat64,
+    'transfer' : IDL.Opt(NeuronStakeTransfer),
+  });
+  const ListNeuronsResponse = IDL.Record({
+    'neuron_infos' : IDL.Vec(IDL.Tuple(IDL.Nat64, NeuronInfo)),
+    'full_neurons' : IDL.Vec(Neuron),
   });
   const Spawn = IDL.Record({ 'new_controller' : IDL.Opt(IDL.Principal) });
   const Split = IDL.Record({ 'amount_e8s' : IDL.Nat64 });
-  const NeuronId = IDL.Record({ 'id' : IDL.Nat64 });
   const Follow = IDL.Record({
     'topic' : IDL.Int32,
     'followees' : IDL.Vec(NeuronId),
@@ -77,10 +85,6 @@ export const idlFactory = ({ IDL }) => {
     'new_controller' : IDL.Opt(IDL.Principal),
     'nonce' : IDL.Nat64,
   });
-  const ManageNeuron = IDL.Record({
-    'id' : IDL.Opt(NeuronId),
-    'command' : IDL.Opt(Command),
-  });
   const ExecuteNnsFunction = IDL.Record({
     'nns_function' : IDL.Int32,
     'payload' : IDL.Vec(IDL.Nat8),
@@ -100,7 +104,6 @@ export const idlFactory = ({ IDL }) => {
     'reward_mode' : IDL.Opt(RewardMode),
     'amount_e8s' : IDL.Nat64,
   });
-  const Followees = IDL.Record({ 'followees' : IDL.Vec(NeuronId) });
   const SetDefaultFollowees = IDL.Record({
     'default_followees' : IDL.Vec(IDL.Tuple(IDL.Int32, Followees)),
   });
@@ -143,21 +146,22 @@ export const idlFactory = ({ IDL }) => {
     'to_account' : IDL.Opt(AccountIdentifier),
     'amount' : IDL.Opt(Amount),
   });
-  Command.fill(
-    IDL.Variant({
-      'Spawn' : Spawn,
-      'Split' : Split,
-      'Follow' : Follow,
-      'Configure' : Configure,
-      'RegisterVote' : RegisterVote,
-      'DisburseToNeuron' : DisburseToNeuron,
-      'MakeProposal' : Proposal,
-      'Disburse' : Disburse,
-    })
+  const Command = IDL.Variant({
+    'Spawn' : Spawn,
+    'Split' : Split,
+    'Follow' : Follow,
+    'Configure' : Configure,
+    'RegisterVote' : RegisterVote,
+    'DisburseToNeuron' : DisburseToNeuron,
+    'MakeProposal' : Proposal,
+    'Disburse' : Disburse,
+  });
+  ManageNeuron.fill(
+    IDL.Record({ 'id' : IDL.Opt(NeuronId), 'command' : IDL.Opt(Command) })
   );
-  const NeuronCommandRequest = IDL.Record({
-    'command' : Command,
-    'neuronIds' : IDL.Opt(IDL.Vec(IDL.Nat64)),
+  const GovernanceError = IDL.Record({
+    'error_message' : IDL.Text,
+    'error_type' : IDL.Int32,
   });
   const SpawnResponse = IDL.Record({ 'created_neuron_id' : IDL.Opt(NeuronId) });
   const MakeProposalResponse = IDL.Record({
@@ -176,6 +180,89 @@ export const idlFactory = ({ IDL }) => {
     'Disburse' : DisburseResponse,
   });
   const ManageNeuronResponse = IDL.Record({ 'command' : IDL.Opt(Command_1) });
+  const Proxy = IDL.Service({
+    'list_neurons' : IDL.Func([], [ListNeuronsResponse], []),
+    'manage_neuron' : IDL.Func([ManageNeuron], [ManageNeuronResponse], []),
+  });
+  const Visibility = IDL.Variant({ 'Private' : IDL.Null, 'Public' : IDL.Null });
+  const Threshold = IDL.Variant({
+    'Percent' : IDL.Record({
+      'percent' : IDL.Nat,
+      'quorum' : IDL.Opt(IDL.Nat),
+    }),
+    'Absolute' : IDL.Nat,
+  });
+  const Policy = IDL.Record({
+    'proposeThreshold' : IDL.Nat,
+    'proposers' : IDL.Variant({
+      'Open' : IDL.Null,
+      'Closed' : IDL.Vec(IDL.Principal),
+    }),
+    'acceptanceThreshold' : Threshold,
+  });
+  const Axon = IDL.Record({
+    'id' : IDL.Nat,
+    'name' : IDL.Text,
+    'supply' : IDL.Nat,
+    'proxy' : Proxy,
+    'visibility' : Visibility,
+    'policy' : Policy,
+  });
+  const ErrorCode = IDL.Variant({
+    'canister_error' : IDL.Null,
+    'system_transient' : IDL.Null,
+    'future' : IDL.Nat32,
+    'canister_reject' : IDL.Null,
+    'destination_invalid' : IDL.Null,
+    'system_fatal' : IDL.Null,
+  });
+  const Error = IDL.Variant({
+    'AlreadyVoted' : IDL.Null,
+    'Error' : IDL.Record({
+      'error_message' : IDL.Text,
+      'error_type' : ErrorCode,
+    }),
+    'CannotExecute' : IDL.Null,
+    'InvalidProposal' : IDL.Null,
+    'InsufficientBalance' : IDL.Null,
+    'NotFound' : IDL.Null,
+    'Unauthorized' : IDL.Null,
+    'NotProposer' : IDL.Null,
+    'NoNeurons' : IDL.Null,
+    'GovernanceError' : GovernanceError,
+    'InsufficientBalanceToPropose' : IDL.Null,
+  });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const LedgerEntry = IDL.Tuple(IDL.Principal, IDL.Nat);
+  const Initialization = IDL.Record({
+    'ledgerEntries' : IDL.Vec(LedgerEntry),
+    'name' : IDL.Text,
+    'visibility' : Visibility,
+    'policy' : Policy,
+  });
+  const Status = IDL.Variant({
+    'Executing' : IDL.Int,
+    'Rejected' : IDL.Int,
+    'Executed' : IDL.Int,
+    'Accepted' : IDL.Int,
+    'Expired' : IDL.Int,
+    'Pending' : IDL.Null,
+  });
+  const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
+  const Ballot = IDL.Record({
+    'principal' : IDL.Principal,
+    'votingPower' : IDL.Nat,
+    'vote' : IDL.Opt(Vote),
+  });
+  const Votes = IDL.Record({
+    'no' : IDL.Nat,
+    'yes' : IDL.Nat,
+    'notVoted' : IDL.Nat,
+  });
+  const NeuronCommandRequest = IDL.Record({
+    'command' : Command,
+    'neuronIds' : IDL.Opt(IDL.Vec(IDL.Nat64)),
+  });
   const Result_1 = IDL.Variant({ 'ok' : ManageNeuronResponse, 'err' : Error });
   const NeuronCommandResponse = IDL.Tuple(IDL.Nat64, Result_1);
   const NeuronCommand = IDL.Tuple(
@@ -183,138 +270,73 @@ export const idlFactory = ({ IDL }) => {
     IDL.Opt(IDL.Vec(NeuronCommandResponse)),
   );
   const AxonCommandRequest = IDL.Variant({
-    'RemoveOwner' : IDL.Record({
-      'principal' : IDL.Principal,
-      'total' : IDL.Opt(IDL.Nat),
-      'needed' : IDL.Nat,
-    }),
-    'UpdateVisibility' : Visibility,
-    'AddOwner' : IDL.Record({
-      'principal' : IDL.Principal,
-      'total' : IDL.Opt(IDL.Nat),
-      'needed' : IDL.Nat,
-    }),
-    'SetPolicy' : IDL.Record({
-      'total' : IDL.Opt(IDL.Nat),
-      'needed' : IDL.Nat,
-    }),
+    'Redenominate' : IDL.Variant({ 'to' : IDL.Nat, 'from' : IDL.Nat }),
+    'RemoveMembers' : IDL.Vec(IDL.Principal),
+    'AddMembers' : IDL.Vec(IDL.Principal),
+    'SetVisibility' : Visibility,
+    'SetPolicy' : Policy,
   });
   const AxonCommandResponse = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const AxonCommand = IDL.Tuple(
     AxonCommandRequest,
     IDL.Opt(AxonCommandResponse),
   );
-  const ActionType = IDL.Variant({
+  const ProposalType = IDL.Variant({
     'NeuronCommand' : NeuronCommand,
     'AxonCommand' : AxonCommand,
   });
-  const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
-  const Ballot = IDL.Record({
-    'principal' : IDL.Principal,
-    'vote' : IDL.Opt(Vote),
-  });
-  const Policy = IDL.Record({ 'total' : IDL.Nat, 'needed' : IDL.Nat });
-  const AxonAction = IDL.Record({
+  const AxonProposal = IDL.Record({
     'id' : IDL.Nat,
     'status' : Status,
     'creator' : IDL.Principal,
-    'action' : ActionType,
     'ballots' : IDL.Vec(Ballot),
     'timeStart' : IDL.Int,
+    'totalVotes' : Votes,
+    'proposal' : ProposalType,
     'timeEnd' : IDL.Int,
-    'policy' : IDL.Opt(Policy),
+    'policy' : Policy,
   });
-  const Result_2 = IDL.Variant({ 'ok' : AxonAction, 'err' : Error });
-  const ActionResult = IDL.Variant({
-    'ok' : IDL.Vec(AxonAction),
+  const Result_2 = IDL.Variant({ 'ok' : AxonProposal, 'err' : Error });
+  const ProposalResult = IDL.Variant({
+    'ok' : IDL.Vec(AxonProposal),
     'err' : Error,
-  });
-  const BallotInfo = IDL.Record({
-    'vote' : IDL.Int32,
-    'proposal_id' : IDL.Opt(NeuronId),
-  });
-  const NeuronInfo = IDL.Record({
-    'dissolve_delay_seconds' : IDL.Nat64,
-    'recent_ballots' : IDL.Vec(BallotInfo),
-    'created_timestamp_seconds' : IDL.Nat64,
-    'state' : IDL.Int32,
-    'retrieved_at_timestamp_seconds' : IDL.Nat64,
-    'voting_power' : IDL.Nat64,
-    'age_seconds' : IDL.Nat64,
-  });
-  const DissolveState = IDL.Variant({
-    'DissolveDelaySeconds' : IDL.Nat64,
-    'WhenDissolvedTimestampSeconds' : IDL.Nat64,
-  });
-  const NeuronStakeTransfer = IDL.Record({
-    'to_subaccount' : IDL.Vec(IDL.Nat8),
-    'neuron_stake_e8s' : IDL.Nat64,
-    'from' : IDL.Opt(IDL.Principal),
-    'memo' : IDL.Nat64,
-    'from_subaccount' : IDL.Vec(IDL.Nat8),
-    'transfer_timestamp' : IDL.Nat64,
-    'block_height' : IDL.Nat64,
-  });
-  const Neuron = IDL.Record({
-    'id' : IDL.Opt(NeuronId),
-    'controller' : IDL.Opt(IDL.Principal),
-    'recent_ballots' : IDL.Vec(BallotInfo),
-    'kyc_verified' : IDL.Bool,
-    'not_for_profit' : IDL.Bool,
-    'maturity_e8s_equivalent' : IDL.Nat64,
-    'cached_neuron_stake_e8s' : IDL.Nat64,
-    'created_timestamp_seconds' : IDL.Nat64,
-    'aging_since_timestamp_seconds' : IDL.Nat64,
-    'hot_keys' : IDL.Vec(IDL.Principal),
-    'account' : IDL.Vec(IDL.Nat8),
-    'dissolve_state' : IDL.Opt(DissolveState),
-    'followees' : IDL.Vec(IDL.Tuple(IDL.Int32, Followees)),
-    'neuron_fees_e8s' : IDL.Nat64,
-    'transfer' : IDL.Opt(NeuronStakeTransfer),
-  });
-  const ListNeuronsResponse = IDL.Record({
-    'neuron_infos' : IDL.Vec(IDL.Tuple(IDL.Nat64, NeuronInfo)),
-    'full_neurons' : IDL.Vec(Neuron),
   });
   const ListNeuronsResult = IDL.Variant({
     'ok' : ListNeuronsResponse,
     'err' : Error,
   });
-  const Info = IDL.Record({
-    'owners' : IDL.Vec(IDL.Principal),
-    'visibility' : Visibility,
-    'policy' : IDL.Opt(Policy),
-  });
-  const InitiateAction = IDL.Record({
-    'action' : ActionType,
+  const NewProposal = IDL.Record({
+    'axonId' : IDL.Nat,
     'timeStart' : IDL.Opt(IDL.Int),
     'durationSeconds' : IDL.Opt(IDL.Nat),
+    'proposal' : ProposalType,
     'execute' : IDL.Opt(IDL.Bool),
   });
   const VoteRequest = IDL.Record({
-    'id' : IDL.Nat,
+    'axonId' : IDL.Nat,
     'vote' : Vote,
-    'execute' : IDL.Bool,
+    'proposalId' : IDL.Nat,
   });
-  const Axon = IDL.Service({
-    'cleanup' : IDL.Func([], [Result], []),
-    'execute' : IDL.Func([IDL.Nat], [Result_2], []),
-    'getAllActions' : IDL.Func([IDL.Opt(IDL.Nat)], [ActionResult], ['query']),
-    'getNeuronIds' : IDL.Func([], [IDL.Vec(IDL.Nat64)], ['query']),
-    'getNeurons' : IDL.Func([], [ListNeuronsResult], ['query']),
-    'getPendingActions' : IDL.Func([], [ActionResult], ['query']),
-    'info' : IDL.Func([], [Info], ['query']),
-    'initiate' : IDL.Func([InitiateAction], [Result], []),
-    'sync' : IDL.Func([], [ListNeuronsResult], []),
+  const AxonService = IDL.Service({
+    'axonById' : IDL.Func([IDL.Nat], [Axon], ['query']),
+    'balanceOf' : IDL.Func([IDL.Nat], [IDL.Nat], ['query']),
+    'cleanup' : IDL.Func([IDL.Nat], [Result], []),
+    'count' : IDL.Func([], [IDL.Nat], ['query']),
+    'create' : IDL.Func([Initialization], [Axon], []),
+    'execute' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], []),
+    'getAllProposals' : IDL.Func(
+        [IDL.Nat, IDL.Opt(IDL.Nat)],
+        [ProposalResult],
+        ['query'],
+      ),
+    'getNeuronIds' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat64)], ['query']),
+    'getNeurons' : IDL.Func([IDL.Nat], [ListNeuronsResult], ['query']),
+    'getPendingProposals' : IDL.Func([IDL.Nat], [ProposalResult], ['query']),
+    'propose' : IDL.Func([NewProposal], [Result], []),
+    'sync' : IDL.Func([IDL.Nat], [ListNeuronsResult], []),
+    'transfer' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [Result], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),
   });
-  return Axon;
+  return AxonService;
 };
-export const init = ({ IDL }) => {
-  const Visibility = IDL.Variant({ 'Private' : IDL.Null, 'Public' : IDL.Null });
-  const Initialization = IDL.Record({
-    'owner' : IDL.Principal,
-    'visibility' : Visibility,
-  });
-  return [Initialization];
-};
+export const init = ({ IDL }) => { return []; };

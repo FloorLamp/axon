@@ -2,8 +2,10 @@ import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { Result_2 } from "../../../declarations/Axon/Axon.did";
 import { errorToString } from "../../utils";
+import useAxonId from "../useAxonId";
 
 export default function useExecute() {
+  const axonId = useAxonId();
   const axon = useAxon();
   const queryClient = useQueryClient();
 
@@ -11,7 +13,7 @@ export default function useExecute() {
     async ({ id }: { id: bigint }) => {
       let result: Result_2;
       try {
-        result = await axon.execute(id);
+        result = await axon.execute(BigInt(axonId), id);
       } catch (error) {
         if (/assertion failed/.test(error.message)) {
           // Already executing, refetch
@@ -29,8 +31,8 @@ export default function useExecute() {
     {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.refetchQueries(["pendingActions"]);
-        queryClient.refetchQueries(["allActions"]);
+        queryClient.refetchQueries(["pendingProposals", axonId]);
+        queryClient.refetchQueries(["allProposals", axonId]);
       },
     }
   );

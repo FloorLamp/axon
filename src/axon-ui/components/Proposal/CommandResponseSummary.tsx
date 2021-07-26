@@ -1,12 +1,12 @@
 import React, { ReactNode } from "react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import { ActionType } from "../../declarations/Axon/Axon.did";
+import { ProposalType } from "../../declarations/Axon/Axon.did";
 import { AxonCommandResponseSummary } from "../Axon/AxonCommandResponseSummary";
 import ErrorAlert from "../Labels/ErrorAlert";
 import SuccessAlert from "../Labels/SuccessAlert";
 import NeuronCommandResponseList from "./NeuronCommandResponseList";
 
-export const ActionError = ({
+export const CommandError = ({
   label,
   children,
 }: {
@@ -29,7 +29,7 @@ export const ActionError = ({
   );
 };
 
-export const ActionSuccess = ({
+export const CommandSuccess = ({
   label,
   children,
 }: {
@@ -52,19 +52,19 @@ export const ActionSuccess = ({
   );
 };
 
-export const ActionResponseSummary = ({
-  actionType,
+export const CommandResponseSummary = ({
+  proposalType,
 }: {
-  actionType: ActionType;
+  proposalType: ProposalType;
 }) => {
   let summary = null;
-  if ("AxonCommand" in actionType) {
-    const response = actionType.AxonCommand[1][0];
+  if ("AxonCommand" in proposalType) {
+    const response = proposalType.AxonCommand[1][0];
     if (response) {
       summary = <AxonCommandResponseSummary response={response} />;
     }
   } else {
-    const response = actionType.NeuronCommand[1][0];
+    const response = proposalType.NeuronCommand[1][0];
     if (response) {
       summary = <NeuronCommandResponseList responses={response} />;
     }

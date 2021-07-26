@@ -1,35 +1,30 @@
 import { useEffect } from "react";
 import { useQuery } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { FIVE_MINUTES_MS } from "../../constants";
-import { errorToString, tryCall } from "../../utils";
+import { ONE_MINUTES_MS } from "../../constants";
+import { tryCall } from "../../utils";
 import useAxonId from "../useAxonId";
 
-export const useNeurons = () => {
+export const useBalance = () => {
   const id = useAxonId();
   const axon = useAxon();
+
   const queryResult = useQuery(
-    ["neurons", id],
+    ["balance", id],
     async () => {
       if (!id) {
         return null;
       }
-      const result = await tryCall(() => axon.getNeurons(BigInt(id)));
-
-      if ("ok" in result) {
-        return result.ok;
-      } else {
-        throw errorToString(result.err);
-      }
+      return await tryCall(() => axon.balanceOf(BigInt(id)));
     },
     {
       keepPreviousData: true,
-      refetchInterval: FIVE_MINUTES_MS,
+      refetchInterval: ONE_MINUTES_MS,
     }
   );
 
   useEffect(() => {
-    queryResult.remove();
+    queryResult.refetch();
   }, [axon]);
 
   return queryResult;
