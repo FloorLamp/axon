@@ -1,3 +1,4 @@
+import { Principal } from "@dfinity/principal";
 import React from "react";
 import { canisterId } from "../../declarations/Axon";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
@@ -38,6 +39,14 @@ export default function AxonDetails() {
 
         {data ? (
           <>
+            <div>
+              <h2 className="text-xl font-bold">Proxy</h2>
+              <IdentifierLabelWithButtons
+                type="Principal"
+                id={data.proxy as unknown as Principal}
+              />
+            </div>
+
             <div>
               <h2 className="text-xl font-bold">Policy</h2>
               <PolicySummary policy={data.policy} />

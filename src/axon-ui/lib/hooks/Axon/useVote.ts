@@ -27,7 +27,7 @@ export default function useVote(proposalId: bigint) {
     {
       onSuccess: (data) => {
         console.log("vote", data);
-        queryClient.refetchQueries(["pendingProposals", axonId]);
+        queryClient.refetchQueries(["activeProposals", axonId]);
         queryClient.refetchQueries(["allProposals", axonId]);
       },
     }

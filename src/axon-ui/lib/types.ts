@@ -1,4 +1,5 @@
 import { ActorSubclass } from "@dfinity/agent";
+import { Principal } from "@dfinity/principal";
 import Axon, {
   AxonCommandRequest,
   Command,
@@ -10,9 +11,11 @@ import Axon, {
 } from "../declarations/Axon/Axon.did";
 import { Action } from "../declarations/Governance/Governance.did.d";
 
+export type Modify<T, R> = Omit<T, keyof R> & R;
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
 
 export type AxonService = ActorSubclass<Axon._SERVICE>;
+export type AxonWithProxy = Modify<Axon.Axon, { proxy: Principal }>;
 
 export type StatusKey = KeysOfUnion<Status>;
 export type ProposalTypeKey = KeysOfUnion<ProposalType>;

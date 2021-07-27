@@ -11,7 +11,7 @@ export default function useSync() {
   return useMutation(
     ["sync", id],
     async () => {
-      const result = await tryCall(axon.sync);
+      const result = await tryCall(() => axon.sync(BigInt(id)));
       if ("ok" in result) {
         return result.ok;
       } else {

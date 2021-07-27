@@ -35,21 +35,15 @@ export default function PolicySummary({
       ? formatPercent(Number(acceptanceThreshold.Percent.quorum[0]) / 1e8)
       : null;
     threshold = (
-      <>
-        <DataRow labelClassName="w-40" label="Acceptance Threshold">
-          {percent} Yes Votes
-        </DataRow>
-        {quorum && (
-          <DataRow labelClassName="w-40" label="">
-            {quorum} of all Votes Required
-          </DataRow>
-        )}
-      </>
+      <DataRow labelClassName="w-40" label="Acceptance Threshold">
+        <div>{percent} of Votes</div>
+        {quorum && <div>{quorum} Quorum Required</div>}
+      </DataRow>
     );
   } else {
     threshold = (
       <DataRow labelClassName="w-40" label="Acceptance Threshold">
-        {formatNumber(acceptanceThreshold.Absolute)} Yes Votes
+        {formatNumber(acceptanceThreshold.Absolute)} Total Votes
       </DataRow>
     );
   }

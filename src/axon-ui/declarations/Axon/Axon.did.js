@@ -222,6 +222,7 @@ export const idlFactory = ({ IDL }) => {
       'error_message' : IDL.Text,
       'error_type' : ErrorCode,
     }),
+    'CannotVote' : IDL.Null,
     'CannotExecute' : IDL.Null,
     'InvalidProposal' : IDL.Null,
     'InsufficientBalance' : IDL.Null,
@@ -241,12 +242,13 @@ export const idlFactory = ({ IDL }) => {
     'policy' : Policy,
   });
   const Status = IDL.Variant({
+    'Active' : IDL.Int,
     'Executing' : IDL.Int,
     'Rejected' : IDL.Int,
     'Executed' : IDL.Int,
     'Accepted' : IDL.Int,
+    'Created' : IDL.Int,
     'Expired' : IDL.Int,
-    'Pending' : IDL.Null,
   });
   const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
   const Ballot = IDL.Record({
@@ -287,7 +289,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const AxonProposal = IDL.Record({
     'id' : IDL.Nat,
-    'status' : Status,
+    'status' : IDL.Vec(Status),
     'creator' : IDL.Principal,
     'ballots' : IDL.Vec(Ballot),
     'timeStart' : IDL.Int,
@@ -324,6 +326,7 @@ export const idlFactory = ({ IDL }) => {
     'count' : IDL.Func([], [IDL.Nat], ['query']),
     'create' : IDL.Func([Initialization], [Axon], []),
     'execute' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], []),
+    'getActiveProposals' : IDL.Func([IDL.Nat], [ProposalResult], ['query']),
     'getAllProposals' : IDL.Func(
         [IDL.Nat, IDL.Opt(IDL.Nat)],
         [ProposalResult],
@@ -331,7 +334,6 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getNeuronIds' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat64)], ['query']),
     'getNeurons' : IDL.Func([IDL.Nat], [ListNeuronsResult], ['query']),
-    'getPendingProposals' : IDL.Func([IDL.Nat], [ProposalResult], ['query']),
     'propose' : IDL.Func([NewProposal], [Result], []),
     'sync' : IDL.Func([IDL.Nat], [ListNeuronsResult], []),
     'transfer' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [Result], []),

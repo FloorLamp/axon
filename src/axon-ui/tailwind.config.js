@@ -23,6 +23,8 @@ module.exports = {
       translate: ["group-hover"],
       borderWidth: ["hover", "focus"],
       display: ["group-hover", "hover", "focus"],
+      visibility: ["group-hover", "hover", "focus"],
+      pointerEvents: ["group-hover", "hover", "focus"],
     },
   },
   plugins: [require("@tailwindcss/forms")],

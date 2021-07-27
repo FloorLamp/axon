@@ -7,13 +7,13 @@ import { errorToString, tryCall } from "../../utils";
 import useAxonId from "../useAxonId";
 import useSync from "./useSync";
 
-export const usePendingProposals = () => {
+export const useActiveProposals = () => {
   const id = useAxonId();
   const axon = useAxon();
   const queryResult = useQuery(
-    ["pendingProposals", id],
+    ["activeProposals", id],
     async () => {
-      const result = await tryCall(() => axon.getPendingProposals(BigInt(id)));
+      const result = await tryCall(() => axon.getActiveProposals(BigInt(id)));
       if ("ok" in result) {
         return result.ok;
       } else {
@@ -31,9 +31,12 @@ export const usePendingProposals = () => {
   const queryClient = useQueryClient();
   const [isExecuting, setIsExecuting] = useState(false);
   useEffect(() => {
-    console.log("got pending proposals", queryResult.data);
-
-    if (queryResult.data?.find((action) => "Executing" in action.status)) {
+    if (
+      queryResult.data?.find(
+        (action) => "Executing" in action.status.slice(-1)[0]
+      )
+    ) {
+      console.log("is Executing", queryResult.data);
       setIsExecuting(true);
       setTimeout(queryResult.refetch, 1000);
     } else {
@@ -81,7 +84,7 @@ export const useAllProposals = () => {
   const sync = useSync();
   const queryClient = useQueryClient();
   const [previousData, setPreviousData] = useState<AxonProposal[]>(null);
-  // Check for any new actions that moved out of pending state
+  // Check for any new actions that moved out of active state
   useEffect(() => {
     if (
       previousData &&

@@ -1,24 +1,24 @@
 import React, { useState } from "react";
 import { BiListUl } from "react-icons/bi";
 import {
+  useActiveProposals as useActiveProposals,
   useAllProposals,
-  usePendingProposals as usePendingProposals,
 } from "../../lib/hooks/Axon/useProposals";
 import NavButtons from "../Buttons/NavButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import ResponseError from "../Labels/ResponseError";
 import { ProposalDetails } from "./ProposalDetails";
 
-const ProposalTypes = ["Pending", "All"] as const;
+const ProposalTypes = ["Active", "All"] as const;
 type ProposalType = typeof ProposalTypes[number];
 
 export default function Proposals() {
-  const activeProposalsQuery = usePendingProposals();
+  const activeProposalsQuery = useActiveProposals();
   const allProposalsQuery = useAllProposals();
   const [type, setType] = useState<ProposalType>(ProposalTypes[0]);
 
   const { data, error, isFetching, isSuccess } =
-    type === "Pending" ? activeProposalsQuery : allProposalsQuery;
+    type === "Active" ? activeProposalsQuery : allProposalsQuery;
 
   const handleRefresh = () => {
     activeProposalsQuery.refetch();
@@ -26,7 +26,7 @@ export default function Proposals() {
   };
 
   const renderTabValue = (t: ProposalType) =>
-    t === "Pending" ? (
+    t === "Active" ? (
       <span>
         {t}
         {activeProposalsQuery.data?.length > 0 && (
@@ -70,7 +70,7 @@ export default function Proposals() {
             <li key={proposal.id.toString()}>
               <ProposalDetails
                 proposal={proposal}
-                defaultOpen={type === "Pending"}
+                defaultOpen={type === "Active"}
               />
             </li>
           ))}
@@ -80,10 +80,8 @@ export default function Proposals() {
           <div className="h-64 flex flex-col items-center justify-center">
             <BiListUl size={48} className="" />
             <p className="py-2">No proposals</p>
-            {type === "Pending" && (
-              <p className="text-gray-500">
-                Pending proposals will appear here
-              </p>
+            {type === "Active" && (
+              <p className="text-gray-500">Active proposals will appear here</p>
             )}
           </div>
         )

@@ -39,6 +39,18 @@ export const proposalTypeToString = (proposal: ProposalType) => {
   }
 };
 
+export const hasExecutionError = (proposal: ProposalType) => {
+  if ("AxonCommand" in proposal) {
+    return proposal.AxonCommand[1][0]
+      ? "err" in proposal.AxonCommand[1][0]
+      : false;
+  } else {
+    return proposal.NeuronCommand[1][0]
+      ? !proposal.NeuronCommand[1][0].every(([_, res]) => "ok" in res)
+      : false;
+  }
+};
+
 export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
@@ -139,7 +151,7 @@ export const axonCommandToString = (command: AxonCommandRequest) => {
         principals.length <= 2
           ? principals.map(shortPrincipal).join(", ")
           : `${principals.length} principals`;
-      return `Add Members: ${display}`;
+      return `Add Proposers: ${display}`;
     }
     case "RemoveMembers": {
       assert("RemoveMembers" in command);
@@ -148,30 +160,32 @@ export const axonCommandToString = (command: AxonCommandRequest) => {
         principals.length <= 2
           ? principals.map(shortPrincipal).join(", ")
           : `${principals.length} principals`;
-      return `Remove Members: ${display}`;
+      return `Remove Proposers: ${display}`;
     }
     case "SetPolicy": {
       assert("SetPolicy" in command);
       const { proposeThreshold, proposers, acceptanceThreshold } =
         command.SetPolicy;
-      const membership = Object.keys(proposers)[0];
+      const membership = "Closed" in proposers ? "Restricted" : "Any";
       let threshold: string;
       if ("Percent" in acceptanceThreshold) {
         const percent = formatPercent(
-          Number(acceptanceThreshold.Percent.percent) / 1e8
+          Number(acceptanceThreshold.Percent.percent) / 1e8,
+          0
         );
         const quorum = acceptanceThreshold.Percent.quorum[0]
-          ? `${formatPercent(
-              Number(acceptanceThreshold.Percent.quorum[0]) / 1e8
-            )} quorum`
+          ? `(${formatPercent(
+              Number(acceptanceThreshold.Percent.quorum[0]) / 1e8,
+              0
+            )} quorum)`
           : "";
-        threshold = `${percent}${quorum ? " " + quorum : ""}`;
+        threshold = `${percent} to accept${quorum ? " " + quorum : ""}`;
       } else {
-        threshold = formatNumber(acceptanceThreshold.Absolute);
+        threshold = `${formatNumber(acceptanceThreshold.Absolute)} to accept`;
       }
-      return `Set Policy: ${membership} membership, ${formatNumber(
+      return `Set Policy: ${membership} proposer, ${formatNumber(
         proposeThreshold
-      )} to propose, ${threshold} to accept)`;
+      )} to propose, ${threshold}`;
     }
     case "SetVisibility": {
       assert("SetVisibility" in command);

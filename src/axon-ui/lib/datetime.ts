@@ -1,5 +1,11 @@
-import { Duration } from "luxon";
+import { DateTime, Duration } from "luxon";
 import { pluralize } from "./utils";
+
+export const dateTimeFromNanos = (n: bigint) =>
+  DateTime.fromSeconds(Number(n / BigInt(1e9)));
+
+export const dateTimeToNanos = (dt: DateTime) =>
+  BigInt(dt.toSeconds()) * BigInt(1e9);
 
 export const secondsToDuration = (n: number | bigint) => {
   let seconds = n;

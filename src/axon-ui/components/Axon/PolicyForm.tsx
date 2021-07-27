@@ -8,6 +8,7 @@ import {
 } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useNames from "../../lib/hooks/useNames";
+import { percentFromBigInt, percentToBigInt } from "../../lib/percents";
 import { KeysOfUnion } from "../../lib/types";
 import { shortPrincipal } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -15,9 +16,6 @@ import { useGlobalContext } from "../Store/Store";
 
 type ProposersKey = KeysOfUnion<Policy["proposers"]>;
 type ThresholdKey = KeysOfUnion<Threshold>;
-
-const percentToBigInt = (arg: string) => BigInt((Number(arg) / 100) * 1e8);
-const percentFromBigInt = (arg: bigint) => String((Number(arg) / 1e8) * 100);
 
 const proposersOptions: [ProposersKey, string][] = [
   ["Open", "Any token holder"],
@@ -34,7 +32,11 @@ export function PolicyForm({
   } = useGlobalContext();
   const { data } = useInfo();
   const { principalName } = useNames();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState(
+    "Closed" in data.policy.proposers
+      ? data.policy.proposers.Closed.map((p) => p.toText())
+      : []
+  );
   const [proposers, setProposers] = useState<ProposersKey>(
     Object.keys(data.policy.proposers)[0] as ProposersKey
   );
@@ -48,12 +50,16 @@ export function PolicyForm({
   const [acceptanceThreshold, setAcceptanceThreshold] = useState(
     "Absolute" in data.policy.acceptanceThreshold
       ? data.policy.acceptanceThreshold.Absolute.toString()
-      : percentFromBigInt(data.policy.acceptanceThreshold.Percent.percent)
+      : String(
+          percentFromBigInt(data.policy.acceptanceThreshold.Percent.percent)
+        )
   );
   const [quorum, setQuorum] = useState(
     "Percent" in data.policy.acceptanceThreshold &&
       data.policy.acceptanceThreshold.Percent.quorum[0]
-      ? percentFromBigInt(data.policy.acceptanceThreshold.Percent.quorum[0])
+      ? String(
+          percentFromBigInt(data.policy.acceptanceThreshold.Percent.quorum[0])
+        )
       : ""
   );
 
@@ -62,6 +68,10 @@ export function PolicyForm({
 
     let proposersValue: Policy["proposers"];
     if (proposers === "Closed") {
+      if (!users.length) {
+        return makeCommand(null);
+      }
+
       let members: Principal[];
       try {
         members = users.map((value) => Principal.fromText(value));
@@ -96,13 +106,24 @@ export function PolicyForm({
     makeCommand({
       SetPolicy: policy,
     });
-  }, [proposers, users, threshold, proposeThreshold, acceptanceThreshold]);
+  }, [
+    proposers,
+    users,
+    threshold,
+    proposeThreshold,
+    acceptanceThreshold,
+    quorum,
+  ]);
 
+  const getPrincipalLabel = (value: string) =>
+    principalName(value)
+      ? `${principalName(value)} (${shortPrincipal(value)})`
+      : value;
+
+  // TODO: use names
   const principals = [principal.toText()].map((value) => ({
     value,
-    label: principalName(value)
-      ? `${principalName(value)} (${shortPrincipal(value)})`
-      : value,
+    label: getPrincipalLabel(value),
   }));
 
   return (
@@ -130,6 +151,10 @@ export function PolicyForm({
             isMulti={true}
             onChange={(values) => setUsers(values.map(({ value }) => value))}
             options={principals}
+            defaultValue={users.map((value) => ({
+              value,
+              label: getPrincipalLabel(value),
+            }))}
           />
         </label>
       )}

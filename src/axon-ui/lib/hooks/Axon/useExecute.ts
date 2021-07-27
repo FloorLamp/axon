@@ -31,7 +31,7 @@ export default function useExecute() {
     {
       onSuccess: (data) => {
         console.log(data);
-        queryClient.refetchQueries(["pendingProposals", axonId]);
+        queryClient.refetchQueries(["activeProposals", axonId]);
         queryClient.refetchQueries(["allProposals", axonId]);
       },
     }

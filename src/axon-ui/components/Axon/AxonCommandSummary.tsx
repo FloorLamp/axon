@@ -19,8 +19,10 @@ export default function AxonCommandSummary({
       const principals = command[key] as Array<Principal>;
 
       return (
-        <DataTable label={`${key === "AddMembers" ? "Add" : "Remove"} Members`}>
-          <DataRow labelClassName="w-20" label="Principal">
+        <DataTable
+          label={`${key === "AddMembers" ? "Add" : "Remove"} Proposers`}
+        >
+          <DataRow labelClassName="w-20" label="Principals">
             {principals.map((principal) => (
               <IdentifierLabelWithButtons
                 key={principal.toText()}

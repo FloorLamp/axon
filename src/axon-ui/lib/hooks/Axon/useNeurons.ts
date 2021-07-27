@@ -18,6 +18,8 @@ export const useNeurons = () => {
 
       if ("ok" in result) {
         return result.ok;
+      } else if ("NoNeurons" in result.err) {
+        return null;
       } else {
         throw errorToString(result.err);
       }

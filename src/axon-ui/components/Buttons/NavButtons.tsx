@@ -6,11 +6,13 @@ export default function NavButtons({
   selected,
   onChange,
   renderValue,
+  itemClassName = "px-3 py-1",
 }: {
   values: readonly string[];
   selected: string;
   onChange: (string) => void;
   renderValue?: (string) => JSX.Element;
+  itemClassName?: string;
 }) {
   return (
     <ul className="flex gap-1 border-b border-gray-300 text-sm">
@@ -18,11 +20,12 @@ export default function NavButtons({
         <li
           key={value}
           className={classNames(
-            "px-3 py-1 cursor-pointer hover:border-indigo-500 hover:border-b-2 transition-all duration-75",
+            "cursor-pointer hover:border-indigo-500 hover:border-b-2 transition-all duration-75",
             {
               "border-b-2 border-indigo-500 text-indigo-500":
                 value === selected,
-            }
+            },
+            itemClassName
           )}
           onClick={() => onChange(value)}
         >

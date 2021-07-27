@@ -10,8 +10,8 @@ import { AddProposersForm, RemoveProposersForm } from "./ProposersForm";
 import { VisibilityForm } from "./VisibilityForm";
 
 const onlyClosedProposersCommands: [AxonCommandName, string][] = [
-  ["AddMembers", "Add Members"],
-  ["RemoveMembers", "Remove Members"],
+  ["AddMembers", "Add Proposers"],
+  ["RemoveMembers", "Remove Proposers"],
 ];
 
 const commands: [AxonCommandName, string][] = [

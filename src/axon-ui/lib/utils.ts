@@ -59,8 +59,8 @@ export const formatNumber = (number: any, digits?: number) => {
 type SignDisplay = "auto" | "never" | "always" | "exceptZero";
 export const formatPercent = (
   number: number,
-  signDisplay: SignDisplay = "auto",
-  digits: number = 2
+  digits: number = 2,
+  signDisplay: SignDisplay = "auto"
 ) => {
   return Intl.NumberFormat("en-US", {
     style: "percent",

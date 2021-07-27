@@ -3,12 +3,16 @@ import Error "mo:base/Error";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
 import GT "./GovernanceTypes";
-import Proxy "./Proxy";
 
 module {
+  public type Proxy = actor {
+    list_neurons : shared () -> async GT.ListNeuronsResponse;
+    manage_neuron : shared GT.ManageNeuron -> async GT.ManageNeuronResponse;
+  };
+
   public type Axon = {
     id: Nat;
-    proxy: Proxy.Proxy;
+    proxy: Proxy;
     name: Text;
     visibility: Visibility;
     supply: Nat;
@@ -17,7 +21,7 @@ module {
 
   public type AxonFull = {
     id: Nat;
-    proxy: Proxy.Proxy;
+    proxy: Proxy;
     name: Text;
     visibility: Visibility;
     supply: Nat;
@@ -25,13 +29,13 @@ module {
     policy: Policy;
     neurons: ?GT.ListNeuronsResponse;
     allProposals: [AxonProposal];
-    pendingProposals: [AxonProposal];
+    activeProposals: [AxonProposal];
     lastProposalId: Nat;
   };
 
   public type AxonEntries = {
     id: Nat;
-    proxy: Proxy.Proxy;
+    proxy: Proxy;
     name: Text;
     visibility: Visibility;
     supply: Nat;
@@ -39,7 +43,7 @@ module {
     policy: Policy;
     neurons: ?GT.ListNeuronsResponse;
     allProposals: [AxonProposal];
-    pendingProposals: [AxonProposal];
+    activeProposals: [AxonProposal];
     lastProposalId: Nat;
   };
 
@@ -90,6 +94,7 @@ module {
     #CannotExecute;
     #NotProposer;
     #InsufficientBalanceToPropose;
+    #CannotVote;
     #AlreadyVoted;
     #InsufficientBalance;
     #GovernanceError: GT.GovernanceError;
@@ -122,7 +127,8 @@ module {
   };
 
   public type Status = {
-    #Pending;
+    #Created: Int;
+    #Active: Int;
     #Accepted: Int;
     #Executing: Int;
     #Executed: Int;
@@ -138,7 +144,7 @@ module {
     timeEnd: Int;
     creator: Principal;
     proposal: ProposalType;
-    status: Status;
+    status: [Status];
     policy: Policy;
   };
 

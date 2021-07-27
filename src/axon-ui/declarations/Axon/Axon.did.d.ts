@@ -33,7 +33,7 @@ export type AxonCommandResponse = { 'ok' : null } |
   { 'err' : Error };
 export interface AxonProposal {
   'id' : bigint,
-  'status' : Status,
+  'status' : Array<Status>,
   'creator' : Principal,
   'ballots' : Array<Ballot>,
   'timeStart' : bigint,
@@ -49,12 +49,12 @@ export interface AxonService {
   'count' : () => Promise<bigint>,
   'create' : (arg_0: Initialization) => Promise<Axon>,
   'execute' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
+  'getActiveProposals' : (arg_0: bigint) => Promise<ProposalResult>,
   'getAllProposals' : (arg_0: bigint, arg_1: [] | [bigint]) => Promise<
       ProposalResult
     >,
   'getNeuronIds' : (arg_0: bigint) => Promise<Array<bigint>>,
   'getNeurons' : (arg_0: bigint) => Promise<ListNeuronsResult>,
-  'getPendingProposals' : (arg_0: bigint) => Promise<ProposalResult>,
   'propose' : (arg_0: NewProposal) => Promise<Result>,
   'sync' : (arg_0: bigint) => Promise<ListNeuronsResult>,
   'transfer' : (arg_0: bigint, arg_1: Principal, arg_2: bigint) => Promise<
@@ -104,6 +104,7 @@ export type DissolveState = { 'DissolveDelaySeconds' : bigint } |
   { 'WhenDissolvedTimestampSeconds' : bigint };
 export type Error = { 'AlreadyVoted' : null } |
   { 'Error' : { 'error_message' : string, 'error_type' : ErrorCode } } |
+  { 'CannotVote' : null } |
   { 'CannotExecute' : null } |
   { 'InvalidProposal' : null } |
   { 'InsufficientBalance' : null } |
@@ -264,12 +265,13 @@ export interface SetDissolveTimestamp { 'dissolve_timestamp_seconds' : bigint }
 export interface Spawn { 'new_controller' : [] | [Principal] }
 export interface SpawnResponse { 'created_neuron_id' : [] | [NeuronId] }
 export interface Split { 'amount_e8s' : bigint }
-export type Status = { 'Executing' : bigint } |
+export type Status = { 'Active' : bigint } |
+  { 'Executing' : bigint } |
   { 'Rejected' : bigint } |
   { 'Executed' : bigint } |
   { 'Accepted' : bigint } |
-  { 'Expired' : bigint } |
-  { 'Pending' : null };
+  { 'Created' : bigint } |
+  { 'Expired' : bigint };
 export type Threshold = {
     'Percent' : { 'percent' : bigint, 'quorum' : [] | [bigint] }
   } |

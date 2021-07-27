@@ -31,10 +31,11 @@ type Threshold =
 type Status = 
  variant {
    Accepted: int;
+   Active: int;
+   Created: int;
    Executed: int;
    Executing: int;
    Expired: int;
-   Pending;
    Rejected: int;
  };
 type Split = record {amount_e8s: nat64;};
@@ -260,6 +261,7 @@ type Error =
  variant {
    AlreadyVoted;
    CannotExecute;
+   CannotVote;
    Error: record {
             error_message: text;
             error_type: ErrorCode;
@@ -340,10 +342,10 @@ type AxonService =
    count: () -> (nat) query;
    create: (Initialization) -> (Axon);
    execute: (nat, nat) -> (Result_2);
+   getActiveProposals: (nat) -> (ProposalResult) query;
    getAllProposals: (nat, opt nat) -> (ProposalResult) query;
    getNeuronIds: (nat) -> (vec nat64) query;
    getNeurons: (nat) -> (ListNeuronsResult) query;
-   getPendingProposals: (nat) -> (ProposalResult) query;
    propose: (NewProposal) -> (Result);
    sync: (nat) -> (ListNeuronsResult);
    transfer: (nat, principal, nat) -> (Result);
@@ -356,7 +358,7 @@ type AxonProposal =
    id: nat;
    policy: Policy;
    proposal: ProposalType;
-   status: Status;
+   status: vec Status;
    timeEnd: int;
    timeStart: int;
    totalVotes: Votes;

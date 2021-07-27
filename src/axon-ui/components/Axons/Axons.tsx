@@ -3,7 +3,7 @@ import React from "react";
 import { BiListUl } from "react-icons/bi";
 import { useCount } from "../../lib/hooks/Axons/useCount";
 import { RefreshButton } from "../Buttons/RefreshButton";
-import ErrorAlert from "../Labels/ErrorAlert";
+import ResponseError from "../Labels/ResponseError";
 
 export default function Axons() {
   const { data, isSuccess, isFetching, refetch, error } = useCount();
@@ -19,19 +19,12 @@ export default function Axons() {
         />
       </div>
       <div>
-        {error && (
-          <ErrorAlert>
-            <pre className="text-xs">{error}</pre>
-          </ErrorAlert>
-        )}
+        {error && <ResponseError>{error}</ResponseError>}
         {data ? (
           <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
             {Array.from({ length: data }).map((_, id) => (
-              <Link href={`/axon/${id}`}>
-                <a
-                  key={id.toString()}
-                  className="flex items-center justify-center bg-gradient-to-br from-green-300 via-blue-500 to-purple-600 rounded-xl text-xl text-white h-48 hover:shadow-xl transition"
-                >
+              <Link key={id.toString()} href={`/axon/${id}`}>
+                <a className="flex items-center justify-center bg-gradient-to-br from-green-300 via-blue-500 to-purple-600 rounded-xl text-xl text-white h-48 hover:shadow-xl transition">
                   Axon {id}
                 </a>
               </Link>

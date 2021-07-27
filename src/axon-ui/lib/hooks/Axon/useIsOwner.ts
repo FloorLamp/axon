@@ -19,6 +19,8 @@ export const useIsOwner = () => {
       principalIsEqual(principal, proposer)
     );
   } else {
-    return balance !== null && balance >= info.policy.proposeThreshold;
+    return (
+      balance !== null && balance > 0 && balance >= info.policy.proposeThreshold
+    );
   }
 };

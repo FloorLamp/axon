@@ -70,7 +70,7 @@ export function RemoveProposersForm({
 
   useEffect(() => {
     setInputError("");
-    if (!users.length) {
+    if (!users.length || members.length <= 1) {
       return makeCommand(null);
     }
 
@@ -89,14 +89,18 @@ export function RemoveProposersForm({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="block">
-        <span>Members</span>
-        <Select
-          isMulti={true}
-          onChange={(values) => setUsers(values.map(({ value }) => value))}
-          options={membersOptions}
-        />
-      </label>
+      {members.length > 1 ? (
+        <label className="block">
+          <span>Proposers</span>
+          <Select
+            isMulti={true}
+            onChange={(values) => setUsers(values.map(({ value }) => value))}
+            options={membersOptions}
+          />
+        </label>
+      ) : (
+        <p className="px-2 text-gray-500">Cannot remove the only proposer.</p>
+      )}
     </div>
   );
 }
