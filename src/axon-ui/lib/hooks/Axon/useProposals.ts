@@ -21,6 +21,7 @@ export const useActiveProposals = () => {
       }
     },
     {
+      enabled: !!id,
       keepPreviousData: true,
       placeholderData: [],
       refetchInterval: ONE_MINUTES_MS,
@@ -71,6 +72,7 @@ export const useAllProposals = () => {
       }
     },
     {
+      enabled: !!id,
       keepPreviousData: true,
       placeholderData: [],
       refetchInterval: ONE_MINUTES_MS,

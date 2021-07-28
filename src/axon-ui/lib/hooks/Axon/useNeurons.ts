@@ -11,9 +11,6 @@ export const useNeurons = () => {
   const queryResult = useQuery(
     ["neurons", id],
     async () => {
-      if (!id) {
-        return null;
-      }
       const result = await tryCall(() => axon.getNeurons(BigInt(id)));
 
       if ("ok" in result) {
@@ -25,6 +22,7 @@ export const useNeurons = () => {
       }
     },
     {
+      enabled: !!id,
       keepPreviousData: true,
       refetchInterval: FIVE_MINUTES_MS,
     }

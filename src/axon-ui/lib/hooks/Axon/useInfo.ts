@@ -13,15 +13,18 @@ function isPrincipal(arg: any): asserts arg is Principal {
 export const useInfo = () => {
   const id = useAxonId();
   const axon = useAxon();
-  return useQuery(["info", id], async () => {
-    if (!id) {
-      return null;
+  return useQuery(
+    ["info", id],
+    async () => {
+      const result = await tryCall(() => axon.axonById(BigInt(id)));
+      isPrincipal(result.proxy);
+      return {
+        ...result,
+        proxy: result.proxy,
+      } as AxonWithProxy;
+    },
+    {
+      enabled: !!id,
     }
-    const result = await tryCall(() => axon.axonById(BigInt(id)));
-    isPrincipal(result.proxy);
-    return {
-      ...result,
-      proxy: result.proxy,
-    } as AxonWithProxy;
-  });
+  );
 };

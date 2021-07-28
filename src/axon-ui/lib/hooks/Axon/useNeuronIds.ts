@@ -10,13 +10,11 @@ export const useNeuronIds = () => {
   return useQuery(
     ["neuronIds", id],
     async () => {
-      if (!id) {
-        return null;
-      }
       const result = await tryCall(() => axon.getNeuronIds(BigInt(id)));
       return result.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
     },
     {
+      enabled: !!id,
       keepPreviousData: true,
       placeholderData: [],
       refetchInterval: FIVE_MINUTES_MS,

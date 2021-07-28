@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { useBalance } from "../../lib/hooks/Axon/useBalance";
 import useAxonId from "../../lib/hooks/useAxonId";
@@ -14,7 +15,9 @@ export default function Nav() {
 
   return (
     <nav className="py-4 flex flex-col sm:flex-row items-center justify-between border-b border-black border-opacity-10">
-      <img src="/img/axon-full-logo.svg" className="h-14" />
+      <Link href="/">
+        <img src="/img/axon-full-logo.svg" className="h-14 cursor-pointer" />
+      </Link>
       <div className="flex items-center gap-4">
         {principal && !principal.isAnonymous() && (
           <div className="flex flex-col">
