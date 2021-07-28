@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import Modal from "../Layout/Modal";
 import ActionsMenu from "./ActionsMenu";
 
 export default function ManageNeuronModal() {
-  const isOwner = useIsOwner();
+  const isOwner = useIsProposer();
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
@@ -15,7 +15,7 @@ export default function ManageNeuronModal() {
 
   return (
     <>
-      <div className="flex gap-1">
+      <div>
         <button
           type="button"
           onClick={openModal}

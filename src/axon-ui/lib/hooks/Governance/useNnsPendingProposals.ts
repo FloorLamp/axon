@@ -1,6 +1,6 @@
 import { useQuery } from "react-query";
-import { governance } from "../canisters";
-import { ONE_MINUTES_MS } from "../constants";
+import { governance } from "../../canisters";
+import { ONE_MINUTES_MS } from "../../constants";
 import {
   Action,
   ErrorType,
@@ -8,7 +8,7 @@ import {
   RewardStatus,
   Status,
   Topic,
-} from "../governance";
+} from "../../governance";
 
 export type ApiProposal = {
   action: Action;

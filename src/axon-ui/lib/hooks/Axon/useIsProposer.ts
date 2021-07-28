@@ -3,7 +3,7 @@ import { principalIsEqual } from "../../utils";
 import { useBalance } from "./useBalance";
 import { useInfo } from "./useInfo";
 
-export const useIsOwner = () => {
+export const useIsProposer = () => {
   const { data: info } = useInfo();
   const { data: balance } = useBalance();
   const {

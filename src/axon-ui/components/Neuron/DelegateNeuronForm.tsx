@@ -61,9 +61,9 @@ export default function DelegateNeuronForm() {
               </p>
             </>
           ) : (
-            <p>
-              This Axon doesn't have any neurons yet. Try adding a neuron before
-              delegating.
+            <p className="py-12 text-center text-gray-500 text-sm">
+              This Axon doesn't have any neurons yet.
+              <br /> Try adding a neuron before delegating.
             </p>
           ))}
       </div>

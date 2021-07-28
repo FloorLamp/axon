@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React from "react";
 import { StatusKey } from "../../lib/types";
 
-const colorOf = (status: StatusKey, hasExecutionError) => {
+export const statusColor = (status: StatusKey, hasExecutionError?: boolean) => {
   switch (status) {
     case "Created":
       return "bg-gray-300 text-gray-700";
@@ -35,7 +35,7 @@ export default function StatusLabel({
     <label
       className={classNames(
         "block w-20 text-center py-0.5 rounded text-xs uppercase",
-        colorOf(status, hasExecutionError)
+        statusColor(status, hasExecutionError)
       )}
       title={hasExecutionError ? "Executed with errors" : undefined}
     >

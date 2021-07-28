@@ -2,8 +2,8 @@ import React from "react";
 import { BiListUl } from "react-icons/bi";
 import { ProposalInfo } from "../../declarations/Governance/Governance.did.d";
 import { Action, Topic } from "../../lib/governance";
-import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
-import { useNnsPendingProposals } from "../../lib/hooks/useNnsPendingProposals";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
+import { useNnsPendingProposals } from "../../lib/hooks/Governance/useNnsPendingProposals";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import ResponseError from "../Labels/ResponseError";
@@ -12,7 +12,7 @@ import AcceptRejectButtons from "./AcceptRejectButtons";
 const NnsProposal = ({ proposal }: { proposal: ProposalInfo }) => {
   const id = proposal.id[0].id;
   const actionKey = Object.keys(proposal.proposal[0].action[0])[0];
-  const isOwner = useIsOwner();
+  const isOwner = useIsProposer();
 
   return (
     <div className="flex flex-col gap-1 sm:flex-row p-2">

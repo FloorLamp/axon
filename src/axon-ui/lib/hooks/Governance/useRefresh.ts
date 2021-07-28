@@ -1,9 +1,9 @@
 import { Principal } from "@dfinity/principal";
 import { useMutation } from "react-query";
-import { governance } from "../canisters";
-import { governanceErrorToString, tryCall } from "../utils";
-import useSync from "./Axon/useSync";
-import { useFindMemo } from "./useFindMemo";
+import { governance } from "../../canisters";
+import { governanceErrorToString, tryCall } from "../../utils";
+import useSync from "../Axon/useSync";
+import { useFindMemo } from "../Ledger/useFindMemo";
 
 export default function useRefresh({
   account,

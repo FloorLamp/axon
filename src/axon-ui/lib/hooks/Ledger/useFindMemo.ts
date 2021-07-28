@@ -1,6 +1,6 @@
 import assert from "assert";
 import { useQuery } from "react-query";
-import { SearchTransactionsResponse } from "../rosetta";
+import { SearchTransactionsResponse } from "../../rosetta";
 
 export function useFindMemo(account: string) {
   return useQuery(

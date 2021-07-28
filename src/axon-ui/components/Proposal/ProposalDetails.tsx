@@ -5,7 +5,8 @@ import React from "react";
 import { useIsMutating } from "react-query";
 import { AxonProposal } from "../../declarations/Axon/Axon.did";
 import { dateTimeFromNanos } from "../../lib/datetime";
-import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
+import { useIsMember } from "../../lib/hooks/Axon/useIsMember";
+import { useMyBallot } from "../../lib/hooks/Axon/useMyBallot";
 import useAxonId from "../../lib/hooks/useAxonId";
 import {
   hasExecutionError,
@@ -20,7 +21,6 @@ import ListButton from "../ExpandableList/ListButton";
 import ListPanel from "../ExpandableList/ListPanel";
 import StatusLabel from "../Labels/StatusLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
-import { useGlobalContext } from "../Store/Store";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 import StatusHistory from "./StatusHistory";
 import VotesTable from "./VotesTable";
@@ -34,22 +34,11 @@ export const ProposalDetails = ({
   defaultOpen?: boolean;
 }) => {
   const axonId = useAxonId();
-  const {
-    state: { principal },
-  } = useGlobalContext();
-  const isOwner = useIsOwner();
+  const isMember = useIsMember();
 
+  const myBallot = useMyBallot(proposal);
   const currentStatus = proposal.status.slice(-1)[0];
   const status = getStatus(proposal);
-
-  const myVote = proposal.ballots.find(
-    (ballot) => principal && ballot.principal.toHex() === principal.toHex()
-  );
-  const isEligibleToVote =
-    isOwner && status === "Active" && myVote && !myVote.vote[0];
-  const isMutating = !!useIsMutating({
-    mutationKey: ["vote", axonId, proposal.id],
-  });
 
   let actionTime: DateTime;
   if (
@@ -65,6 +54,15 @@ export const ProposalDetails = ({
   } else if (status === "Active") {
     actionTime = dateTimeFromNanos(proposal.timeEnd);
   }
+
+  const isEligibleToVote =
+    (status === "Active" ||
+      (status === "Created" && actionTime.diffNow().toMillis() < 0)) &&
+    myBallot &&
+    !myBallot.vote[0];
+  const isMutating = !!useIsMutating({
+    mutationKey: ["vote", axonId, proposal.id],
+  });
 
   return (
     <Disclosure defaultOpen={defaultOpen}>
@@ -87,7 +85,7 @@ export const ProposalDetails = ({
                   {actionTime && (
                     <span className="text-gray-500 text-xs">
                       {status === "Created" && "Starts "}
-                      {status === "Active" && "End "}
+                      {status === "Active" && "Ends "}
                       {actionTime.toRelative()}
                     </span>
                   )}
@@ -102,7 +100,7 @@ export const ProposalDetails = ({
                           !isMutating,
                       })}
                     >
-                      <AcceptRejectButtons id={proposal.id} size="small" />
+                      <AcceptRejectButtons proposal={proposal} size="small" />
                     </div>
                     <span
                       className="w-2 h-2 relative"
@@ -132,7 +130,7 @@ export const ProposalDetails = ({
                   {!!actionTime && (
                     <>
                       {status === "Created" && "Starts "}
-                      {status === "Active" && "End "}
+                      {status === "Active" && "Ends "}
                       <TimestampLabel dt={actionTime} />
                     </>
                   )}
@@ -147,14 +145,6 @@ export const ProposalDetails = ({
                   />
                 </div>
               </div>
-              {status === "Active" && (
-                <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                  <div className="w-32 font-bold">Ends</div>
-                  <div>
-                    <TimestampLabel dt={dateTimeFromNanos(proposal.timeEnd)} />
-                  </div>
-                </div>
-              )}
               <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
                 <div className="w-32 font-bold">Policy</div>
                 <div>
@@ -168,7 +158,7 @@ export const ProposalDetails = ({
                 </div>
               </div>
               <div className="flex flex-col gap-2 md:gap-12 md:flex-row leading-tight divide-y divide-gray-200 md:divide-none">
-                <div className="flex flex-col gap-8 md:flex-1 py-2">
+                <div className="flex flex-col gap-2 md:flex-1 py-2">
                   <VoteSummary proposal={proposal} />
                   <VotesTable proposal={proposal} />
                 </div>

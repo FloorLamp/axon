@@ -14,13 +14,11 @@ export const DataRow = ({
   return (
     <div className="xs:flex">
       <div className={labelClassName}>
-        <div className="flex h-4 items-end">
-          <span className="text-gray-500 text-xs uppercase leading-none">
-            {label}
-          </span>
+        <div className="flex h-5 items-center text-gray-500 text-xs uppercase leading-none">
+          {label}
         </div>
       </div>
-      <div className="flex-1">{children || emptyValue}</div>
+      <div className="flex-1 leading-tight">{children || emptyValue}</div>
     </div>
   );
 };

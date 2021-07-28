@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ProposalType } from "../../declarations/Axon/Axon.did";
+import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import usePropose from "../../lib/hooks/Axon/usePropose";
 import { ProposalOptions, ProposalTypeKey } from "../../lib/types";
 import AxonCommandForm from "../Axon/AxonCommandForm";
@@ -15,6 +16,7 @@ export default function ProposalForm({
   closeModal: () => void;
   proposalType: ProposalTypeKey;
 }) {
+  const { data } = useNeuronIds();
   const [options, setOptions] = useState<ProposalOptions>({});
   const [proposal, setProposal] = useState<ProposalType>(null);
 
@@ -28,6 +30,14 @@ export default function ProposalForm({
         onSuccess: closeModal,
       });
     }
+  }
+
+  if (proposalType === "NeuronCommand" && !data?.length) {
+    return (
+      <p className="py-12 text-center text-gray-500 text-sm">
+        No neurons to manage.
+      </p>
+    );
   }
 
   return (

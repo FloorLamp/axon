@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { AxonProposal, Status } from "../../declarations/Axon/Axon.did";
 import { dateTimeFromNanos } from "../../lib/datetime";
-import { useIsOwner } from "../../lib/hooks/Axon/useIsOwner";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { getStatus } from "../../lib/status";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import AcceptRejectButtons from "./AcceptRejectButtons";
@@ -54,7 +54,7 @@ export default function StatusHistory({
   proposal: AxonProposal;
   isEligibleToVote: boolean;
 }) {
-  const isOwner = useIsOwner();
+  const isOwner = useIsProposer();
 
   const statuses = proposal.status.length;
   const currentStatus = getStatus(proposal);
@@ -83,6 +83,11 @@ export default function StatusHistory({
             >
               Starts{" "}
               <TimestampLabel dt={dateTimeFromNanos(proposal.timeStart)} />
+              {isEligibleToVote && (
+                <div className="mt-2 border-t border-gray-300 pt-3">
+                  <AcceptRejectButtons proposal={proposal} />
+                </div>
+              )}
             </StatusSummary>
           )}
         </>
@@ -111,7 +116,7 @@ export default function StatusHistory({
           <TimestampLabel dt={dateTimeFromNanos(status.Active)} />
           {isEligibleToVote && (
             <div className="mt-2 border-t border-gray-300 pt-3">
-              <AcceptRejectButtons id={proposal.id} />
+              <AcceptRejectButtons proposal={proposal} />
             </div>
           )}
         </StatusSummary>
@@ -161,21 +166,23 @@ export default function StatusHistory({
           )}
         </>
       );
-    } else if ("Executing" in status && currentStatus === "Executing") {
-      return (
-        <StatusSummary
-          circle={
-            <FaCircleNotch
-              size={CIRCLE_SIZE}
-              className="animate-spin text-blue-400"
-            />
-          }
-          label={<span className="text-blue-700">Executing</span>}
-          showLine={!isLast}
-        >
-          <TimestampLabel dt={dateTimeFromNanos(status.Executing)} />
-        </StatusSummary>
-      );
+    } else if ("Executing" in status) {
+      if (currentStatus === "Executing") {
+        return (
+          <StatusSummary
+            circle={
+              <FaCircleNotch
+                size={CIRCLE_SIZE}
+                className="animate-spin text-blue-400"
+              />
+            }
+            label={<span className="text-blue-700">Executing</span>}
+            showLine={!isLast}
+          >
+            <TimestampLabel dt={dateTimeFromNanos(status.Executing)} />
+          </StatusSummary>
+        );
+      }
     } else if ("Executed" in status) {
       return (
         <StatusSummary
@@ -209,7 +216,10 @@ export default function StatusHistory({
           showLine={!isLast}
         />
       );
+    } else {
+      console.log("status not rendered", status);
     }
+    return null;
   };
 
   return (

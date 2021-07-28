@@ -1,7 +1,7 @@
 import { Principal } from "@dfinity/principal";
 import React from "react";
-import { useFindMemo } from "../../lib/hooks/useFindMemo";
-import useRefresh from "../../lib/hooks/useRefresh";
+import useRefresh from "../../lib/hooks/Governance/useRefresh";
+import { useFindMemo } from "../../lib/hooks/Ledger/useFindMemo";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
