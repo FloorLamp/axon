@@ -1,19 +1,24 @@
+import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { BiListUl } from "react-icons/bi";
 import {
   useActiveProposals as useActiveProposals,
   useAllProposals,
 } from "../../lib/hooks/Axon/useProposals";
+import useAxonId from "../../lib/hooks/useAxonId";
 import NavButtons from "../Buttons/NavButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
+import { ListButton } from "../ExpandableList/ListButton";
 import ResponseError from "../Labels/ResponseError";
-import { ProposalDetails } from "./ProposalDetails";
+import { ProposalSummary } from "./ProposalSummary";
 
 const ProposalTypes = ["Active", "All"] as const;
 type ProposalType = typeof ProposalTypes[number];
 
 export default function Proposals() {
+  const router = useRouter();
+  const axonId = useAxonId();
   const activeProposalsQuery = useActiveProposals();
   const allProposalsQuery = useAllProposals();
   const [type, setType] = useState<ProposalType>(ProposalTypes[0]);
@@ -69,10 +74,15 @@ export default function Proposals() {
         <ul className="divide-y divide-gray-300">
           {data.map((proposal) => (
             <li key={proposal.id.toString()}>
-              <ProposalDetails
-                proposal={proposal}
-                defaultOpen={type === "Active"}
-              />
+              <ListButton
+                onClick={() =>
+                  router.push(
+                    `/axon/${axonId}/proposal/${proposal.id.toString()}`
+                  )
+                }
+              >
+                <ProposalSummary proposal={proposal} />
+              </ListButton>
             </li>
           ))}
         </ul>

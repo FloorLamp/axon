@@ -3,18 +3,20 @@ import classNames from "classnames";
 import React, { ReactNode } from "react";
 import { FiChevronRight } from "react-icons/fi";
 
-function ListButton({
-  open = true,
+export function ListButton({
+  open = false,
   disabled = false,
+  onClick,
   children,
 }: {
-  open: boolean;
+  open?: boolean;
   disabled?: boolean;
+  onClick?: () => void;
   children?: ReactNode;
 }) {
   return (
-    <Disclosure.Button
-      as="div"
+    <div
+      onClick={onClick}
       className={classNames(
         "group flex items-center px-4 py-2 transition-colors duration-75",
         {
@@ -37,8 +39,20 @@ function ListButton({
           />
         </div>
       )}
-    </Disclosure.Button>
+    </div>
   );
 }
 
-export default ListButton;
+export function DisclosureListButton({
+  open = true,
+  disabled = false,
+  onClick,
+  children,
+}: {
+  open?: boolean;
+  disabled?: boolean;
+  onClick?: () => void;
+  children?: ReactNode;
+}) {
+  return <Disclosure.Button as={ListButton}></Disclosure.Button>;
+}

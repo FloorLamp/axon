@@ -22,7 +22,7 @@ export default function Breadcrumbs({ path }: { path: Path[] }) {
       <Link href="/">
         <a
           className={classNames({
-            "opacity-50": path.length > 0,
+            "opacity-50 hover:opacity-100 transition-opacity": path.length > 0,
           })}
         >
           Home

@@ -34,7 +34,7 @@ export default function StatusLabel({
   return (
     <label
       className={classNames(
-        "block w-20 text-center py-0.5 rounded text-xs uppercase",
+        "block w-20 text-center py-0.5 rounded text-xs uppercase pointer-events-none",
         statusColor(status, hasExecutionError)
       )}
       title={hasExecutionError ? "Executed with errors" : undefined}

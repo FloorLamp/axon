@@ -6,7 +6,7 @@ export const useMyBallot = (proposal: AxonProposal) => {
     state: { principal },
   } = useGlobalContext();
 
-  return proposal.ballots.find(
+  return proposal?.ballots.find(
     (ballot) => principal && ballot.principal.toHex() === principal.toHex()
   );
 };

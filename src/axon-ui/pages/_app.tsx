@@ -1,8 +1,8 @@
 import Head from "next/head";
 import "react";
 import React from "react";
-import { FaGithub } from "react-icons/fa";
 import { QueryClient, QueryClientProvider } from "react-query";
+import Footer from "../components/Layout/Footer";
 import Nav from "../components/Layout/Nav";
 import Store from "../components/Store/Store";
 import { ONE_HOUR_MS } from "../lib/constants";
@@ -34,16 +34,7 @@ export default function App({ Component, pageProps }) {
               <Component {...pageProps} />
             </main>
 
-            <footer className="py-8 flex justify-center">
-              <a
-                href="https://github.com/FloorLamp/axon"
-                className="underline inline-flex items-center gap-1 text-sm"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FaGithub /> Github
-              </a>
-            </footer>
+            <Footer />
           </div>
         </div>
       </Store>

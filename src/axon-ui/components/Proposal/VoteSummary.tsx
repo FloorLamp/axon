@@ -41,16 +41,20 @@ export default function VoteSummary({
   const deltaPercent = delta / maxVotes;
   const deltaYes = newVote?.yesNo === true ? delta : 0;
   const deltaNo = newVote?.yesNo === false ? delta : 0;
+  const totalVotedWithDelta = totalVoted + delta;
 
   const renderCount = (base: number, label: string, delta?: number) => {
     if (isPercent) {
-      const denominator = totalVoted + delta;
       if (delta) {
         return `${formatPercent(
-          (base + delta) / denominator
-        )} ${label} (${formatPercent(delta / denominator, 2, "always")})`;
+          (base + delta) / totalVotedWithDelta
+        )} ${label} (${formatPercent(
+          (base + delta) / totalVotedWithDelta - base / totalVoted,
+          2,
+          "always"
+        )})`;
       } else {
-        return `${formatPercent(base / denominator)} ${label}`;
+        return `${formatPercent(base / totalVotedWithDelta)} ${label}`;
       }
     } else {
       if (delta) {
@@ -68,6 +72,7 @@ export default function VoteSummary({
     const acceptancePercent =
       percentFromBigInt(proposal.policy.acceptanceThreshold.Percent.percent) /
       100;
+    const rejectionThreshold = (1 - acceptancePercent) * maxVotes;
 
     if (proposal.policy.acceptanceThreshold.Percent.quorum[0]) {
       const quorumPercent =
@@ -116,6 +121,9 @@ export default function VoteSummary({
       if (newVote && yes + deltaYes >= acceptancePercent * maxVotes) {
         newStatus = "Accepted";
       }
+    }
+    if (newVote && no + deltaNo > rejectionThreshold) {
+      newStatus = "Rejected";
     }
   } else if ("Absolute" in proposal.policy.acceptanceThreshold) {
     const abs = Number(proposal.policy.acceptanceThreshold.Absolute);
@@ -166,102 +174,85 @@ export default function VoteSummary({
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="font-bold">
-        {newVote ? "Results after voting" : "Votes"}
-      </div>
-      <div className="flex flex-col gap-1">
-        <div className="text-gray-800">
-          <span className="text-xl font-bold mr-1">
-            {newVote ? (
-              <>
-                {formatPercent(participationPercent + deltaPercent)} (
-                {formatPercent(deltaPercent, 2, "always")})
-              </>
-            ) : (
-              formatPercent(participationPercent)
-            )}
-          </span>
-
-          <span className="text-sm uppercase">Participation</span>
-        </div>
-        <div className="flex justify-between text-sm uppercase">
-          <span
-            className={classNames("text-green-500", {
-              "font-bold": yes + deltaYes > no + deltaNo,
-            })}
-          >
-            {renderCount(yes, "For", deltaYes)}
-          </span>
-          <span
-            className={classNames("text-red-500", {
-              "font-bold": yes + deltaYes < no + deltaNo,
-            })}
-          >
-            {renderCount(no, "Against", deltaNo)}
-          </span>
-        </div>
-        <div
-          className={classNames(
-            "relative h-1 rounded-full w-full bg-gray-200",
-            {
-              "mb-6": !acceptanceDisplay,
-              "mb-10": !!acceptanceDisplay,
-            }
+    <div className="flex flex-col gap-1">
+      <div className="text-gray-800">
+        <span className="text-xl font-bold mr-1">
+          {newVote ? (
+            <>
+              {formatPercent(participationPercent + deltaPercent)} (
+              {formatPercent(deltaPercent, 2, "always")})
+            </>
+          ) : (
+            formatPercent(participationPercent)
           )}
+        </span>
+
+        <span className="text-sm uppercase">Participation</span>
+      </div>
+      <div className="flex justify-between text-sm uppercase">
+        <span
+          className={classNames("text-green-500", {
+            "font-bold": yes + deltaYes > no + deltaNo,
+          })}
         >
+          {renderCount(yes, "For", deltaYes)}
+        </span>
+        <span
+          className={classNames("text-red-500", {
+            "font-bold": yes + deltaYes < no + deltaNo,
+          })}
+        >
+          {renderCount(no, "Against", deltaNo)}
+        </span>
+      </div>
+      <div
+        className={classNames("relative h-1 rounded-full w-full bg-gray-200", {
+          "mb-6": !acceptanceDisplay,
+          "mb-10": !!acceptanceDisplay,
+        })}
+      >
+        <div
+          className="bg-green-400 h-full absolute"
+          style={{ width: yesPercentMax }}
+        />
+        <div
+          className="bg-red-400 h-full absolute"
+          style={{
+            left: newVote?.yesNo
+              ? formatPercent((yes + deltaYes) / maxVotes)
+              : yesPercentMax,
+            width: noPercentMax,
+          }}
+        />
+        {newVote && (
           <div
-            className="bg-green-400 h-full absolute"
-            style={{ width: yesPercentMax }}
-          />
-          <div
-            className="bg-red-400 h-full absolute"
+            className={classNames("h-full absolute animate-pulse opacity-100", {
+              "bg-green-300 ring-1 ring-green-100": newVote.yesNo,
+              "bg-red-300 ring-1 ring-red-100": !newVote.yesNo,
+            })}
             style={{
-              left: newVote?.yesNo
-                ? formatPercent((yes + deltaYes) / maxVotes)
-                : yesPercentMax,
-              width: noPercentMax,
+              left: newVote.yesNo
+                ? yesPercentMax
+                : formatPercent((yes + no) / maxVotes),
+              width: formatPercent(deltaPercent),
             }}
           />
-          {newVote && (
-            <div
-              className={classNames(
-                "h-full absolute animate-pulse opacity-100",
-                {
-                  "bg-green-300 ring-1 ring-green-100": newVote.yesNo,
-                  "bg-red-300 ring-1 ring-red-100": !newVote.yesNo,
-                }
-              )}
-              style={{
-                left: newVote.yesNo
-                  ? yesPercentMax
-                  : formatPercent((yes + no) / maxVotes),
-                width: formatPercent(deltaPercent),
-              }}
-            />
-          )}
-          {acceptanceDisplay}
-        </div>
-        {newStatus && (
-          <div>
-            Proposal will be{" "}
-            <label
-              className={classNames(
-                "inline-flex gap-2 items-center rounded-md px-2 py-0.5 text-xs uppercase",
-                statusColor(newStatus)
-              )}
-            >
-              {/* {newStatus === "Accepted" && (
-                <FaCheckCircle className="text-gray-50" />
-              )}
-              {newStatus === "Rejected" && (
-                <FaTimesCircle className="text-gray-50" />
-              )} */}
-              {newStatus}
-            </label>
-          </div>
         )}
+        {acceptanceDisplay}
       </div>
+      {newStatus && (
+        <div>
+          Proposal will be{" "}
+          <label
+            className={classNames(
+              "inline-flex gap-2 items-center rounded-md px-2 py-0.5 text-xs uppercase",
+              statusColor(newStatus)
+            )}
+          >
+            {newStatus}
+          </label>
+        </div>
+      )}
     </div>
   );
 }

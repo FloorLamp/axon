@@ -12,7 +12,6 @@ import { dateTimeFromNanos } from "../../lib/datetime";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { getStatus } from "../../lib/status";
 import { TimestampLabel } from "../Labels/TimestampLabel";
-import AcceptRejectButtons from "./AcceptRejectButtons";
 import { CommandResponseSummary } from "./CommandResponseSummary";
 import ExecuteButton from "./ExecuteButton";
 
@@ -33,13 +32,13 @@ const StatusSummary = ({
     <li className="flex flex-col text-sm">
       <div className="flex items-center">
         <div className="w-6 flex justify-center">{circle}</div>
-        <div className="pl-2 uppercase font-bold">{label}</div>
+        <div className="pl-2 uppercase font-bold leading-none">{label}</div>
       </div>
       <div className="flex items-stretch">
         <div className="w-6 flex justify-center">
           {showLine && <div className="bg-gray-200 w-px h-full -mx-px" />}
         </div>
-        <div className={classNames("pl-2", { "pb-2": showLine })}>
+        <div className={classNames("pl-2", { "pb-3": showLine })}>
           {children}
         </div>
       </div>
@@ -49,10 +48,8 @@ const StatusSummary = ({
 
 export default function StatusHistory({
   proposal,
-  isEligibleToVote,
 }: {
   proposal: AxonProposal;
-  isEligibleToVote: boolean;
 }) {
   const isOwner = useIsProposer();
 
@@ -83,11 +80,6 @@ export default function StatusHistory({
             >
               Starts{" "}
               <TimestampLabel dt={dateTimeFromNanos(proposal.timeStart)} />
-              {isEligibleToVote && (
-                <div className="mt-2 border-t border-gray-300 pt-3">
-                  <AcceptRejectButtons proposal={proposal} />
-                </div>
-              )}
             </StatusSummary>
           )}
         </>
@@ -114,11 +106,6 @@ export default function StatusHistory({
           showLine={!isLast}
         >
           <TimestampLabel dt={dateTimeFromNanos(status.Active)} />
-          {isEligibleToVote && (
-            <div className="mt-2 border-t border-gray-300 pt-3">
-              <AcceptRejectButtons proposal={proposal} />
-            </div>
-          )}
         </StatusSummary>
       );
     } else if ("Accepted" in status) {

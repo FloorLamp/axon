@@ -46,27 +46,25 @@ export default function VoteForm({
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col divide-gray-300 divide-y">
         <div className="pb-4 flex flex-col gap-4">
+          <div className="flex gap-2 leading-tight">
+            <span className="text-gray-500">#{proposal.id.toString()}</span>
+            <span>{proposalTypeToString(proposal.proposal)}</span>
+          </div>
           <p className="leading-tight">
-            You have <strong>{formatNumber(myBallot.votingPower)}</strong> vote
+            You are voting{" "}
+            <span
+              className={classNames("font-bold uppercase", {
+                "text-green-500": yesNo,
+                "text-red-500": !yesNo,
+              })}
+            >
+              {yesNo ? "For" : "Against"}
+            </span>{" "}
+            with <strong>{formatNumber(myBallot.votingPower)}</strong> vote
             power.
           </p>
-          <div>
-            <p className="leading-tight">
-              You are voting{" "}
-              <span
-                className={classNames("font-bold uppercase", {
-                  "text-green-500": yesNo,
-                  "text-red-500": !yesNo,
-                })}
-              >
-                {yesNo ? "For" : "Against"}
-              </span>{" "}
-              Proposal #{proposal.id.toString()}:
-            </p>
-            <p className="pt-2 text-sm leading-tight italic">
-              {proposalTypeToString(proposal.proposal)}
-            </p>
-          </div>
+        </div>
+        <div className="py-4">
           <VoteSummary
             proposal={proposal}
             newVote={{

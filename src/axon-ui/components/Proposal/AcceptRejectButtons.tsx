@@ -36,7 +36,7 @@ export default function AcceptRejectButtons({
         <div className="flex gap-2">
           <SpinnerButton
             className={classNames({
-              "w-20 p-2": size === "large",
+              "w-20 text-sm p-2": size === "large",
               "p-0.5": size === "small",
             })}
             activeClassName="text-white bg-green-500 hover:bg-green-400 transition-colors"
@@ -49,7 +49,7 @@ export default function AcceptRejectButtons({
           </SpinnerButton>
           <SpinnerButton
             className={classNames({
-              "w-20 p-2": size === "large",
+              "w-20 text-sm p-2": size === "large",
               "p-0.5": size === "small",
             })}
             activeClassName="text-white bg-red-500 hover:bg-red-400 transition-colors"

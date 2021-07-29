@@ -1,12 +1,12 @@
-import { Disclosure } from "@headlessui/react";
-import classNames from "classnames";
 import { DateTime } from "luxon";
 import React from "react";
-import { useIsMutating } from "react-query";
-import { AxonProposal } from "../../declarations/Axon/Axon.did";
+import { ProposalType } from "../../declarations/Axon/Axon.did";
 import { dateTimeFromNanos } from "../../lib/datetime";
-import { useIsMember } from "../../lib/hooks/Axon/useIsMember";
 import { useMyBallot } from "../../lib/hooks/Axon/useMyBallot";
+import {
+  useActiveProposals,
+  useAllProposals,
+} from "../../lib/hooks/Axon/useProposals";
 import useAxonId from "../../lib/hooks/useAxonId";
 import {
   hasExecutionError,
@@ -16,9 +16,9 @@ import { getStatus } from "../../lib/status";
 import AxonCommandSummary from "../Axon/AxonCommandSummary";
 import PolicySummary from "../Axon/PolicySummary";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
+import { RefreshButton } from "../Buttons/RefreshButton";
 import NeuronCommandSummary from "../Commands/NeuronCommandSummary";
-import ListButton from "../ExpandableList/ListButton";
-import ListPanel from "../ExpandableList/ListPanel";
+import Panel from "../Containers/Panel";
 import StatusLabel from "../Labels/StatusLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import AcceptRejectButtons from "./AcceptRejectButtons";
@@ -26,19 +26,30 @@ import StatusHistory from "./StatusHistory";
 import VotesTable from "./VotesTable";
 import VoteSummary from "./VoteSummary";
 
-export const ProposalDetails = ({
-  proposal,
-  defaultOpen = false,
-}: {
-  proposal: AxonProposal;
-  defaultOpen?: boolean;
-}) => {
+export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
   const axonId = useAxonId();
-  const isMember = useIsMember();
+  const activeProposalsQuery = useActiveProposals();
+  const allProposalsQuery = useAllProposals();
+  const proposal =
+    activeProposalsQuery.data?.find((p) => p.id.toString() === proposalId) ??
+    allProposalsQuery.data?.find((p) => p.id.toString() === proposalId);
 
   const myBallot = useMyBallot(proposal);
-  const currentStatus = proposal.status.slice(-1)[0];
-  const status = getStatus(proposal);
+  const currentStatus = proposal?.status.slice(-1)[0];
+  const status = proposal ? getStatus(proposal) : null;
+
+  if (activeProposalsQuery.data && allProposalsQuery.data && !proposal) {
+    return (
+      <Panel className="py-16 text-center text-gray-500 text-sm">
+        Proposal {proposalId} not found
+      </Panel>
+    );
+  }
+
+  const handleRefresh = () => {
+    activeProposalsQuery.refetch();
+    allProposalsQuery.refetch();
+  };
 
   let actionTime: DateTime;
   if (
@@ -50,9 +61,9 @@ export const ProposalDetails = ({
     const ts = Object.values(currentStatus)[0];
     actionTime = dateTimeFromNanos(ts);
   } else if (status === "Created") {
-    actionTime = dateTimeFromNanos(proposal.timeStart);
+    actionTime = dateTimeFromNanos(proposal?.timeStart);
   } else if (status === "Active") {
-    actionTime = dateTimeFromNanos(proposal.timeEnd);
+    actionTime = dateTimeFromNanos(proposal?.timeEnd);
   }
 
   const isEligibleToVote =
@@ -60,132 +71,94 @@ export const ProposalDetails = ({
       (status === "Created" && actionTime.diffNow().toMillis() < 0)) &&
     myBallot &&
     !myBallot.vote[0];
-  const isMutating = !!useIsMutating({
-    mutationKey: ["vote", axonId, proposal.id],
-  });
 
   return (
-    <Disclosure defaultOpen={defaultOpen}>
-      {({ open }) => (
-        <>
-          <ListButton open={open}>
-            <div className="flex">
-              <div className="flex flex-col sm:flex-row">
-                <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 leading-tight">
-                  <span className="text-gray-500">
-                    #{proposal.id.toString()}
-                  </span>
-                  <span>{proposalTypeToString(proposal.proposal)}</span>
-                </div>
-                <div className="flex-1 flex items-center gap-2">
-                  <StatusLabel
-                    status={status}
-                    hasExecutionError={hasExecutionError(proposal.proposal)}
-                  />
-                  {actionTime && (
-                    <span className="text-gray-500 text-xs">
-                      {status === "Created" && "Starts "}
-                      {status === "Active" && "Ends "}
-                      {actionTime.toRelative()}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="flex-1 flex items-center justify-end pr-2">
-                {isEligibleToVote && (
-                  <>
-                    <div
-                      className={classNames("pr-4", {
-                        "invisible pointer-events-none group-hover:visible group-hover:pointer-events-auto":
-                          !isMutating,
-                      })}
-                    >
-                      <AcceptRejectButtons proposal={proposal} size="small" />
-                    </div>
-                    <span
-                      className="w-2 h-2 relative"
-                      title="Needs your approval"
-                    >
-                      <span className="h-full w-full animate-ping absolute inline-flex rounded-full bg-indigo-300 opacity-75" />
-                      <span className="absolute inline-flex rounded-full h-2 w-2 bg-indigo-400" />
-                    </span>
-                  </>
-                )}
-              </div>
+    <div className="flex flex-col gap-4">
+      <Panel>
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mb-2">
+            <div className="inline-flex items-center gap-2">
+              <h2 className="text-xl font-bold">
+                {proposal && proposalTypeToString(proposal.proposal)}
+              </h2>
+              <RefreshButton
+                isFetching={
+                  activeProposalsQuery.isFetching ||
+                  allProposalsQuery.isFetching
+                }
+                onClick={handleRefresh}
+                title="Refresh"
+              />
             </div>
-          </ListButton>
-          <ListPanel>
-            <div className="shadow-inner flex flex-col divide-y divide-gray-200 px-6 py-4">
-              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                <div className="w-32 font-bold">Proposal ID</div>
-                <div>{proposal.id.toString()}</div>
-              </div>
-              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                <div className="w-32 font-bold">Status</div>
-                <div className="xs:flex items-center gap-1">
-                  <StatusLabel
-                    status={status}
-                    hasExecutionError={hasExecutionError(proposal.proposal)}
-                  />
-                  {!!actionTime && (
-                    <>
-                      {status === "Created" && "Starts "}
-                      {status === "Active" && "Ends "}
-                      <TimestampLabel dt={actionTime} />
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                <div className="w-32 font-bold">Creator</div>
-                <div>
-                  <IdentifierLabelWithButtons
-                    type="Principal"
-                    id={proposal.creator}
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                <div className="w-32 font-bold">Policy</div>
-                <div>
-                  <PolicySummary policy={proposal.policy} />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 md:flex-row leading-tight py-2">
-                <div className="w-32 font-bold">Action</div>
-                <div>
-                  <ProposalSummary proposal={proposal} />
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 md:gap-12 md:flex-row leading-tight divide-y divide-gray-200 md:divide-none">
-                <div className="flex flex-col gap-2 md:flex-1 py-2">
-                  <VoteSummary proposal={proposal} />
-                  <VotesTable proposal={proposal} />
-                </div>
-                <div className="flex flex-col gap-2 md:flex-1 py-2">
-                  <div className="font-bold">Progress</div>
-                  <StatusHistory
-                    proposal={proposal}
-                    isEligibleToVote={isEligibleToVote}
-                  />
-                </div>
-              </div>
-            </div>
-          </ListPanel>
-        </>
-      )}
-    </Disclosure>
+            {isEligibleToVote && <AcceptRejectButtons proposal={proposal} />}
+          </div>
+          <div className="xs:flex items-center gap-4">
+            {proposal && (
+              <StatusLabel
+                status={status}
+                hasExecutionError={hasExecutionError(proposal.proposal)}
+              />
+            )}
+            {!!actionTime && (
+              <>
+                {status === "Created" && "Starts "}
+                {status === "Active" && "Ends "}
+                <TimestampLabel dt={actionTime} />
+              </>
+            )}
+          </div>
+          <div className="flex flex-col xs:flex-row xs:gap-4">
+            <span className="text-gray-400 whitespace-nowrap">
+              ID {proposalId}
+            </span>
+            <span>
+              Created by{" "}
+              {proposal && (
+                <IdentifierLabelWithButtons
+                  type="Principal"
+                  id={proposal.creator}
+                />
+              )}
+            </span>
+          </div>
+        </div>
+      </Panel>
+
+      <Panel>
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl">Policy</h2>
+          {proposal && <PolicySummary policy={proposal.policy} />}
+        </div>
+      </Panel>
+
+      <Panel>
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl">Action</h2>
+          {proposal && <ProposalTypeSummary proposal={proposal.proposal} />}
+        </div>
+      </Panel>
+
+      <Panel>
+        <div className="flex flex-col gap-2 md:gap-12 md:flex-row leading-tight divide-y divide-gray-200 md:divide-none">
+          <div className="flex flex-col gap-2 md:flex-1 pb-4">
+            <h2 className="text-xl">Votes</h2>
+            {proposal && <VoteSummary proposal={proposal} />}
+            {proposal && <VotesTable proposal={proposal} />}
+          </div>
+          <div className="flex flex-col gap-2 md:flex-1 pt-4 md:pt-0">
+            <h2 className="text-xl">History</h2>
+            {proposal && <StatusHistory proposal={proposal} />}
+          </div>
+        </div>
+      </Panel>
+    </div>
   );
 };
 
-const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
-  if ("AxonCommand" in proposal.proposal) {
-    return <AxonCommandSummary command={proposal.proposal.AxonCommand[0]} />;
+const ProposalTypeSummary = ({ proposal }: { proposal: ProposalType }) => {
+  if ("AxonCommand" in proposal) {
+    return <AxonCommandSummary command={proposal.AxonCommand[0]} />;
   } else {
-    return (
-      <NeuronCommandSummary
-        neuronCommand={proposal.proposal.NeuronCommand[0]}
-      />
-    );
+    return <NeuronCommandSummary neuronCommand={proposal.NeuronCommand[0]} />;
   }
 };
