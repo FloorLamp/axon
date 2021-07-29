@@ -4,12 +4,15 @@ import { useIsMutating } from "react-query";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import useSync from "../../lib/hooks/Axon/useSync";
+import useAxonId from "../../lib/hooks/useAxonId";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 import ManageNeuronModal from "./ManageNeuronModal";
 import NeuronDetails from "./NeuronDetails";
 
 export default function Neurons() {
+  const id = useAxonId();
   const {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
@@ -26,11 +29,11 @@ export default function Neurons() {
   const handleRefresh = () => {
     sync.mutate();
   };
-  const isSyncing = !!useIsMutating({ mutationKey: ["sync"] });
+  const isSyncing = !!useIsMutating({ mutationKey: ["sync", id] });
   const isFetching = isSyncing || isFetchingNeuronIds || isFetchingNeurons;
 
   return (
-    <section className="py-4 bg-gray-50 rounded-lg shadow-lg">
+    <Panel className="py-4">
       <div className="px-4 flex justify-between mb-2">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold">Neurons</h2>
@@ -74,6 +77,6 @@ export default function Neurons() {
           </div>
         )
       )}
-    </section>
+    </Panel>
   );
 }

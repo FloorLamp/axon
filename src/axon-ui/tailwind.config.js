@@ -15,6 +15,10 @@ module.exports = {
       gridTemplateColumns: {
         label: "auto 1fr",
       },
+      flex: {
+        2: "2 2 0%",
+        3: "3 3 0%",
+      },
     },
   },
   variants: {

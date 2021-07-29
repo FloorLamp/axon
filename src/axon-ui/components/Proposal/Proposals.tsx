@@ -6,6 +6,7 @@ import {
 } from "../../lib/hooks/Axon/useProposals";
 import NavButtons from "../Buttons/NavButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 import { ProposalDetails } from "./ProposalDetails";
 
@@ -40,7 +41,7 @@ export default function Proposals() {
     );
 
   return (
-    <section className="py-4 bg-gray-50 rounded-lg shadow-lg">
+    <Panel className="py-4">
       <div className="px-4 grid xs:grid-cols-3 gap-2 items-center mb-2">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold">Proposals</h2>
@@ -86,6 +87,6 @@ export default function Proposals() {
           </div>
         )
       )}
-    </section>
+    </Panel>
   );
 }

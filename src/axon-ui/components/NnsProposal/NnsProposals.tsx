@@ -6,6 +6,7 @@ import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { useNnsPendingProposals } from "../../lib/hooks/Governance/useNnsPendingProposals";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 
@@ -38,7 +39,7 @@ export default function NnsProposals() {
     useNnsPendingProposals();
 
   return (
-    <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
+    <Panel>
       <div className="flex gap-2 items-center mb-2">
         <h2 className="text-xl font-bold">Open NNS Proposals</h2>
         <RefreshButton
@@ -66,6 +67,6 @@ export default function NnsProposals() {
           )
         )}
       </div>
-    </section>
+    </Panel>
   );
 }

@@ -19,10 +19,7 @@ export const canisterId =
 export const createActor = (canisterId, agent) => {
   // Fetch root key for certificate validation during development
   if (process.env.NEXT_PUBLIC_DFX_NETWORK === "local") {
-    console.log("old rootKey", agent.rootKey.toString("hex"));
-    agent.fetchRootKey().then((rootKey) => {
-      console.log("new rootKey", rootKey.toString("hex"));
-    });
+    agent.fetchRootKey();
   }
 
   // Creates an actor with using the candid interface and the HttpAgent

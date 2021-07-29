@@ -59,6 +59,14 @@ shared actor class AxonService() = this {
     Option.get(ledger.get(caller), 0)
   };
 
+  public query({ caller }) func ledger(id: Nat) : async [T.LedgerEntry] {
+    let {ledger} = axons[id];
+    // sort descending
+    Array.sort<T.LedgerEntry>(Iter.toArray(ledger.entries()), func (a, b) {
+      if (b.1 > a.1) { #greater } else { #less }
+    });
+  };
+
 
   //---- Permissioned queries
 

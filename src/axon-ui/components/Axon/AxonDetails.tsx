@@ -5,6 +5,7 @@ import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useAxonId from "../../lib/hooks/useAxonId";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 import { VisibilityLabel } from "../Labels/VisibilityLabel";
 import ManageAxonModal from "./ManageAxonModal";
@@ -15,7 +16,7 @@ export default function AxonDetails() {
   const { data, error, isFetching, refetch } = useInfo();
 
   return (
-    <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
+    <Panel>
       <div className="xs:flex justify-between">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold leading-tight">
@@ -56,6 +57,6 @@ export default function AxonDetails() {
           <strong>Axon not found</strong>
         )}
       </div>
-    </section>
+    </Panel>
   );
 }

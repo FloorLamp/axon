@@ -28,7 +28,7 @@ export default function App({ Component, pageProps }) {
         </Head>
         <div className="flex flex-col items-center bg-gradient-to-b from-yellow-300 to-pink-500">
           <div className="flex flex-col justify-between min-h-screen w-full sm:max-w-screen-lg px-4">
-            <main className="flex flex-col gap-8 justify-start">
+            <main className="flex flex-col justify-start">
               <Nav />
 
               <Component {...pageProps} />

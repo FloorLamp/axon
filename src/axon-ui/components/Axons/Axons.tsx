@@ -3,13 +3,14 @@ import React from "react";
 import { BiListUl } from "react-icons/bi";
 import { useCount } from "../../lib/hooks/Axons/useCount";
 import { RefreshButton } from "../Buttons/RefreshButton";
+import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 
 export default function Axons() {
   const { data, isSuccess, isFetching, refetch, error } = useCount();
 
   return (
-    <section className="p-4 bg-gray-50 rounded-lg shadow-lg">
+    <Panel>
       <div className="flex gap-2 items-center mb-2">
         <h2 className="text-xl font-bold">All Axons</h2>
         <RefreshButton
@@ -21,7 +22,7 @@ export default function Axons() {
       <div>
         {error && <ResponseError>{error}</ResponseError>}
         {data ? (
-          <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
+          <div className="grid md:grid-cols-3 grid-cols-1 gap-8 p-4">
             {Array.from({ length: data }).map((_, id) => (
               <Link key={id.toString()} href={`/axon/${id}`}>
                 <a className="flex items-center justify-center bg-gradient-to-br from-green-300 via-blue-500 to-purple-600 rounded-xl text-xl text-white h-48 hover:shadow-xl transition">
@@ -39,6 +40,6 @@ export default function Axons() {
           )
         )}
       </div>
-    </section>
+    </Panel>
   );
 }

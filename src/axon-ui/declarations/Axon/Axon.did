@@ -346,6 +346,7 @@ type AxonService =
    getAllProposals: (nat, opt nat) -> (ProposalResult) query;
    getNeuronIds: (nat) -> (vec nat64) query;
    getNeurons: (nat) -> (ListNeuronsResult) query;
+   ledger: (nat) -> (vec LedgerEntry) query;
    propose: (NewProposal) -> (Result);
    sync: (nat) -> (ListNeuronsResult);
    transfer: (nat, principal, nat) -> (Result);

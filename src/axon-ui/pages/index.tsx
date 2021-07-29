@@ -1,14 +1,15 @@
 import React from "react";
 import Axons from "../components/Axons/Axons";
+import Panel from "../components/Containers/Panel";
 
 export default function Home() {
   return (
-    <>
-      <section className="p-8 bg-gray-50 rounded-lg shadow-lg text-xl">
+    <div className="flex flex-col gap-8 pt-8">
+      <Panel className="p-8 text-xl">
         <strong>Axon</strong> is a multi-user, multi-neuron management canister.
-      </section>
+      </Panel>
 
       <Axons />
-    </>
+    </div>
   );
 }

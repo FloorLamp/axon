@@ -7,9 +7,14 @@ import { shortAccount, shortPrincipal } from "../../lib/utils";
 import CopyButton from "./CopyButton";
 import ExternalLinkButton from "./ExternalLinkButton";
 
-type DisplayRenderProps = { rawId: string; displayId: string; name: string };
+export type IdentifierRenderProps = {
+  rawId: string;
+  shortId?: string;
+  displayId: string;
+  name?: string;
+};
 
-const defaultRender = ({ rawId, displayId, name }: DisplayRenderProps) => {
+const defaultRender = ({ rawId, displayId, name }: IdentifierRenderProps) => {
   const display = name ?? displayId;
   // Show raw id as title when using name or short id
   const showTitle = rawId !== display;
@@ -35,7 +40,7 @@ export default function IdentifierLabelWithButtons({
   showName?: boolean;
   isShort?: boolean;
   showButtons?: boolean;
-  render?: (arg: DisplayRenderProps) => JSX.Element;
+  render?: (arg: IdentifierRenderProps) => JSX.Element;
 }) {
   const { neuronName, principalName } = useNames();
   const rawId =
@@ -70,16 +75,16 @@ export default function IdentifierLabelWithButtons({
   }
 
   let shortId: string;
-  if (isShort && (type === "Principal" || type === "Account")) {
+  if (type === "Principal" || type === "Account") {
     if (type === "Principal") shortId = shortPrincipal(rawId);
     else if (type === "Account") shortId = shortAccount(rawId);
   }
 
-  const displayId = shortId ?? rawId;
+  const displayId = isShort ? shortId ?? rawId : rawId;
 
   return (
     <span className={classNames("break-all leading-tight", className)}>
-      {render({ rawId, displayId, name })}
+      {render({ rawId, shortId, displayId, name })}
       {showButtons && (
         <>
           <CopyButton text={rawId} title={`Copy ${type}`} />
