@@ -14,6 +14,7 @@ export interface Amount { 'e8s' : bigint }
 export interface ApproveGenesisKyc { 'principals' : Array<Principal> }
 export interface Axon {
   'id' : bigint,
+  'balance' : bigint,
   'name' : string,
   'supply' : bigint,
   'proxy' : Proxy,
@@ -21,15 +22,25 @@ export interface Axon {
   'policy' : Policy,
 }
 export type AxonCommand = [AxonCommandRequest, [] | [AxonCommandResponse]];
-export type AxonCommandRequest = {
-    'Redenominate' : { 'to' : bigint } |
-      { 'from' : bigint }
+export type AxonCommandExecution = { 'Ok' : null } |
+  {
+    'Transfer' : {
+      'senderBalanceAfter' : bigint,
+      'amount' : bigint,
+      'receiver' : Principal,
+    }
   } |
+  { 'SupplyChanged' : { 'to' : bigint, 'from' : bigint } };
+export type AxonCommandRequest = {
+    'Redenominate' : { 'to' : bigint, 'from' : bigint }
+  } |
+  { 'Mint' : { 'recipient' : [] | [Principal], 'amount' : bigint } } |
   { 'RemoveMembers' : Array<Principal> } |
   { 'AddMembers' : Array<Principal> } |
+  { 'Transfer' : { 'recipient' : Principal, 'amount' : bigint } } |
   { 'SetVisibility' : Visibility } |
   { 'SetPolicy' : Policy };
-export type AxonCommandResponse = { 'ok' : null } |
+export type AxonCommandResponse = { 'ok' : AxonCommandExecution } |
   { 'err' : Error };
 export interface AxonProposal {
   'id' : bigint,
@@ -44,7 +55,7 @@ export interface AxonProposal {
 }
 export interface AxonService {
   'axonById' : (arg_0: bigint) => Promise<Axon>,
-  'balanceOf' : (arg_0: bigint) => Promise<bigint>,
+  'balanceOf' : (arg_0: bigint, arg_1: [] | [Principal]) => Promise<bigint>,
   'cleanup' : (arg_0: bigint) => Promise<Result>,
   'count' : () => Promise<bigint>,
   'create' : (arg_0: Initialization) => Promise<Axon>,

@@ -192,5 +192,18 @@ export const axonCommandToString = (command: AxonCommandRequest) => {
       const visibility = Object.keys(command.SetVisibility)[0];
       return `Set Visibility to ${visibility}`;
     }
+    case "Mint": {
+      assert("Mint" in command);
+      const to = command.Mint.recipient[0]
+        ? `to ${shortPrincipal(command.Mint.recipient[0])}`
+        : "";
+      return `Mint ${formatNumber(command.Mint.amount)} tokens${to}`;
+    }
+    case "Transfer": {
+      assert("Transfer" in command);
+      return `Transfer ${formatNumber(
+        command.Transfer.amount
+      )} tokens to ${shortPrincipal(command.Transfer.recipient)}`;
+    }
   }
 };

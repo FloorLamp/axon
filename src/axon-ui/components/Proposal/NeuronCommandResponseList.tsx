@@ -3,9 +3,18 @@ import {
   Command_1,
   NeuronCommandResponse,
 } from "../../declarations/Axon/Axon.did";
+import { KeysOfUnion } from "../../lib/types";
 import { errorToString, governanceErrorToString } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { CommandError, CommandSuccess } from "./CommandResponseSummary";
+
+const renderSuccess = (result: Command_1) => {
+  const key = Object.keys(result)[0] as KeysOfUnion<Command_1>;
+  switch (key) {
+    case "Follow":
+      return "Successfully set followees";
+  }
+};
 
 const Result = ({ id, result }: { id: string; result: Command_1 }) => {
   const label = (
@@ -19,12 +28,7 @@ const Result = ({ id, result }: { id: string; result: Command_1 }) => {
     );
   }
 
-  let message;
-  if ("Follow" in result) {
-    message = "Successfully set followees";
-  }
-
-  return <CommandSuccess label={label}>{message}</CommandSuccess>;
+  return <CommandSuccess label={label}>{renderSuccess(result)}</CommandSuccess>;
 };
 
 export default function NeuronCommandResponseList({

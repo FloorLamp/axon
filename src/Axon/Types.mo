@@ -17,6 +17,7 @@ module {
     visibility: Visibility;
     supply: Nat;
     policy: Policy;
+    balance: Nat;
   };
 
   public type AxonFull = {
@@ -76,9 +77,36 @@ module {
     #AddMembers: [Principal];
     #RemoveMembers: [Principal];
     #SetVisibility: Visibility;
-    #Redenominate: { #from: Nat; #to: Nat };
+
+    //---- Token functions
+
+    /*
+      Change supply by multiplying each balance by `to`, then dividing by `from`. Rounds down.
+
+      Example:
+      from=10, to=1
+        Total=100, A=81 (81%), B=10 (10%), C=9 (9%)
+      becomes
+        Total=9, A=8 (88.8%), B=1 (11.1%), C=0
+    */
+    #Redenominate: { from: Nat; to: Nat };
+
+    // Mints new tokens to the principal if specified, or Axon itself otherwise
+    #Mint: { amount: Nat; recipient: ?Principal };
+
+    // Transfers tokens from Axon to the specified principal
+    #Transfer: { amount: Nat; recipient: Principal };
   };
-  public type AxonCommandResponse = Result<()>;
+  public type AxonCommandExecution = {
+    #Ok;
+    #SupplyChanged: { from: Nat; to: Nat };
+    #Transfer: {
+      receiver: Principal;
+      amount: Nat;
+      senderBalanceAfter: Nat;
+    };
+  };
+  public type AxonCommandResponse = Result<AxonCommandExecution>;
 
   public type VoteRequest = {
     axonId: Nat;

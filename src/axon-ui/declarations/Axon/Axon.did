@@ -337,7 +337,7 @@ type Ballot =
 type AxonService = 
  service {
    axonById: (nat) -> (Axon) query;
-   balanceOf: (nat) -> (nat) query;
+   balanceOf: (nat, opt principal) -> (nat) query;
    cleanup: (nat) -> (Result);
    count: () -> (nat) query;
    create: (Initialization) -> (Axon);
@@ -367,18 +367,40 @@ type AxonProposal =
 type AxonCommandResponse = 
  variant {
    err: Error;
-   ok;
+   ok: AxonCommandExecution;
  };
 type AxonCommandRequest = 
  variant {
    AddMembers: vec principal;
-   Redenominate: variant {
+   Mint: record {
+           amount: nat;
+           recipient: opt principal;
+         };
+   Redenominate: record {
                    from: nat;
                    to: nat;
                  };
    RemoveMembers: vec principal;
    SetPolicy: Policy;
    SetVisibility: Visibility;
+   Transfer: record {
+               amount: nat;
+               recipient: principal;
+             };
+ };
+type AxonCommandExecution = 
+ variant {
+   Ok;
+   SupplyChanged: record {
+                    from: nat;
+                    to: nat;
+                  };
+   Transfer:
+    record {
+      amount: nat;
+      receiver: principal;
+      senderBalanceAfter: nat;
+    };
  };
 type AxonCommand = 
  record {
@@ -387,6 +409,7 @@ type AxonCommand =
  };
 type Axon = 
  record {
+   balance: nat;
    id: nat;
    name: text;
    policy: Policy;

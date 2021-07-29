@@ -202,6 +202,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const Axon = IDL.Record({
     'id' : IDL.Nat,
+    'balance' : IDL.Nat,
     'name' : IDL.Text,
     'supply' : IDL.Nat,
     'proxy' : Proxy,
@@ -272,13 +273,33 @@ export const idlFactory = ({ IDL }) => {
     IDL.Opt(IDL.Vec(NeuronCommandResponse)),
   );
   const AxonCommandRequest = IDL.Variant({
-    'Redenominate' : IDL.Variant({ 'to' : IDL.Nat, 'from' : IDL.Nat }),
+    'Redenominate' : IDL.Record({ 'to' : IDL.Nat, 'from' : IDL.Nat }),
+    'Mint' : IDL.Record({
+      'recipient' : IDL.Opt(IDL.Principal),
+      'amount' : IDL.Nat,
+    }),
     'RemoveMembers' : IDL.Vec(IDL.Principal),
     'AddMembers' : IDL.Vec(IDL.Principal),
+    'Transfer' : IDL.Record({
+      'recipient' : IDL.Principal,
+      'amount' : IDL.Nat,
+    }),
     'SetVisibility' : Visibility,
     'SetPolicy' : Policy,
   });
-  const AxonCommandResponse = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const AxonCommandExecution = IDL.Variant({
+    'Ok' : IDL.Null,
+    'Transfer' : IDL.Record({
+      'senderBalanceAfter' : IDL.Nat,
+      'amount' : IDL.Nat,
+      'receiver' : IDL.Principal,
+    }),
+    'SupplyChanged' : IDL.Record({ 'to' : IDL.Nat, 'from' : IDL.Nat }),
+  });
+  const AxonCommandResponse = IDL.Variant({
+    'ok' : AxonCommandExecution,
+    'err' : Error,
+  });
   const AxonCommand = IDL.Tuple(
     AxonCommandRequest,
     IDL.Opt(AxonCommandResponse),
@@ -321,7 +342,11 @@ export const idlFactory = ({ IDL }) => {
   });
   const AxonService = IDL.Service({
     'axonById' : IDL.Func([IDL.Nat], [Axon], ['query']),
-    'balanceOf' : IDL.Func([IDL.Nat], [IDL.Nat], ['query']),
+    'balanceOf' : IDL.Func(
+        [IDL.Nat, IDL.Opt(IDL.Principal)],
+        [IDL.Nat],
+        ['query'],
+      ),
     'cleanup' : IDL.Func([IDL.Nat], [Result], []),
     'count' : IDL.Func([], [IDL.Nat], ['query']),
     'create' : IDL.Func([Initialization], [Axon], []),

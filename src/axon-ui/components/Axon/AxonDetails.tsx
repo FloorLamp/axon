@@ -34,7 +34,11 @@ export default function AxonDetails() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <IdentifierLabelWithButtons type="Principal" id={canisterId} />
+        <IdentifierLabelWithButtons
+          type="Principal"
+          id={canisterId}
+          showName={false}
+        />
 
         {error && <ResponseError>{error}</ResponseError>}
 
@@ -45,6 +49,7 @@ export default function AxonDetails() {
               <IdentifierLabelWithButtons
                 type="Principal"
                 id={data.proxy as unknown as Principal}
+                showName={false}
               />
             </div>
 

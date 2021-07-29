@@ -9,7 +9,7 @@ export const useBalance = () => {
 
   const queryResult = useQuery(
     ["balance", id],
-    () => axon.balanceOf(BigInt(id)),
+    () => axon.balanceOf(BigInt(id), []),
     {
       enabled: !!id,
       keepPreviousData: true,

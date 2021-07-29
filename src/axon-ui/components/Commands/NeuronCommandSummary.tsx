@@ -12,7 +12,7 @@ import {
   Follow,
   IncreaseDissolveDelay,
   ManageNeuron,
-  NeuronCommandRequest,
+  NeuronCommand,
   Proposal,
   RegisterVote,
   SetDissolveTimestamp,
@@ -29,9 +29,9 @@ import { TimestampLabel } from "../Labels/TimestampLabel";
 import { DataRow, DataTable } from "../Proposal/DataTable";
 
 export default function NeuronCommandSummary({
-  neuronCommand: { neuronIds, command },
+  neuronCommand: [{ neuronIds, command }],
 }: {
-  neuronCommand: NeuronCommandRequest;
+  neuronCommand: NeuronCommand;
 }) {
   return (
     <div className="flex flex-col gap-2">

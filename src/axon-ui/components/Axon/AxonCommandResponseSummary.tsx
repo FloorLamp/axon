@@ -1,9 +1,33 @@
+import assert from "assert";
 import React from "react";
-import { FaCheckCircle } from "react-icons/fa";
-import { AxonCommandResponse } from "../../declarations/Axon/Axon.did";
-import { errorToString } from "../../lib/utils";
-import SuccessAlert from "../Labels/SuccessAlert";
-import { CommandError } from "../Proposal/CommandResponseSummary";
+import {
+  AxonCommandExecution,
+  AxonCommandResponse,
+} from "../../declarations/Axon/Axon.did";
+import { KeysOfUnion } from "../../lib/types";
+import { errorToString, formatNumber, shortPrincipal } from "../../lib/utils";
+import {
+  CommandError,
+  CommandSuccess,
+} from "../Proposal/CommandResponseSummary";
+
+const renderSuccess = (result: AxonCommandExecution) => {
+  const key = Object.keys(result)[0] as KeysOfUnion<AxonCommandExecution>;
+  switch (key) {
+    case "Ok":
+      return null;
+    case "SupplyChanged":
+      assert("SupplyChanged" in result);
+      return `Supply changed from ${formatNumber(
+        result.SupplyChanged.from
+      )} to ${formatNumber(result.SupplyChanged.to)}`;
+    case "Transfer":
+      assert("Transfer" in result);
+      return `Transferred ${formatNumber(
+        result.Transfer.amount
+      )} to ${shortPrincipal(result.Transfer.receiver)}`;
+  }
+};
 
 export const AxonCommandResponseSummary = ({
   response,
@@ -12,12 +36,9 @@ export const AxonCommandResponseSummary = ({
 }) => {
   if ("ok" in response) {
     return (
-      <SuccessAlert>
-        <div className="flex items-center">
-          <FaCheckCircle className="w-4 text-green-500" />
-          <div className="pl-1 font-bold">Success</div>
-        </div>
-      </SuccessAlert>
+      <CommandSuccess label="Success">
+        {renderSuccess(response.ok)}
+      </CommandSuccess>
     );
   } else {
     return (

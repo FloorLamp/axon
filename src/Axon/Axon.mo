@@ -47,16 +47,17 @@ shared actor class AxonService() = this {
   };
 
   public query func axonById(id: Nat) : async T.Axon {
-    axons[id]
+    let axon = axons[id];
+    axonFromFull(axon)
   };
 
   public query func getNeuronIds(id: Nat) : async [Nat64] {
     neuronIdsFromInfos(id)
   };
 
-  public query({ caller }) func balanceOf(id: Nat) : async Nat {
+  public query({ caller }) func balanceOf(id: Nat, principal: ?Principal) : async Nat {
     let {ledger} = axons[id];
-    Option.get(ledger.get(caller), 0)
+    Option.get(ledger.get(Option.get(principal, caller)), 0)
   };
 
   public query({ caller }) func ledger(id: Nat) : async [T.LedgerEntry] {
@@ -160,7 +161,7 @@ shared actor class AxonService() = this {
     };
     axons := Array.thaw(Array.append(Array.freeze(axons), [axon]));
     lastAxonId += 1;
-    axon
+    axonFromFull(axon)
   };
 
   // Submit a new Axon proposal
@@ -497,13 +498,16 @@ shared actor class AxonService() = this {
   system func postupgrade() {
     // Restore ledger hashmap from entries
     axons := Array.thaw(Array.map<T.AxonEntries, T.AxonFull>(axonEntries, func(axon) {
+      // Remove 0-balance entries
+      let filteredEntries = Array.filter<T.LedgerEntry>(axon.ledgerEntries, func((_, balance)) { balance > 0 });
       {
         id = axon.id;
         proxy = axon.proxy;
         name = axon.name;
         visibility = axon.visibility;
+        // supply = Array.foldLeft<(Principal,Nat), Nat>(axon.ledgerEntries, 0, func(sum, c) { sum + c.1 });
         supply = axon.supply;
-        ledger = HashMap.fromIter<Principal, Nat>(axon.ledgerEntries.vals(), axon.ledgerEntries.size(), Principal.equal, Principal.hash);
+        ledger = HashMap.fromIter<Principal, Nat>(filteredEntries.vals(), filteredEntries.size(), Principal.equal, Principal.hash);
         policy = axon.policy;
         neurons = axon.neurons;
         allProposals = axon.allProposals;
@@ -538,15 +542,15 @@ shared actor class AxonService() = this {
         #NeuronCommand((command, ?proposalResponses.toArray()))
       };
       case (#AxonCommand((command,_))) {
-        let response = A._applyAxonCommand(axon, command);
+        let response = _applyAxonCommand(axon, command);
         switch (response) {
-          case (#ok(newAxon)) {
+          case (#ok((newAxon,_))) {
             maybeNewAxon := ?newAxon;
             axons[newAxon.id] := newAxon;
           };
           case _ {}
         };
-        #AxonCommand((command, ?Result.mapOk<T.AxonFull, (), T.Error>(response, func(_) { })))
+        #AxonCommand((command, ?Result.mapOk<(T.AxonFull, T.AxonCommandExecution), T.AxonCommandExecution, T.Error>(response, func(t) { t.1 })))
       };
     };
     let newAxon = Option.get(maybeNewAxon, axon);
@@ -582,6 +586,166 @@ shared actor class AxonService() = this {
     executedProposal
   };
 
+  func _applyAxonCommand(axon: T.AxonFull, request: T.AxonCommandRequest) : T.Result<(T.AxonFull, T.AxonCommandExecution)> {
+    switch(request) {
+      case (#SetPolicy(policy)) {
+        switch (policy.proposers) {
+          case (#Closed(current)) {
+            if (current.size() == 0) {
+              return #err(#CannotExecute);
+            };
+          };
+          case _ {}
+        };
+        #ok({
+          id = axon.id;
+          proxy = axon.proxy;
+          name = axon.name;
+          visibility = axon.visibility;
+          supply = axon.supply;
+          ledger = axon.ledger;
+          policy = policy;
+          neurons = axon.neurons;
+          allProposals = axon.allProposals;
+          activeProposals = axon.activeProposals;
+          lastProposalId = axon.lastProposalId;
+        }, #Ok)
+      };
+      case (#SetVisibility(visibility)) {
+        #ok({
+          id = axon.id;
+          proxy = axon.proxy;
+          name = axon.name;
+          visibility = visibility;
+          supply = axon.supply;
+          ledger = axon.ledger;
+          policy = axon.policy;
+          neurons = axon.neurons;
+          allProposals = axon.allProposals;
+          activeProposals = axon.activeProposals;
+          lastProposalId = axon.lastProposalId;
+        }, #Ok)
+      };
+      case (#AddMembers(principals)) {
+        switch (axon.policy.proposers) {
+          case (#Closed(current)) {
+            let diff = Array.filter<Principal>(principals, func(p) {
+              not Arr.contains<Principal>(current, p, Principal.equal)
+            });
+            Debug.print(" diff " # debug_show(diff));
+            #ok({
+              id = axon.id;
+              proxy = axon.proxy;
+              name = axon.name;
+              visibility = axon.visibility;
+              supply = axon.supply;
+              ledger = axon.ledger;
+              policy = {
+                // set to current + diff
+                proposers = #Closed(Array.append(current, diff));
+                proposeThreshold = axon.policy.proposeThreshold;
+                acceptanceThreshold = axon.policy.acceptanceThreshold;
+              };
+              neurons = axon.neurons;
+              allProposals = axon.allProposals;
+              activeProposals = axon.activeProposals;
+              lastProposalId = axon.lastProposalId;
+            }, #Ok)
+
+          };
+          case _ {
+            #err(#InvalidProposal);
+          }
+        }
+      };
+      case (#RemoveMembers(principals)) {
+        switch (axon.policy.proposers) {
+          case (#Closed(current)) {
+            let diff = Array.filter<Principal>(current, func(c) {
+              not Arr.contains<Principal>(principals, c, Principal.equal)
+            });
+            if (diff.size() == 0) {
+              return #err(#CannotExecute)
+            };
+
+            #ok({
+              id = axon.id;
+              proxy = axon.proxy;
+              name = axon.name;
+              visibility = axon.visibility;
+              supply = axon.supply;
+              ledger = axon.ledger;
+              policy = {
+                proposers = #Closed(diff);
+                proposeThreshold = axon.policy.proposeThreshold;
+                acceptanceThreshold = axon.policy.acceptanceThreshold;
+              };
+              neurons = axon.neurons;
+              allProposals = axon.allProposals;
+              activeProposals = axon.activeProposals;
+              lastProposalId = axon.lastProposalId;
+            }, #Ok)
+
+          };
+          case _ {
+            #err(#InvalidProposal);
+          }
+        }
+      };
+      case (#Redenominate({from; to})) {
+        let newLedgerEntries = Array.map<T.LedgerEntry, T.LedgerEntry>(Iter.toArray(axon.ledger.entries()), func (a) {
+          (a.0, a.1 * to / from)
+        });
+        let newSupply = Array.foldLeft<(Principal,Nat), Nat>(newLedgerEntries, 0, func(sum, c) { sum + c.1 });
+        let newLedger = HashMap.fromIter<Principal, Nat>(newLedgerEntries.vals(), newLedgerEntries.size(), Principal.equal, Principal.hash);
+        #ok({
+          id = axon.id;
+          proxy = axon.proxy;
+          name = axon.name;
+          visibility = axon.visibility;
+          supply = newSupply;
+          ledger = newLedger;
+          policy = axon.policy;
+          neurons = axon.neurons;
+          allProposals = axon.allProposals;
+          activeProposals = axon.activeProposals;
+          lastProposalId = axon.lastProposalId;
+        }, #SupplyChanged({ from = axon.supply; to = newSupply }))
+      };
+      case (#Mint({amount; recipient})) {
+        let dest = Option.get(recipient, Principal.fromActor(this));
+        axon.ledger.put(dest, Option.get(axon.ledger.get(dest), 0) + amount);
+        let newSupply = axon.supply + amount;
+        #ok({
+          id = axon.id;
+          proxy = axon.proxy;
+          name = axon.name;
+          visibility = axon.visibility;
+          supply = newSupply;
+          ledger = axon.ledger;
+          policy = axon.policy;
+          neurons = axon.neurons;
+          allProposals = axon.allProposals;
+          activeProposals = axon.activeProposals;
+          lastProposalId = axon.lastProposalId;
+        }, #SupplyChanged({ from = axon.supply; to = newSupply }))
+      };
+      case (#Transfer({amount; recipient})) {
+        let senderBalance = Option.get(axon.ledger.get(Principal.fromActor(this)), 0);
+        if (senderBalance < amount) {
+          return #err(#CannotExecute);
+        };
+
+        axon.ledger.put(Principal.fromActor(this), senderBalance - amount);
+        axon.ledger.put(recipient, Option.get(axon.ledger.get(recipient), 0) + amount);
+        #ok(axon, #Transfer({
+          senderBalanceAfter = senderBalance - amount;
+          amount = amount;
+          receiver = recipient;
+        }))
+      };
+    };
+  };
 
   // ---- Helpers
 
@@ -598,6 +762,19 @@ shared actor class AxonService() = this {
         Array.map<(Nat64, GT.NeuronInfo), Nat64>(data.neuron_infos, func(i) { i.0 })
       };
       case _ { [] }
+    }
+  };
+
+  // Return Axon with own balance
+  func axonFromFull(axon: T.AxonFull): T.Axon {
+    {
+      id = axon.id;
+      proxy = axon.proxy;
+      name = axon.name;
+      visibility = axon.visibility;
+      supply = axon.supply;
+      policy = axon.policy;
+      balance = Option.get(axon.ledger.get(Principal.fromActor(this)), 0)
     }
   };
 

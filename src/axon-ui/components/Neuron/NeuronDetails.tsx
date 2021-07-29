@@ -8,7 +8,7 @@ import { canisterId as governanceCanisterId } from "../../declarations/Governanc
 import { subaccountToAccount } from "../../lib/account";
 import { Topic } from "../../lib/governance";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
-import ListButton from "../ExpandableList/ListButton";
+import { DisclosureListButton } from "../ExpandableList/ListButton";
 import ListPanel from "../ExpandableList/ListPanel";
 import BalanceLabel from "../Labels/BalanceLabel";
 import ControllerTypeLabel from "../Labels/ControllerTypeLabel";
@@ -140,7 +140,7 @@ export default function NeuronDetails({
     <Disclosure defaultOpen={defaultOpen}>
       {({ open }) => (
         <>
-          <ListButton open={open} disabled={!neuron}>
+          <DisclosureListButton open={open} disabled={!neuron}>
             <div className="flex flex-col sm:flex-row">
               <div className="flex-1 sm:flex-none sm:w-72 md:w-96 xs:flex gap-2 items-center">
                 {neuron && (
@@ -165,7 +165,7 @@ export default function NeuronDetails({
                 )}
               </div>
             </div>
-          </ListButton>
+          </DisclosureListButton>
           {neuron && <NeuronPanel neuron={neuron} />}
         </>
       )}

@@ -59,6 +59,10 @@ export default function Votes({ proposal }: { proposal: AxonProposal }) {
   const notVotedBallots = proposal.ballots.filter(({ vote }) => !vote[0]);
 
   const [type, setType] = useState<VoteType>(VoteTypes[0]);
+  const maxVotes =
+    Number(proposal.totalVotes.no) +
+    Number(proposal.totalVotes.yes) +
+    Number(proposal.totalVotes.notVoted);
   const selectedBallots = (
     type === "For"
       ? yesBallots
@@ -67,9 +71,7 @@ export default function Votes({ proposal }: { proposal: AxonProposal }) {
       : notVotedBallots
   ).map((ballot) => ({
     ...ballot,
-    percent: data
-      ? formatPercent(Number(ballot.votingPower) / Number(data.supply))
-      : null,
+    percent: data ? formatPercent(Number(ballot.votingPower) / maxVotes) : null,
   }));
 
   return (

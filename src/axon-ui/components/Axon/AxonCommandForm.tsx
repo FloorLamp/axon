@@ -5,8 +5,10 @@ import {
 } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { KeysOfUnion } from "../../lib/types";
+import { MintForm } from "./MintForm";
 import { PolicyForm } from "./PolicyForm";
 import { AddProposersForm, RemoveProposersForm } from "./ProposersForm";
+import { TransferForm } from "./TransferForm";
 import { VisibilityForm } from "./VisibilityForm";
 
 const onlyClosedProposersCommands: [AxonCommandName, string][] = [
@@ -17,6 +19,8 @@ const onlyClosedProposersCommands: [AxonCommandName, string][] = [
 const commands: [AxonCommandName, string][] = [
   ["SetVisibility", "Set Visibility"],
   ["SetPolicy", "Set Policy"],
+  ["Mint", "Mint"],
+  ["Transfer", "Transfer"],
   ["Redenominate", "Redenominate"],
 ];
 
@@ -52,6 +56,10 @@ export default function AxonCommandForm({
         return <VisibilityForm makeCommand={setCommand} />;
       case "SetPolicy":
         return <PolicyForm makeCommand={setCommand} />;
+      case "Mint":
+        return <MintForm makeCommand={setCommand} />;
+      case "Transfer":
+        return <TransferForm makeCommand={setCommand} />;
     }
   };
 

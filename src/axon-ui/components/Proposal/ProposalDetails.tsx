@@ -157,8 +157,8 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
 
 const ProposalTypeSummary = ({ proposal }: { proposal: ProposalType }) => {
   if ("AxonCommand" in proposal) {
-    return <AxonCommandSummary command={proposal.AxonCommand[0]} />;
+    return <AxonCommandSummary axonCommand={proposal.AxonCommand} />;
   } else {
-    return <NeuronCommandSummary neuronCommand={proposal.NeuronCommand[0]} />;
+    return <NeuronCommandSummary neuronCommand={proposal.NeuronCommand} />;
   }
 };
