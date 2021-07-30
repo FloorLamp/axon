@@ -16,8 +16,8 @@ function BallotsList({
         <span className="flex-1">
           {ballots.length} {pluralize("Principal", ballots.length)}
         </span>
-        <span className="flex-1 text-right">Voting Power</span>
-        <span className="hidden xs:block flex-1 text-right">Vote %</span>
+        <span className="flex-1 text-right">Votes</span>
+        <span className="hidden xs:block flex-1 text-right">Voting Power</span>
       </div>
       <ul className="flex flex-col mt-2 pb-2 divide divide-gray-300">
         {ballots.map((ballot) => {

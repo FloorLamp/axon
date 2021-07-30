@@ -3,13 +3,18 @@ import { useQuery, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { AxonProposal } from "../../../declarations/Axon/Axon.did";
 import { ONE_MINUTES_MS } from "../../constants";
+import { dateTimeFromNanos } from "../../datetime";
+import { getStatus } from "../../status";
 import { errorToString, tryCall } from "../../utils";
 import useAxonId from "../useAxonId";
+import useCleanup from "./useCleanup";
 import useSync from "./useSync";
 
 export const useActiveProposals = () => {
   const id = useAxonId();
   const axon = useAxon();
+  const cleanup = useCleanup();
+
   const queryResult = useQuery(
     ["activeProposals", id],
     async () => {
@@ -28,20 +33,33 @@ export const useActiveProposals = () => {
     }
   );
 
-  // If any actions are executing, poll for updates
+  // If any proposals are executing, poll for updates
   const queryClient = useQueryClient();
   const [isExecuting, setIsExecuting] = useState(false);
   useEffect(() => {
     if (
-      queryResult.data?.find(
-        (action) => "Executing" in action.status.slice(-1)[0]
-      )
+      queryResult.data?.find((proposal) => getStatus(proposal) === "Executing")
     ) {
       console.log("is Executing", queryResult.data);
       setIsExecuting(true);
       setTimeout(queryResult.refetch, 1000);
     } else {
       setIsExecuting(false);
+    }
+
+    // Check for expired and call cleanup
+    if (
+      queryResult.data?.find((proposal) => {
+        const status = getStatus(proposal);
+        return (
+          (status === "Active" &&
+            dateTimeFromNanos(proposal.timeEnd).diffNow().toMillis() < 0) ||
+          (status === "Created" &&
+            dateTimeFromNanos(proposal.timeStart).diffNow().toMillis() < 0)
+        );
+      })
+    ) {
+      cleanup.mutate();
     }
   }, [queryResult.data]);
 
@@ -86,7 +104,7 @@ export const useAllProposals = () => {
   const sync = useSync();
   const queryClient = useQueryClient();
   const [previousData, setPreviousData] = useState<AxonProposal[]>(null);
-  // Check for any new actions that moved out of active state
+  // Check for any new proposals that moved out of active state
   useEffect(() => {
     if (
       previousData &&

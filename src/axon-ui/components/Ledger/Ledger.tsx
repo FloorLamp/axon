@@ -4,30 +4,11 @@ import { useLedger } from "../../lib/hooks/Axon/useLedger";
 import useAxonId from "../../lib/hooks/useAxonId";
 import { formatNumber, formatPercent } from "../../lib/utils";
 import IdentifierLabelWithButtons, {
-  IdentifierRenderProps,
+  renderResponsiveShortId,
 } from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
-
-const renderPrincipal = ({
-  rawId,
-  shortId,
-  displayId,
-  name,
-}: IdentifierRenderProps) => {
-  const display = name ?? displayId;
-  return (
-    <>
-      <span className="hidden sm:inline" title={rawId}>
-        {display}
-      </span>
-      <span className="inline sm:hidden" title={rawId}>
-        {name ?? shortId}
-      </span>
-    </>
-  );
-};
 
 export default function Ledger() {
   const id = useAxonId();
@@ -36,7 +17,7 @@ export default function Ledger() {
 
   return (
     <div className="flex flex-col gap-8">
-      <section className="flex flex-col xs:flex-row gap-4">
+      <section className="flex flex-col xs:flex-row gap-8">
         <Panel className="flex-1 p-4">
           <label className="text-gray-500 uppercase text-sm">
             Total Holders
@@ -55,7 +36,7 @@ export default function Ledger() {
       <Panel>
         <div className="xs:flex justify-between">
           <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-bold">Top Voters</h2>
+            <h2 className="text-xl font-bold">Ledger</h2>
             <RefreshButton
               isFetching={isFetching}
               onClick={refetch}
@@ -88,7 +69,7 @@ export default function Ledger() {
                     <IdentifierLabelWithButtons
                       type="Principal"
                       id={id}
-                      render={renderPrincipal}
+                      render={renderResponsiveShortId}
                     />
                   </div>
 

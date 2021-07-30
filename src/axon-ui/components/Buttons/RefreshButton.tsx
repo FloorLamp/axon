@@ -13,8 +13,8 @@ export function RefreshButton({
 }) {
   return (
     <GrRefresh
-      className={classNames("opacity-50", {
-        "cursor-pointer filter hover:drop-shadow hover:opacity-100 transition-all":
+      className={classNames("opacity-20", {
+        "cursor-pointer filter hover:drop-shadow hover:opacity-80 transition-all":
           !isFetching,
         "inline-block animate-spin": isFetching,
       })}

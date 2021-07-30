@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import NavButtons from "../Buttons/NavButtons";
 import ProposalForm from "../Proposal/ProposalForm";
 import AddHotKeyForm from "./AddHotKeyForm";
@@ -11,7 +12,10 @@ export default function ActionsMenu({
 }: {
   closeModal: () => void;
 }) {
-  const [action, setAction] = useState<typeof ACTIONS[number]>(ACTIONS[0]);
+  const { data } = useNeuronIds();
+  const [action, setAction] = useState<typeof ACTIONS[number]>(
+    data && !data.length ? ACTIONS[1] : ACTIONS[0]
+  );
   return (
     <div>
       <NavButtons values={ACTIONS} selected={action} onChange={setAction} />

@@ -21,6 +21,25 @@ const defaultRender = ({ rawId, displayId, name }: IdentifierRenderProps) => {
   return showTitle ? <span title={rawId}>{display}</span> : <>{display}</>;
 };
 
+export const renderResponsiveShortId = ({
+  rawId,
+  shortId,
+  displayId,
+  name,
+}: IdentifierRenderProps) => {
+  const display = name ?? displayId;
+  return (
+    <>
+      <span className="hidden sm:inline" title={rawId}>
+        {display}
+      </span>
+      <span className="inline sm:hidden" title={rawId}>
+        {name ?? shortId}
+      </span>
+    </>
+  );
+};
+
 /**
  * @param showName - Show or hide the name, if available
  */

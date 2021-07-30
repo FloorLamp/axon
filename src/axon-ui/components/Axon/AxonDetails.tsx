@@ -16,7 +16,7 @@ export default function AxonDetails() {
   const { data, error, isFetching, refetch } = useInfo();
 
   return (
-    <Panel>
+    <Panel className="flex-1 p-4">
       <div className="xs:flex justify-between">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold leading-tight">

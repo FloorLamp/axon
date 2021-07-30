@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React from "react";
-import { BiListUl } from "react-icons/bi";
 import { useCount } from "../../lib/hooks/Axons/useCount";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
@@ -34,8 +33,8 @@ export default function Axons() {
         ) : (
           isSuccess && (
             <div className="h-40 flex flex-col items-center justify-center">
-              <BiListUl size={48} className="" />
-              <p className="py-2">No Axons</p>
+              <p className="text-5xl">🤷‍♂️</p>
+              <p className="py-4 text-gray-500 text-sm">No Axons found</p>
             </div>
           )
         )}

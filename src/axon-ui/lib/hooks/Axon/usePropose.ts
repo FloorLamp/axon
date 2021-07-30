@@ -36,7 +36,6 @@ export default function usePropose({
     },
     {
       onSuccess: (data) => {
-        console.log(data);
         queryClient.refetchQueries(["activeProposals", id]);
       },
     }
