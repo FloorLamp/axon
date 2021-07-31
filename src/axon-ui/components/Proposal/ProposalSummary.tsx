@@ -21,7 +21,7 @@ export const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
 
   const isEligibleToVote =
     (status === "Active" ||
-      (status === "Created" && actionTime.diffNow().toMillis() < 0)) &&
+      (status === "Created" && actionTime?.diffNow().toMillis() < 0)) &&
     myBallot &&
     !myBallot.vote[0];
   const isMutating = !!useIsMutating({

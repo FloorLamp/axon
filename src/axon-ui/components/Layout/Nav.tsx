@@ -2,6 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { useBalance } from "../../lib/hooks/Axon/useBalance";
 import useAxonId from "../../lib/hooks/useAxonId";
+import { formatNumber } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import LoginButton from "../Buttons/LoginButton";
 import { useGlobalContext } from "../Store/Store";
@@ -31,7 +32,7 @@ export default function Nav() {
             {id && (
               <Link href={`/axon/${id}/ledger`}>
                 <a className="text-right hover:underline">
-                  <strong>{balance?.toString()}</strong> AXON_{id}
+                  <strong>{balance && formatNumber(balance)}</strong> AXON_{id}
                 </a>
               </Link>
             )}

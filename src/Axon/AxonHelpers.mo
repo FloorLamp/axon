@@ -160,4 +160,8 @@ module {
   };
 
   func percentOf(percent: Nat, n: Nat): Nat { (percent * n) / 100_000_000 };
+
+  public func scaleByFraction(n: Nat, numerator: Nat, denominator: Nat): Nat {
+    n * numerator / denominator
+  };
 }

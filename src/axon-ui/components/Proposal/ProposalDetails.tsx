@@ -1,11 +1,9 @@
 import React from "react";
 import { ProposalType } from "../../declarations/Axon/Axon.did";
 import { getActionTime, getStatus } from "../../lib/axonProposal";
+import { useActiveProposals } from "../../lib/hooks/Axon/useActiveProposals";
+import { useAllProposals } from "../../lib/hooks/Axon/useAllProposals";
 import { useMyBallot } from "../../lib/hooks/Axon/useMyBallot";
-import {
-  useActiveProposals,
-  useAllProposals,
-} from "../../lib/hooks/Axon/useProposals";
 import {
   hasExecutionError,
   proposalTypeToString,
@@ -83,7 +81,11 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
                 />
               </div>
               {isEligibleToVote && <AcceptRejectButtons proposal={proposal} />}
-              {isCancellable && <CancelButton proposal={proposal} />}
+              {isCancellable && (
+                <div>
+                  <CancelButton proposal={proposal} />
+                </div>
+              )}
             </div>
             <div className="xs:flex items-center gap-4">
               {proposal && (

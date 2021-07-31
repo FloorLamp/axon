@@ -131,5 +131,31 @@ export default function AxonCommandSummary({
         </DataTable>
       );
     }
+    case "Redenominate": {
+      assert("Redenominate" in request);
+      const effects = response[0]
+        ? "ok" in response[0]
+          ? "SupplyChanged" in response[0].ok
+            ? response[0].ok.SupplyChanged
+            : null
+          : null
+        : null;
+      return (
+        <DataTable label={`Redenominate Token Supply`}>
+          <DataRow labelClassName="w-40" label="Supply Before">
+            {data && formatNumber(effects ? effects.from : data.supply)}
+          </DataRow>
+          <DataRow labelClassName="w-40" label="Supply After">
+            {data &&
+              formatNumber(
+                effects
+                  ? effects.to
+                  : (data.supply * request.Redenominate.to) /
+                      request.Redenominate.from
+              )}
+          </DataRow>
+        </DataTable>
+      );
+    }
   }
 }

@@ -8,7 +8,7 @@ export default function CancelButton({ proposal }: { proposal: AxonProposal }) {
 
   return (
     <SpinnerButton
-      className="w-16 text-xs leading-none px-1 py-0.5"
+      className="w-16 text-xs leading-none px-2 py-1"
       activeClassName="bg-gray-300 hover:bg-gray-200 transition-colors"
       disabledClassName="bg-gray-200 text-gray-400"
       isLoading={cancel.isLoading}

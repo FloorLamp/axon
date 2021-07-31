@@ -1,10 +1,8 @@
 import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { BiListUl } from "react-icons/bi";
-import {
-  useActiveProposals as useActiveProposals,
-  useAllProposals,
-} from "../../lib/hooks/Axon/useProposals";
+import { useActiveProposals as useActiveProposals } from "../../lib/hooks/Axon/useActiveProposals";
+import { useAllProposals } from "../../lib/hooks/Axon/useAllProposals";
 import useAxonId from "../../lib/hooks/useAxonId";
 import NavButtons from "../Buttons/NavButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";

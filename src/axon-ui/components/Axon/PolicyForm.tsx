@@ -10,7 +10,7 @@ import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useNames from "../../lib/hooks/useNames";
 import { percentFromBigInt, percentToBigInt } from "../../lib/percents";
 import { KeysOfUnion } from "../../lib/types";
-import { shortPrincipal } from "../../lib/utils";
+import { formatNumber, shortPrincipal } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
 import { useGlobalContext } from "../Store/Store";
 
@@ -162,7 +162,7 @@ export function PolicyForm({
       <label className="block">
         <div className="flex justify-between">
           <span>Proposal Threshold</span>
-          <span className="text-gray-400">Max {data.supply.toString()}</span>
+          <span className="text-gray-400">Max {formatNumber(data.supply)}</span>
         </div>
         <input
           type="number"
@@ -180,7 +180,9 @@ export function PolicyForm({
         <div className="flex justify-between">
           <span>Acceptance Threshold</span>
           {threshold === "Absolute" && (
-            <span className="text-gray-400">Max {data.supply.toString()}</span>
+            <span className="text-gray-400">
+              Max {formatNumber(data.supply)}
+            </span>
           )}
         </div>
         <div className="flex">

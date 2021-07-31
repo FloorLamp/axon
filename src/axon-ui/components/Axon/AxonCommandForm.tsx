@@ -8,6 +8,7 @@ import { KeysOfUnion } from "../../lib/types";
 import { MintForm } from "./MintForm";
 import { PolicyForm } from "./PolicyForm";
 import { AddProposersForm, RemoveProposersForm } from "./ProposersForm";
+import { RedenominateForm } from "./RedenominateForm";
 import { TransferForm } from "./TransferForm";
 import { VisibilityForm } from "./VisibilityForm";
 
@@ -60,6 +61,8 @@ export default function AxonCommandForm({
         return <MintForm makeCommand={setCommand} />;
       case "Transfer":
         return <TransferForm makeCommand={setCommand} />;
+      case "Redenominate":
+        return <RedenominateForm makeCommand={setCommand} />;
     }
   };
 

@@ -205,5 +205,11 @@ export const axonCommandToString = (command: AxonCommandRequest) => {
         command.Transfer.amount
       )} tokens to ${shortPrincipal(command.Transfer.recipient)}`;
     }
+    case "Redenominate": {
+      assert("Redenominate" in command);
+      return `Redenominate ${formatNumber(
+        command.Redenominate.from
+      )} to ${formatNumber(command.Redenominate.to)}`;
+    }
   }
 };

@@ -7,7 +7,7 @@ export const getStatus = (proposal: AxonProposal) =>
   Object.keys(proposal.status.slice(-1)[0])[0] as StatusKey;
 
 export const getActionTime = (proposal: AxonProposal): DateTime | null => {
-  const currentStatus = proposal.status.slice(-1)[0];
+  const status = getStatus(proposal);
   if (
     status === "ExecutionQueued" ||
     status === "ExecutionStarted" ||
@@ -16,7 +16,7 @@ export const getActionTime = (proposal: AxonProposal): DateTime | null => {
     status === "Accepted" ||
     status === "Expired"
   ) {
-    const ts = Object.values(currentStatus)[0];
+    const ts = Object.values(proposal.status.slice(-1)[0])[0];
     return dateTimeFromNanos(ts);
   } else if (status === "Created") {
     return dateTimeFromNanos(proposal.timeStart);

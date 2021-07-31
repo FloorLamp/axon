@@ -785,7 +785,7 @@ shared actor class AxonService() = this {
       };
       case (#Redenominate({from; to})) {
         let newLedgerEntries = Array.map<T.LedgerEntry, T.LedgerEntry>(Iter.toArray(axon.ledger.entries()), func (a) {
-          (a.0, a.1 * to / from)
+          (a.0, A.scaleByFraction(a.1, to, from))
         });
         let newSupply = Array.foldLeft<(Principal,Nat), Nat>(newLedgerEntries, 0, func(sum, c) { sum + c.1 });
         let newLedger = HashMap.fromIter<Principal, Nat>(newLedgerEntries.vals(), newLedgerEntries.size(), Principal.equal, Principal.hash);
@@ -796,7 +796,14 @@ shared actor class AxonService() = this {
           visibility = axon.visibility;
           supply = newSupply;
           ledger = newLedger;
-          policy = axon.policy;
+          policy = {
+            proposers = axon.policy.proposers;
+            proposeThreshold = A.scaleByFraction(axon.policy.proposeThreshold, to, from);
+            acceptanceThreshold = switch (axon.policy.acceptanceThreshold) {
+              case (#Absolute(n)) { #Absolute(A.scaleByFraction(n, to, from)) };
+              case (p) { p };
+            };
+          };
           neurons = axon.neurons;
           allProposals = axon.allProposals;
           activeProposals = axon.activeProposals;
