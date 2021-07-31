@@ -56,6 +56,7 @@ export interface AxonProposal {
 export interface AxonService {
   'axonById' : (arg_0: bigint) => Promise<Axon>,
   'balanceOf' : (arg_0: bigint, arg_1: [] | [Principal]) => Promise<bigint>,
+  'cancel' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
   'cleanup' : (arg_0: bigint) => Promise<Result>,
   'count' : () => Promise<bigint>,
   'create' : (arg_0: Initialization) => Promise<Axon>,
@@ -278,10 +279,12 @@ export interface Spawn { 'new_controller' : [] | [Principal] }
 export interface SpawnResponse { 'created_neuron_id' : [] | [NeuronId] }
 export interface Split { 'amount_e8s' : bigint }
 export type Status = { 'Active' : bigint } |
-  { 'Executing' : bigint } |
   { 'Rejected' : bigint } |
-  { 'Executed' : bigint } |
+  { 'ExecutionQueued' : bigint } |
   { 'Accepted' : bigint } |
+  { 'ExecutionStarted' : bigint } |
+  { 'ExecutionFinished' : bigint } |
+  { 'Cancelled' : bigint } |
   { 'Created' : bigint } |
   { 'Expired' : bigint };
 export type Threshold = {

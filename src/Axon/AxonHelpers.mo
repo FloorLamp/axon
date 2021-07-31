@@ -43,17 +43,11 @@ module {
       case (#Created(_)) {
         if (now >= proposal.timeStart) {
           // Activate voting and check ballots
-          return _applyNewStatusWithTime({
-            id = proposal.id;
-            totalVotes = proposal.totalVotes;
-            ballots = proposal.ballots;
-            timeStart = proposal.timeStart;
-            timeEnd = proposal.timeEnd;
-            creator = proposal.creator;
-            proposal = proposal.proposal;
-            status = Array.append(proposal.status, [#Active(now)]);
-            policy = proposal.policy;
-          }, now)
+          Debug.print("Proposal " # debug_show(proposal.id) # " new status=" # debug_show(#Active(now)));
+          return _applyNewStatusWithTime(
+            withNewStatus(proposal, #Active(now)),
+            now
+          )
         } else {
           return proposal;
         }
@@ -63,6 +57,8 @@ module {
         return proposal;
       }
     };
+
+    // If proposal is active: Count votes and update status if needed
 
     let { yes; no; notVoted } = proposal.totalVotes;
     let totalVotingPower = yes + no + notVoted;
@@ -80,10 +76,10 @@ module {
       };
       case (#Absolute(amount)) { (0, amount) };
     };
-    Debug.print("totalVotes: " # debug_show(proposal.totalVotes) # " quorumVotes: " # debug_show(quorumVotes) # " absoluteThresholdVotes: " # debug_show(absoluteThresholdVotes));
+    // Debug.print("totalVotes: " # debug_show(proposal.totalVotes) # " quorumVotes: " # debug_show(quorumVotes) # " absoluteThresholdVotes: " # debug_show(absoluteThresholdVotes));
     let maybeNewStatus = if (yes >= absoluteThresholdVotes and (yes + no) >= quorumVotes) {
       // Accept if we have exceeded the absolute threshold
-      ?[#Accepted(now)];
+      ?(#Accepted(now));
     } else {
       switch (proposal.policy.acceptanceThreshold) {
         case (#Percent({ percent; quorum })) {
@@ -91,31 +87,53 @@ module {
             // Voting has ended, accept if yes votes exceed the required threshold
             let totalVotes = no + yes;
             let thresholdOfVoted = percentOf(percent, totalVotes);
-            Debug.print("thresholdOfVoted: " # debug_show(thresholdOfVoted));
             if (totalVotes >= quorumVotes and yes >= thresholdOfVoted) {
-              ?[#Accepted(now)];
+              ?(#Accepted(now));
             } else {
-              ?[#Expired(now)];
+              ?(#Expired(now));
             }
           } else if (absoluteThresholdVotes > yes + notVoted) {
             // Reject if we cannot reach the absolute threshold
-            ?[#Rejected(now)];
+            ?(#Rejected(now));
           } else {
+            // Voting still active
             null
           }
         };
         case _ {
+          // We don't need to check for Accept here, since that is always checked immediately after voting
           if (absoluteThresholdVotes > yes + notVoted) {
             // Reject if we cannot reach the absolute threshold
-            ?[#Rejected(now)];
+            ?(#Rejected(now));
           } else if (now >= proposal.timeEnd) {
-            ?[#Expired(now)];
+            ?(#Expired(now));
           } else {
+            // Voting still active
             null
           }
         }
       }
     };
+    switch (maybeNewStatus) {
+      case (?status) {
+        Debug.print("Proposal " # debug_show(proposal.id) # " new status=" # debug_show(status));
+        withNewStatus(proposal, status);
+      };
+      case _ { proposal }
+    };
+  };
+
+  // If proposal is accepted and conditions are met, return it with status ExecutionQueued
+  public func _applyExecutingStatusConditionally(proposal: T.AxonProposal, conditions: Bool) : T.AxonProposal {
+    switch (currentStatus(proposal.status), conditions) {
+      case (#Accepted(_), true) {
+        withNewStatus(proposal, #ExecutionQueued(Time.now()));
+      };
+      case _ { proposal }
+    };
+  };
+
+  public func withNewStatus(proposal: T.AxonProposal, status: T.Status): T.AxonProposal {
     {
       id = proposal.id;
       totalVotes = proposal.totalVotes;
@@ -124,34 +142,22 @@ module {
       timeEnd = proposal.timeEnd;
       creator = proposal.creator;
       proposal = proposal.proposal;
-      status = Array.append(proposal.status, Option.get(maybeNewStatus, []));
+      status = Array.append(proposal.status, [status]);
       policy = proposal.policy;
     }
   };
 
-  // If proposal is accepted and conditions are met, return it with status Executing
-  public func _applyExecutingStatusConditionally(proposal: T.AxonProposal, conditions: Bool) : T.AxonProposal {
-    switch (currentStatus(proposal.status), conditions) {
-      case (#Accepted(_), true) {
-        {
-          id = proposal.id;
-          totalVotes = proposal.totalVotes;
-          ballots = proposal.ballots;
-          timeStart = proposal.timeStart;
-          timeEnd = proposal.timeEnd;
-          creator = proposal.creator;
-          proposal = proposal.proposal;
-          status = Array.append(proposal.status, [#Executing(Time.now())]);
-          policy = proposal.policy;
-        };
-      };
-      case _ { proposal }
-    };
+  public func isCancellable(s: T.Status): Bool {
+    switch (s) {
+      case (#Created(_)) { true };
+      case (#Active(_)) { true };
+      case _ { false };
+    }
   };
-
-  func percentOf(percent: Nat, n: Nat): Nat { (percent * n) / 100_000_000 };
 
   public func currentStatus(s: [T.Status]): T.Status {
     s[s.size() - 1]
   };
+
+  func percentOf(percent: Nat, n: Nat): Nat { (percent * n) / 100_000_000 };
 }

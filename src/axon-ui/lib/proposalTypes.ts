@@ -195,7 +195,7 @@ export const axonCommandToString = (command: AxonCommandRequest) => {
     case "Mint": {
       assert("Mint" in command);
       const to = command.Mint.recipient[0]
-        ? `to ${shortPrincipal(command.Mint.recipient[0])}`
+        ? ` to ${shortPrincipal(command.Mint.recipient[0])}`
         : "";
       return `Mint ${formatNumber(command.Mint.amount)} tokens${to}`;
     }

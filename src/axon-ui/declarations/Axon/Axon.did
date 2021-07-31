@@ -32,9 +32,11 @@ type Status =
  variant {
    Accepted: int;
    Active: int;
+   Cancelled: int;
    Created: int;
-   Executed: int;
-   Executing: int;
+   ExecutionFinished: int;
+   ExecutionQueued: int;
+   ExecutionStarted: int;
    Expired: int;
    Rejected: int;
  };
@@ -338,6 +340,7 @@ type AxonService =
  service {
    axonById: (nat) -> (Axon) query;
    balanceOf: (nat, opt principal) -> (nat) query;
+   cancel: (nat, nat) -> (Result_2);
    cleanup: (nat) -> (Result);
    count: () -> (nat) query;
    create: (Initialization) -> (Axon);

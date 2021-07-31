@@ -158,10 +158,12 @@ module {
     #Created: Int;
     #Active: Int;
     #Accepted: Int;
-    #Executing: Int;
-    #Executed: Int;
+    #ExecutionQueued: Int;
+    #ExecutionStarted: Int;
+    #ExecutionFinished: Int;
     #Rejected: Int;
     #Expired: Int;
+    #Cancelled: Int;
   };
 
   public type AxonProposal = {
@@ -174,6 +176,13 @@ module {
     proposal: ProposalType;
     status: [Status];
     policy: Policy;
+  };
+
+  public type PartialAxonProposal = {
+    totalVotes: ?Votes;
+    proposal: ?ProposalType;
+    status: ?Status;
+    policy: ?Policy;
   };
 
   public type AxonCommand = (AxonCommandRequest, ?AxonCommandResponse);

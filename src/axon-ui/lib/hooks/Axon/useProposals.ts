@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { AxonProposal } from "../../../declarations/Axon/Axon.did";
+import { getStatus } from "../../axonProposal";
 import { ONE_MINUTES_MS } from "../../constants";
 import { dateTimeFromNanos } from "../../datetime";
-import { getStatus } from "../../status";
 import { errorToString, tryCall } from "../../utils";
 import useAxonId from "../useAxonId";
 import useCleanup from "./useCleanup";
@@ -38,7 +38,10 @@ export const useActiveProposals = () => {
   const [isExecuting, setIsExecuting] = useState(false);
   useEffect(() => {
     if (
-      queryResult.data?.find((proposal) => getStatus(proposal) === "Executing")
+      queryResult.data?.find((proposal) => {
+        const status = getStatus(proposal);
+        return status === "ExecutionQueued" || status === "ExecutionStarted";
+      })
     ) {
       console.log("is Executing", queryResult.data);
       setIsExecuting(true);

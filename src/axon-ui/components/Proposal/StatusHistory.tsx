@@ -8,9 +8,9 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import { AxonProposal, Status } from "../../declarations/Axon/Axon.did";
+import { getStatus } from "../../lib/axonProposal";
 import { dateTimeFromNanos } from "../../lib/datetime";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
-import { getStatus } from "../../lib/status";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import { CommandResponseSummary } from "./CommandResponseSummary";
 import ExecuteButton from "./ExecuteButton";
@@ -153,8 +153,28 @@ export default function StatusHistory({
           )}
         </>
       );
-    } else if ("Executing" in status) {
-      if (currentStatus === "Executing") {
+    } else if ("ExecutionQueued" in status) {
+      if (currentStatus === "ExecutionQueued") {
+        return (
+          <StatusSummary
+            circle={
+              <FaCircleNotch
+                size={CIRCLE_SIZE}
+                className="animate-spin text-gray-400"
+              />
+            }
+            label={<span className="text-gray-500">Execution Queued</span>}
+            showLine={!isLast}
+          >
+            <TimestampLabel dt={dateTimeFromNanos(status.ExecutionQueued)} />
+          </StatusSummary>
+        );
+      }
+    } else if ("ExecutionStarted" in status) {
+      const timestamp = (
+        <TimestampLabel dt={dateTimeFromNanos(status.ExecutionStarted)} />
+      );
+      if (currentStatus === "ExecutionStarted") {
         return (
           <StatusSummary
             circle={
@@ -163,24 +183,46 @@ export default function StatusHistory({
                 className="animate-spin text-blue-400"
               />
             }
-            label={<span className="text-blue-700">Executing</span>}
+            label={<span className="text-blue-700">Execution Started</span>}
             showLine={!isLast}
           >
-            <TimestampLabel dt={dateTimeFromNanos(status.Executing)} />
+            {timestamp}
+          </StatusSummary>
+        );
+      } else {
+        return (
+          <StatusSummary
+            circle={
+              <FaCheckCircle size={CIRCLE_SIZE} className="text-gray-400" />
+            }
+            label={<span className="text-gray-500">Execution Started</span>}
+            showLine={!isLast}
+          >
+            {timestamp}
           </StatusSummary>
         );
       }
-    } else if ("Executed" in status) {
+    } else if ("ExecutionFinished" in status) {
       return (
         <StatusSummary
           circle={
             <FaCheckCircle size={CIRCLE_SIZE} className="text-green-400" />
           }
-          label={<span className="text-green-700">Executed</span>}
+          label={<span className="text-green-700">Execution Finished</span>}
           showLine={!isLast}
         >
-          <TimestampLabel dt={dateTimeFromNanos(status.Executed)} />
+          <TimestampLabel dt={dateTimeFromNanos(status.ExecutionFinished)} />
           <CommandResponseSummary proposalType={proposal.proposal} />
+        </StatusSummary>
+      );
+    } else if ("Cancelled" in status) {
+      return (
+        <StatusSummary
+          circle={<FaTimesCircle size={CIRCLE_SIZE} className="text-red-400" />}
+          label={<span className="text-red-700">Cancelled</span>}
+          showLine={!isLast}
+        >
+          <TimestampLabel dt={dateTimeFromNanos(status.Cancelled)} />
         </StatusSummary>
       );
     } else if ("Rejected" in status) {
@@ -204,7 +246,7 @@ export default function StatusHistory({
         />
       );
     } else {
-      console.log("status not rendered", status);
+      console.warn("status not rendered", status);
     }
     return null;
   };

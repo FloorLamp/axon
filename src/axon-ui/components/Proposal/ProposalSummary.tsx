@@ -1,16 +1,14 @@
 import classNames from "classnames";
-import { DateTime } from "luxon";
 import React from "react";
 import { useIsMutating } from "react-query";
 import { AxonProposal } from "../../declarations/Axon/Axon.did";
-import { dateTimeFromNanos } from "../../lib/datetime";
+import { getActionTime, getStatus } from "../../lib/axonProposal";
 import { useMyBallot } from "../../lib/hooks/Axon/useMyBallot";
 import useAxonId from "../../lib/hooks/useAxonId";
 import {
   hasExecutionError,
   proposalTypeToString,
 } from "../../lib/proposalTypes";
-import { getStatus } from "../../lib/status";
 import StatusLabel from "../Labels/StatusLabel";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 
@@ -18,23 +16,8 @@ export const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
   const axonId = useAxonId();
 
   const myBallot = useMyBallot(proposal);
-  const currentStatus = proposal.status.slice(-1)[0];
   const status = getStatus(proposal);
-
-  let actionTime: DateTime;
-  if (
-    status === "Executed" ||
-    status === "Rejected" ||
-    status === "Accepted" ||
-    status === "Expired"
-  ) {
-    const ts = Object.values(currentStatus)[0];
-    actionTime = dateTimeFromNanos(ts);
-  } else if (status === "Created") {
-    actionTime = dateTimeFromNanos(proposal.timeStart);
-  } else if (status === "Active") {
-    actionTime = dateTimeFromNanos(proposal.timeEnd);
-  }
+  const actionTime = proposal ? getActionTime(proposal) : null;
 
   const isEligibleToVote =
     (status === "Active" ||

@@ -209,6 +209,32 @@ export const idlFactory = ({ IDL }) => {
     'visibility' : Visibility,
     'policy' : Policy,
   });
+  const Status = IDL.Variant({
+    'Active' : IDL.Int,
+    'Rejected' : IDL.Int,
+    'ExecutionQueued' : IDL.Int,
+    'Accepted' : IDL.Int,
+    'ExecutionStarted' : IDL.Int,
+    'ExecutionFinished' : IDL.Int,
+    'Cancelled' : IDL.Int,
+    'Created' : IDL.Int,
+    'Expired' : IDL.Int,
+  });
+  const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
+  const Ballot = IDL.Record({
+    'principal' : IDL.Principal,
+    'votingPower' : IDL.Nat,
+    'vote' : IDL.Opt(Vote),
+  });
+  const Votes = IDL.Record({
+    'no' : IDL.Nat,
+    'yes' : IDL.Nat,
+    'notVoted' : IDL.Nat,
+  });
+  const NeuronCommandRequest = IDL.Record({
+    'command' : Command,
+    'neuronIds' : IDL.Opt(IDL.Vec(IDL.Nat64)),
+  });
   const ErrorCode = IDL.Variant({
     'canister_error' : IDL.Null,
     'system_transient' : IDL.Null,
@@ -233,38 +259,6 @@ export const idlFactory = ({ IDL }) => {
     'NoNeurons' : IDL.Null,
     'GovernanceError' : GovernanceError,
     'InsufficientBalanceToPropose' : IDL.Null,
-  });
-  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
-  const LedgerEntry = IDL.Tuple(IDL.Principal, IDL.Nat);
-  const Initialization = IDL.Record({
-    'ledgerEntries' : IDL.Vec(LedgerEntry),
-    'name' : IDL.Text,
-    'visibility' : Visibility,
-    'policy' : Policy,
-  });
-  const Status = IDL.Variant({
-    'Active' : IDL.Int,
-    'Executing' : IDL.Int,
-    'Rejected' : IDL.Int,
-    'Executed' : IDL.Int,
-    'Accepted' : IDL.Int,
-    'Created' : IDL.Int,
-    'Expired' : IDL.Int,
-  });
-  const Vote = IDL.Variant({ 'No' : IDL.Null, 'Yes' : IDL.Null });
-  const Ballot = IDL.Record({
-    'principal' : IDL.Principal,
-    'votingPower' : IDL.Nat,
-    'vote' : IDL.Opt(Vote),
-  });
-  const Votes = IDL.Record({
-    'no' : IDL.Nat,
-    'yes' : IDL.Nat,
-    'notVoted' : IDL.Nat,
-  });
-  const NeuronCommandRequest = IDL.Record({
-    'command' : Command,
-    'neuronIds' : IDL.Opt(IDL.Vec(IDL.Nat64)),
   });
   const Result_1 = IDL.Variant({ 'ok' : ManageNeuronResponse, 'err' : Error });
   const NeuronCommandResponse = IDL.Tuple(IDL.Nat64, Result_1);
@@ -320,6 +314,14 @@ export const idlFactory = ({ IDL }) => {
     'policy' : Policy,
   });
   const Result_2 = IDL.Variant({ 'ok' : AxonProposal, 'err' : Error });
+  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const LedgerEntry = IDL.Tuple(IDL.Principal, IDL.Nat);
+  const Initialization = IDL.Record({
+    'ledgerEntries' : IDL.Vec(LedgerEntry),
+    'name' : IDL.Text,
+    'visibility' : Visibility,
+    'policy' : Policy,
+  });
   const ProposalResult = IDL.Variant({
     'ok' : IDL.Vec(AxonProposal),
     'err' : Error,
@@ -347,6 +349,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Nat],
         ['query'],
       ),
+    'cancel' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], []),
     'cleanup' : IDL.Func([IDL.Nat], [Result], []),
     'count' : IDL.Func([], [IDL.Nat], ['query']),
     'create' : IDL.Func([Initialization], [Axon], []),

@@ -4,7 +4,7 @@ import React from "react";
 import { AxonCommand } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { AxonCommandKey } from "../../lib/types";
-import { formatNumber } from "../../lib/utils";
+import { formatNumber, formatPercent } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { DataRow, DataTable } from "../Proposal/DataTable";
 import PolicySummary from "./PolicySummary";
@@ -60,6 +60,11 @@ export default function AxonCommandSummary({
             : null
           : null
         : null;
+      const supplyBefore = effects ? effects.from : data?.supply;
+      const supplyAfter = effects
+        ? effects.to
+        : request.Mint.amount + data?.supply;
+      const percent = Number(request.Mint.amount) / Number(supplyBefore);
       return (
         <DataTable label={`Mint ${formatNumber(request.Mint.amount)} tokens`}>
           <DataRow labelClassName="w-40" label="Recipient">
@@ -73,14 +78,16 @@ export default function AxonCommandSummary({
               "Axon"
             )}
           </DataRow>
-          <DataRow labelClassName="w-40" label="Current Supply">
-            {data && formatNumber(effects ? effects.from : data.supply)}
+          <DataRow labelClassName="w-40" label="Supply Before">
+            {data && formatNumber(supplyBefore)}
           </DataRow>
-          <DataRow labelClassName="w-40" label="New Supply">
-            {data &&
-              formatNumber(
-                effects ? effects.to : request.Mint.amount + data.supply
-              )}
+          <DataRow labelClassName="w-40" label="Supply After">
+            {data && (
+              <>
+                {formatNumber(supplyAfter)} (
+                {formatPercent(percent, 2, "always")})
+              </>
+            )}
           </DataRow>
         </DataTable>
       );
