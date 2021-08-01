@@ -322,6 +322,7 @@ export const idlFactory = ({ IDL }) => {
     'visibility' : Visibility,
     'policy' : Policy,
   });
+  const Result_3 = IDL.Variant({ 'ok' : Axon, 'err' : Error });
   const ProposalResult = IDL.Variant({
     'ok' : IDL.Vec(AxonProposal),
     'err' : Error,
@@ -352,7 +353,7 @@ export const idlFactory = ({ IDL }) => {
     'cancel' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], []),
     'cleanup' : IDL.Func([IDL.Nat], [Result], []),
     'count' : IDL.Func([], [IDL.Nat], ['query']),
-    'create' : IDL.Func([Initialization], [Axon], []),
+    'create' : IDL.Func([Initialization], [Result_3], []),
     'execute' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], []),
     'getActiveProposals' : IDL.Func([IDL.Nat], [ProposalResult], ['query']),
     'getAllProposals' : IDL.Func(

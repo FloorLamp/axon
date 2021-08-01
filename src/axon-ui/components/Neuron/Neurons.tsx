@@ -17,12 +17,12 @@ export default function Neurons() {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
     error: errorNeuronIds,
-    isSuccess,
   } = useNeuronIds();
   const {
     data: neurons,
     isFetching: isFetchingNeurons,
     error: errorNeurons,
+    isSuccess,
   } = useNeurons();
   const sync = useSync();
 
@@ -31,7 +31,6 @@ export default function Neurons() {
   };
   const isSyncing = !!useIsMutating({ mutationKey: ["sync", id] });
   const isFetching = isSyncing || isFetchingNeuronIds || isFetchingNeurons;
-  console.log({ isSyncing, isFetchingNeuronIds, isFetchingNeurons });
 
   return (
     <Panel className="py-4">

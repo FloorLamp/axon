@@ -14,13 +14,13 @@ export const useIsProposer = () => {
     return false;
   }
 
-  if ("Closed" in info.policy.proposers) {
-    return !!info.policy.proposers.Closed.find((proposer) =>
-      principalIsEqual(principal, proposer)
-    );
-  } else {
-    return (
-      balance !== null && balance > 0 && balance >= info.policy.proposeThreshold
-    );
-  }
+  return (
+    balance !== null &&
+    balance > BigInt(0) &&
+    balance >= info.policy.proposeThreshold &&
+    ("Open" in info.policy.proposers ||
+      !!info.policy.proposers.Closed.find((proposer) =>
+        principalIsEqual(principal, proposer)
+      ))
+  );
 };

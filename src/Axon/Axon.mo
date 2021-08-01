@@ -139,7 +139,7 @@ shared actor class AxonService() = this {
   };
 
   // Create a new Axon
-  public shared({ caller }) func create(init: T.Initialization) : async T.Axon {
+  public shared({ caller }) func create(init: T.Initialization) : async T.Result<T.Axon> {
     // Verify at least one ledger entry
     assert(init.ledgerEntries.size() > 0);
 
@@ -161,7 +161,7 @@ shared actor class AxonService() = this {
     };
     axons := Array.thaw(Array.append(Array.freeze(axons), [axon]));
     lastAxonId += 1;
-    axonFromFull(axon)
+    #ok(axonFromFull(axon))
   };
 
   // Submit a new Axon proposal
@@ -850,7 +850,10 @@ shared actor class AxonService() = this {
   // Returns true if the principal holds a balance in ledger, OR if it's this canister
   func isAuthed(principal: Principal, ledger: T.Ledger): Bool {
     principal == Principal.fromActor(this) or
-    Option.isSome(ledger.get(principal))
+    (switch (ledger.get(principal)) {
+      case (?balance) { balance > 0 };
+      case _ { false };
+    })
   };
 
   // Return neuron IDs from stored neuron_infos

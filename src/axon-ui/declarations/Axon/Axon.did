@@ -62,6 +62,11 @@ type RewardMode =
    RewardToAccount: RewardToAccount;
    RewardToNeuron: RewardToNeuron;
  };
+type Result_3 = 
+ variant {
+   err: Error;
+   ok: Axon;
+ };
 type Result_2 = 
  variant {
    err: Error;
@@ -343,7 +348,7 @@ type AxonService =
    cancel: (nat, nat) -> (Result_2);
    cleanup: (nat) -> (Result);
    count: () -> (nat) query;
-   create: (Initialization) -> (Axon);
+   create: (Initialization) -> (Result_3);
    execute: (nat, nat) -> (Result_2);
    getActiveProposals: (nat) -> (ProposalResult) query;
    getAllProposals: (nat, opt nat) -> (ProposalResult) query;

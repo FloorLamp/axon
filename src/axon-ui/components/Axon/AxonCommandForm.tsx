@@ -6,7 +6,7 @@ import {
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { KeysOfUnion } from "../../lib/types";
 import { MintForm } from "./MintForm";
-import { PolicyForm } from "./PolicyForm";
+import { PolicyFormWithDefaults } from "./PolicyForm";
 import { AddProposersForm, RemoveProposersForm } from "./ProposersForm";
 import { RedenominateForm } from "./RedenominateForm";
 import { TransferForm } from "./TransferForm";
@@ -56,7 +56,7 @@ export default function AxonCommandForm({
       case "SetVisibility":
         return <VisibilityForm makeCommand={setCommand} />;
       case "SetPolicy":
-        return <PolicyForm makeCommand={setCommand} />;
+        return <PolicyFormWithDefaults makeCommand={setCommand} />;
       case "Mint":
         return <MintForm makeCommand={setCommand} />;
       case "Transfer":

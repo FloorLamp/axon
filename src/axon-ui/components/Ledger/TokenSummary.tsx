@@ -38,60 +38,83 @@ export default function TokenSummary() {
         </div>
       </div>
 
-      <DataTable>
-        <DataRow labelClassName="w-32" label="Total Holders">
-          {ledger?.length}
-        </DataRow>
-        <DataRow labelClassName="w-32" label="Total Votes">
-          {info && formatNumber(info.supply)}
-        </DataRow>
-      </DataTable>
-
-      {error && <ResponseError>{error}</ResponseError>}
-
-      {topHolders?.length > 0 ? (
-        <ul className="divide-y divide-gray-300">
-          <li className="text-gray-500 text-xs flex py-1">
-            <div className="flex-2 flex pl-2 overflow-hidden">Principal</div>
-
-            <div className="flex-1 text-right">Votes</div>
-
-            <div className="hidden xs:block flex-1 text-right pr-2">
-              Voting Power
+      {ledger && info && ledger[0][1] === info.supply ? (
+        <div className="flex flex-col gap-4 py-2">
+          <div>
+            <div className="text-gray-500 text-xs uppercase leading-none">
+              Owner
             </div>
-          </li>
-          {topHolders.map(([principal, balance]) => {
-            const id = principal.toText();
-            const percent = info
-              ? formatPercent(Number(balance) / Number(info.supply))
-              : null;
-
-            return (
-              <li key={id} className="flex py-0.5 leading-tight">
+            <div className="leading-tight">
+              <IdentifierLabelWithButtons type="Principal" id={ledger[0][0]} />
+            </div>
+          </div>
+          <div>
+            <div className="text-gray-500 text-xs uppercase leading-none">
+              Total Votes
+            </div>
+            <div>{formatNumber(info.supply)}</div>
+          </div>
+        </div>
+      ) : (
+        <>
+          <DataTable>
+            <DataRow labelClassName="w-32" label="Total Holders">
+              {ledger?.length}
+            </DataRow>
+            <DataRow labelClassName="w-32" label="Total Votes">
+              {info && formatNumber(info.supply)}
+            </DataRow>
+          </DataTable>
+          {error && <ResponseError>{error}</ResponseError>}
+          {topHolders?.length > 0 ? (
+            <ul className="divide-y divide-gray-300">
+              <li className="text-gray-500 text-xs flex py-1">
                 <div className="flex-2 flex pl-2 overflow-hidden">
-                  <IdentifierLabelWithButtons
-                    type="Principal"
-                    id={id}
-                    isShort={true}
-                  />
+                  Principal
                 </div>
 
-                <div className="flex-1 text-right">{formatNumber(balance)}</div>
+                <div className="flex-1 text-right">Votes</div>
 
                 <div className="hidden xs:block flex-1 text-right pr-2">
-                  {percent}
+                  Voting Power
                 </div>
               </li>
-            );
-          })}
-        </ul>
-      ) : (
-        isSuccess && (
-          <div className="h-32 flex flex-col items-center justify-center">
-            <p className="py-2">No Ledger entries</p>
-            <p className="text-gray-500">That's weird.</p>
-          </div>
-        )
+              {topHolders.map(([principal, balance]) => {
+                const id = principal.toText();
+                const percent = info
+                  ? formatPercent(Number(balance) / Number(info.supply))
+                  : null;
+
+                return (
+                  <li key={id} className="flex py-0.5 leading-tight">
+                    <div className="flex-2 flex pl-2 overflow-hidden">
+                      <IdentifierLabelWithButtons
+                        type="Principal"
+                        id={id}
+                        isShort={true}
+                      />
+                    </div>
+
+                    <div className="flex-1 text-right">
+                      {formatNumber(balance)}
+                    </div>
+
+                    <div className="hidden xs:block flex-1 text-right pr-2">
+                      {percent}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            isSuccess && (
+              <div className="h-32 flex flex-col items-center justify-center">
+                <p className="py-2">No Ledger entries</p>
+                <p className="text-gray-500">That's weird.</p>
+              </div>
+            )
+          )}
+        </>
       )}
     </Panel>
   );

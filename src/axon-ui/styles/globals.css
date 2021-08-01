@@ -11,10 +11,13 @@ input[type="number"],
 input[type="datetime-local"],
 input[type="date"],
 input[type="button"],
-input[type="radio"],
 button,
 select {
   @apply border-gray-300 focus:ring-2 focus:ring-opacity-50 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none rounded-md;
+}
+
+input[type="radio"] {
+  @apply focus:ring-2 focus:ring-opacity-50 focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none rounded-full;
 }
 
 input[type="checkbox"] {

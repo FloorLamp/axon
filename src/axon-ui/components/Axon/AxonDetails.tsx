@@ -1,6 +1,5 @@
 import { Principal } from "@dfinity/principal";
 import React from "react";
-import { canisterId } from "../../declarations/Axon";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useAxonId from "../../lib/hooks/useAxonId";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -8,6 +7,7 @@ import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 import { VisibilityLabel } from "../Labels/VisibilityLabel";
+import { DataRow, DataTable } from "../Proposal/DataTable";
 import ManageAxonModal from "./ManageAxonModal";
 import PolicySummary from "./PolicySummary";
 
@@ -20,8 +20,7 @@ export default function AxonDetails() {
       <div className="xs:flex justify-between">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold leading-tight">
-            Axon #{id}
-            {data?.name ? ` — ${data.name}` : null}
+            {data && data.name}
           </h2>
           {data && <VisibilityLabel visibility={data.visibility} />}
           <RefreshButton
@@ -34,25 +33,22 @@ export default function AxonDetails() {
       </div>
 
       <div className="flex flex-col gap-2">
-        <IdentifierLabelWithButtons
-          type="Principal"
-          id={canisterId}
-          showName={false}
-        />
-
         {error && <ResponseError>{error}</ResponseError>}
 
         {data ? (
           <>
-            <div>
-              <h2 className="text-xl font-bold">Proxy</h2>
-              <IdentifierLabelWithButtons
-                type="Principal"
-                id={data.proxy as unknown as Principal}
-                showName={false}
-              />
-            </div>
-
+            <DataTable>
+              <DataRow labelClassName="w-16" label="Axon ID">
+                {id}
+              </DataRow>
+              <DataRow labelClassName="w-16" label="Proxy">
+                <IdentifierLabelWithButtons
+                  type="Principal"
+                  id={data.proxy as unknown as Principal}
+                  showName={false}
+                />
+              </DataRow>
+            </DataTable>
             <div>
               <h2 className="text-xl font-bold">Policy</h2>
               <PolicySummary policy={data.policy} />

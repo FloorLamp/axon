@@ -59,7 +59,7 @@ export interface AxonService {
   'cancel' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
   'cleanup' : (arg_0: bigint) => Promise<Result>,
   'count' : () => Promise<bigint>,
-  'create' : (arg_0: Initialization) => Promise<Axon>,
+  'create' : (arg_0: Initialization) => Promise<Result_3>,
   'execute' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
   'getActiveProposals' : (arg_0: bigint) => Promise<ProposalResult>,
   'getAllProposals' : (arg_0: bigint, arg_1: [] | [bigint]) => Promise<
@@ -261,6 +261,8 @@ export type Result = { 'ok' : null } |
 export type Result_1 = { 'ok' : ManageNeuronResponse } |
   { 'err' : Error };
 export type Result_2 = { 'ok' : AxonProposal } |
+  { 'err' : Error };
+export type Result_3 = { 'ok' : Axon } |
   { 'err' : Error };
 export type RewardMode = { 'RewardToNeuron' : RewardToNeuron } |
   { 'RewardToAccount' : RewardToAccount };

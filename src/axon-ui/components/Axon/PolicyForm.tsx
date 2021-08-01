@@ -1,5 +1,6 @@
 import { Principal } from "@dfinity/principal";
 import React, { useEffect, useState } from "react";
+import { BiInfoCircle } from "react-icons/bi";
 import CreatableSelect from "react-select/creatable";
 import {
   AxonCommandRequest,
@@ -22,46 +23,95 @@ const proposersOptions: [ProposersKey, string][] = [
   ["Closed", "Restricted"],
 ];
 
-export function PolicyForm({
+export function PolicyFormWithDefaults({
   makeCommand,
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
 }) {
+  const { data } = useInfo();
+
+  if (data?.policy) {
+    return (
+      <PolicyForm
+        makeCommand={makeCommand}
+        defaultMaxSupply={data.supply}
+        defaultProposersKey={
+          Object.keys(data.policy.proposers)[0] as ProposersKey
+        }
+        defaultProposers={
+          "Closed" in data.policy.proposers
+            ? data.policy.proposers.Closed.map((p) => p.toText())
+            : []
+        }
+        defaultProposeThreshold={data.policy.proposeThreshold.toString()}
+        defaultAcceptanceThresholdKey={
+          Object.keys(data.policy.acceptanceThreshold)[0] as ThresholdKey
+        }
+        defaultAcceptanceThreshold={
+          "Absolute" in data.policy.acceptanceThreshold
+            ? data.policy.acceptanceThreshold.Absolute.toString()
+            : String(
+                percentFromBigInt(
+                  data.policy.acceptanceThreshold.Percent.percent
+                )
+              )
+        }
+        defaultQuorum={
+          "Percent" in data.policy.acceptanceThreshold &&
+          data.policy.acceptanceThreshold.Percent.quorum[0]
+            ? String(
+                percentFromBigInt(
+                  data.policy.acceptanceThreshold.Percent.quorum[0]
+                )
+              )
+            : ""
+        }
+      />
+    );
+  }
+
+  return <PolicyForm makeCommand={makeCommand} />;
+}
+
+export type DefaultPolicy = {
+  defaultProposersKey?: ProposersKey;
+  defaultProposers?: string[];
+  defaultProposeThreshold?: string;
+  defaultAcceptanceThresholdKey?: ThresholdKey;
+  defaultAcceptanceThreshold?: string;
+  defaultQuorum?: string;
+  defaultMaxSupply?: bigint;
+};
+
+export function PolicyForm({
+  makeCommand,
+  defaultProposersKey = "Open",
+  defaultProposers = [],
+  defaultProposeThreshold = "",
+  defaultAcceptanceThresholdKey = "Absolute",
+  defaultAcceptanceThreshold = "",
+  defaultQuorum = "",
+  defaultMaxSupply,
+}: {
+  makeCommand: (cmd: AxonCommandRequest | null) => void;
+} & DefaultPolicy) {
   const {
     state: { principal },
   } = useGlobalContext();
-  const { data } = useInfo();
   const { principalName } = useNames();
-  const [users, setUsers] = useState(
-    "Closed" in data.policy.proposers
-      ? data.policy.proposers.Closed.map((p) => p.toText())
-      : []
-  );
-  const [proposers, setProposers] = useState<ProposersKey>(
-    Object.keys(data.policy.proposers)[0] as ProposersKey
-  );
+  const [users, setUsers] = useState(defaultProposers);
+  const [proposers, setProposers] = useState<ProposersKey>(defaultProposersKey);
   const [inputError, setInputError] = useState("");
   const [proposeThreshold, setProposeThreshold] = useState(
-    data.policy.proposeThreshold.toString()
+    defaultProposeThreshold
   );
   const [threshold, setThreshold] = useState<ThresholdKey>(
-    Object.keys(data.policy.acceptanceThreshold)[0] as ThresholdKey
+    defaultAcceptanceThresholdKey
   );
   const [acceptanceThreshold, setAcceptanceThreshold] = useState(
-    "Absolute" in data.policy.acceptanceThreshold
-      ? data.policy.acceptanceThreshold.Absolute.toString()
-      : String(
-          percentFromBigInt(data.policy.acceptanceThreshold.Percent.percent)
-        )
+    defaultAcceptanceThreshold
   );
-  const [quorum, setQuorum] = useState(
-    "Percent" in data.policy.acceptanceThreshold &&
-      data.policy.acceptanceThreshold.Percent.quorum[0]
-      ? String(
-          percentFromBigInt(data.policy.acceptanceThreshold.Percent.quorum[0])
-        )
-      : ""
-  );
+  const [quorum, setQuorum] = useState(defaultQuorum);
 
   useEffect(() => {
     const proposeThresholdValue = BigInt(proposeThreshold);
@@ -129,7 +179,13 @@ export function PolicyForm({
   return (
     <div className="flex flex-col gap-2">
       <label className="block">
-        <span>Proposers</span>
+        <span>
+          Proposers
+          <BiInfoCircle
+            className="ml-1 inline cursor-help"
+            title="Who is eligible to create proposals"
+          />
+        </span>
         <select
           name="proposers"
           className="w-full mt-1"
@@ -161,8 +217,18 @@ export function PolicyForm({
 
       <label className="block">
         <div className="flex justify-between">
-          <span>Proposal Threshold</span>
-          <span className="text-gray-400">Max {formatNumber(data.supply)}</span>
+          <span>
+            Proposal Threshold
+            <BiInfoCircle
+              className="ml-1 inline cursor-help"
+              title="Minimum amount of votes required to create a proposal"
+            />
+          </span>
+          {defaultMaxSupply && (
+            <span className="text-gray-400">
+              Max {formatNumber(defaultMaxSupply)}
+            </span>
+          )}
         </div>
         <input
           type="number"
@@ -171,17 +237,23 @@ export function PolicyForm({
           value={proposeThreshold}
           onChange={(e) => setProposeThreshold(e.target.value)}
           min={0}
-          max={Number(data.supply)}
+          max={defaultMaxSupply ? Number(defaultMaxSupply) : undefined}
           required
         />
       </label>
 
       <div>
         <div className="flex justify-between">
-          <span>Acceptance Threshold</span>
-          {threshold === "Absolute" && (
+          <span>
+            Acceptance Threshold
+            <BiInfoCircle
+              className="ml-1 inline cursor-help"
+              title="Percentage or absolute number of votes required to accept a proposal"
+            />
+          </span>
+          {threshold === "Absolute" && defaultMaxSupply && (
             <span className="text-gray-400">
-              Max {formatNumber(data.supply)}
+              Max {formatNumber(defaultMaxSupply)}
             </span>
           )}
         </div>
@@ -193,7 +265,13 @@ export function PolicyForm({
             value={acceptanceThreshold}
             onChange={(e) => setAcceptanceThreshold(e.target.value)}
             min={0}
-            max={threshold === "Absolute" ? Number(data.supply) : 100}
+            max={
+              threshold === "Absolute"
+                ? defaultMaxSupply
+                  ? Number(defaultMaxSupply)
+                  : undefined
+                : 100
+            }
             required
           />
 
@@ -214,7 +292,13 @@ export function PolicyForm({
       {threshold === "Percent" && (
         <label className="block">
           <div className="flex justify-between">
-            <span>Quorum</span>
+            <span>
+              Quorum
+              <BiInfoCircle
+                className="ml-1 inline cursor-help"
+                title="Minimum percentage of votes that must participate before a proposal is accepted"
+              />
+            </span>
             <span className="text-gray-400">Optional</span>
           </div>
           <input
