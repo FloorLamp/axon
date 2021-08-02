@@ -209,6 +209,23 @@ export const idlFactory = ({ IDL }) => {
     'visibility' : Visibility,
     'policy' : Policy,
   });
+  const definite_canister_settings = IDL.Record({
+    'freezing_threshold' : IDL.Nat,
+    'controllers' : IDL.Vec(IDL.Principal),
+    'memory_allocation' : IDL.Nat,
+    'compute_allocation' : IDL.Nat,
+  });
+  const CanisterStatusResult = IDL.Record({
+    'status' : IDL.Variant({
+      'stopped' : IDL.Null,
+      'stopping' : IDL.Null,
+      'running' : IDL.Null,
+    }),
+    'memory_size' : IDL.Nat,
+    'cycles' : IDL.Nat,
+    'settings' : definite_canister_settings,
+    'module_hash' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+  });
   const Status = IDL.Variant({
     'Active' : IDL.Int,
     'Rejected' : IDL.Int,
@@ -345,6 +362,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const AxonService = IDL.Service({
     'axonById' : IDL.Func([IDL.Nat], [Axon], ['query']),
+    'axonStatusById' : IDL.Func([IDL.Nat], [CanisterStatusResult], []),
     'balanceOf' : IDL.Func(
         [IDL.Nat, IDL.Opt(IDL.Principal)],
         [IDL.Nat],
@@ -368,6 +386,7 @@ export const idlFactory = ({ IDL }) => {
     'sync' : IDL.Func([IDL.Nat], [ListNeuronsResult], []),
     'transfer' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [Result], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),
+    'wallet_receive' : IDL.Func([], [IDL.Nat], []),
   });
   return AxonService;
 };

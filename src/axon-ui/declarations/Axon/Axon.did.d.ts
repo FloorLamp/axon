@@ -55,6 +55,7 @@ export interface AxonProposal {
 }
 export interface AxonService {
   'axonById' : (arg_0: bigint) => Promise<Axon>,
+  'axonStatusById' : (arg_0: bigint) => Promise<CanisterStatusResult>,
   'balanceOf' : (arg_0: bigint, arg_1: [] | [Principal]) => Promise<bigint>,
   'cancel' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
   'cleanup' : (arg_0: bigint) => Promise<Result>,
@@ -74,6 +75,7 @@ export interface AxonService {
       Result
     >,
   'vote' : (arg_0: VoteRequest) => Promise<Result>,
+  'wallet_receive' : () => Promise<bigint>,
 }
 export interface Ballot {
   'principal' : Principal,
@@ -81,6 +83,15 @@ export interface Ballot {
   'vote' : [] | [Vote],
 }
 export interface BallotInfo { 'vote' : number, 'proposal_id' : [] | [NeuronId] }
+export interface CanisterStatusResult {
+  'status' : { 'stopped' : null } |
+    { 'stopping' : null } |
+    { 'running' : null },
+  'memory_size' : bigint,
+  'cycles' : bigint,
+  'settings' : definite_canister_settings,
+  'module_hash' : [] | [Array<number>],
+}
 export type Change = { 'ToRemove' : NodeProvider } |
   { 'ToAdd' : NodeProvider };
 export type Command = { 'Spawn' : Spawn } |
@@ -303,4 +314,10 @@ export interface VoteRequest {
   'proposalId' : bigint,
 }
 export interface Votes { 'no' : bigint, 'yes' : bigint, 'notVoted' : bigint }
+export interface definite_canister_settings {
+  'freezing_threshold' : bigint,
+  'controllers' : Array<Principal>,
+  'memory_allocation' : bigint,
+  'compute_allocation' : bigint,
+}
 export interface _SERVICE extends AxonService {}

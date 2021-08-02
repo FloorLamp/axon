@@ -1,7 +1,9 @@
 import { Principal } from "@dfinity/principal";
 import React from "react";
+import { useCanisterStatus } from "../../lib/hooks/Axon/useCanisterStatus";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useAxonId from "../../lib/hooks/useAxonId";
+import { formatNumber } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
@@ -13,6 +15,7 @@ import PolicySummary from "./PolicySummary";
 
 export default function AxonDetails() {
   const id = useAxonId();
+  const status = useCanisterStatus();
   const { data, error, isFetching, refetch } = useInfo();
 
   return (
@@ -47,6 +50,10 @@ export default function AxonDetails() {
                   id={data.proxy as unknown as Principal}
                   showName={false}
                 />
+              </DataRow>
+              <DataRow labelClassName="w-16" label="Cycles">
+                {status.data &&
+                  `${formatNumber(Number(status.data.cycles) / 1e12)}T`}
               </DataRow>
             </DataTable>
             <div>

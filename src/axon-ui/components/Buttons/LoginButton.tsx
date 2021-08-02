@@ -27,7 +27,10 @@ export default function Dropdown() {
 
   const handleLogin = () =>
     authClient.login({
-      identityProvider: "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000",
+      identityProvider:
+        process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
+          ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000"
+          : undefined,
       maxTimeToLive: ONE_WEEK_NS,
       onSuccess: () => handleAuthenticated(authClient),
     });

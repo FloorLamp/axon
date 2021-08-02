@@ -2,6 +2,8 @@ import HashMap "mo:base/HashMap";
 import Error "mo:base/Error";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
+
+import IC "./IcManagementTypes";
 import GT "./GovernanceTypes";
 
 module {

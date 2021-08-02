@@ -1,3 +1,5 @@
+import Cycles "mo:base/ExperimentalCycles";
+
 import GT "./GovernanceTypes";
 
 /**
@@ -8,6 +10,12 @@ import GT "./GovernanceTypes";
 shared actor class Proxy(owner: Principal) = this {
   let Governance = actor "rrkah-fqaaa-aaaaa-aaaaq-cai" : GT.Service;
   stable var neurons: ?GT.ListNeuronsResponse = null;
+
+  // Accept cycles
+  public func wallet_receive() : async Nat {
+    let amount = Cycles.available();
+    Cycles.accept(amount);
+  };
 
   // Call list_neurons() and save the list of neurons that this canister controls
   public shared({ caller }) func list_neurons() : async GT.ListNeuronsResponse {

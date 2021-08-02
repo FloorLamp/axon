@@ -1,6 +1,6 @@
 import { Disclosure } from "@headlessui/react";
 import classNames from "classnames";
-import React, { ReactNode } from "react";
+import React, { Fragment, ReactNode } from "react";
 import { FiChevronRight } from "react-icons/fi";
 
 export function ListButton({
@@ -43,16 +43,15 @@ export function ListButton({
   );
 }
 
-export function DisclosureListButton({
-  open = true,
-  disabled = false,
-  onClick,
-  children,
-}: {
+export function DisclosureListButton(props: {
   open?: boolean;
   disabled?: boolean;
   onClick?: () => void;
   children?: ReactNode;
 }) {
-  return <Disclosure.Button as={ListButton}></Disclosure.Button>;
+  return (
+    <Disclosure.Button as={Fragment}>
+      <ListButton {...props} />
+    </Disclosure.Button>
+  );
 }

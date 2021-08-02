@@ -1,3 +1,10 @@
+type definite_canister_settings = 
+ record {
+   compute_allocation: nat;
+   controllers: vec principal;
+   freezing_threshold: nat;
+   memory_allocation: nat;
+ };
 type Votes = 
  record {
    no: nat;
@@ -330,6 +337,18 @@ type Change =
    ToAdd: NodeProvider;
    ToRemove: NodeProvider;
  };
+type CanisterStatusResult = 
+ record {
+   cycles: nat;
+   memory_size: nat;
+   module_hash: opt vec nat8;
+   settings: definite_canister_settings;
+   status: variant {
+             running;
+             stopped;
+             stopping;
+           };
+ };
 type BallotInfo = 
  record {
    proposal_id: opt NeuronId;
@@ -344,6 +363,7 @@ type Ballot =
 type AxonService = 
  service {
    axonById: (nat) -> (Axon) query;
+   axonStatusById: (nat) -> (CanisterStatusResult);
    balanceOf: (nat, opt principal) -> (nat) query;
    cancel: (nat, nat) -> (Result_2);
    cleanup: (nat) -> (Result);
@@ -359,6 +379,7 @@ type AxonService =
    sync: (nat) -> (ListNeuronsResult);
    transfer: (nat, principal, nat) -> (Result);
    vote: (VoteRequest) -> (Result);
+   wallet_receive: () -> (nat);
  };
 type AxonProposal = 
  record {

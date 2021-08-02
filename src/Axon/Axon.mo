@@ -2,6 +2,7 @@ import Array "mo:base/Array";
 import Debug "mo:base/Debug";
 import Buffer "mo:base/Buffer";
 import Error "mo:base/Error";
+import Cycles "mo:base/ExperimentalCycles";
 import HashMap "mo:base/HashMap";
 import Iter "mo:base/Iter";
 import Int "mo:base/Int";
@@ -17,6 +18,7 @@ import TrieSet "mo:base/TrieSet";
 
 import Arr "./Array";
 import GT "./GovernanceTypes";
+import IC "./IcManagementTypes";
 import T "./Types";
 import Proxy "./Proxy";
 import A "./AxonHelpers";
@@ -29,6 +31,8 @@ shared actor class AxonService() = this {
   var axons: [var T.AxonFull] = [var];
 
   // ---- Constants
+
+  let ic = actor "aaaaa-aa" : IC.Self;
 
   // Default voting period for active proposals, 1 day
   let DEFAULT_DURATION_SEC = 24 * 60 * 60;
@@ -49,6 +53,11 @@ shared actor class AxonService() = this {
   public query func axonById(id: Nat) : async T.Axon {
     let axon = axons[id];
     axonFromFull(axon)
+  };
+
+  public shared func axonStatusById(id: Nat) : async IC.CanisterStatusResult {
+    let axon = axons[id];
+    await ic.canister_status({ canister_id = Principal.fromActor(axon.proxy) });
   };
 
   public query func getNeuronIds(id: Nat) : async [Nat64] {
@@ -124,6 +133,11 @@ shared actor class AxonService() = this {
 
   //---- Updates
 
+  // Accept cycles
+  public func wallet_receive() : async Nat {
+    let amount = Cycles.available();
+    Cycles.accept(amount);
+  };
 
   // Transfer tokens
   public shared({ caller }) func transfer(id: Nat, dest: Principal, amount: Nat) : async T.Result<()> {
@@ -146,6 +160,7 @@ shared actor class AxonService() = this {
     // TODO: Axon creation costs
 
     let supply = Array.foldLeft<(Principal,Nat), Nat>(init.ledgerEntries, 0, func(sum, c) { sum + c.1 });
+    Cycles.add(1_500_000_000_000);
     let axon: T.AxonFull = {
       id = lastAxonId;
       proxy = await Proxy.Proxy(Principal.fromActor(this));
