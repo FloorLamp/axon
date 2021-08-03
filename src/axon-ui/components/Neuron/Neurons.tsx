@@ -1,4 +1,5 @@
-import React from "react";
+import { useRouter } from "next/dist/client/router";
+import React, { useState } from "react";
 import { BsInboxFill } from "react-icons/bs";
 import { useIsMutating } from "react-query";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
@@ -7,12 +8,14 @@ import useSync from "../../lib/hooks/Axon/useSync";
 import useAxonId from "../../lib/hooks/useAxonId";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
+import { ListButton } from "../ExpandableList/ListButton";
 import ResponseError from "../Labels/ResponseError";
 import ManageNeuronModal from "./ManageNeuronModal";
-import NeuronDetails from "./NeuronDetails";
+import NeuronSummary from "./NeuronSummary";
 
 export default function Neurons() {
-  const id = useAxonId();
+  const axonId = useAxonId();
+  const router = useRouter();
   const {
     data: neuronIds,
     isFetching: isFetchingNeuronIds,
@@ -29,8 +32,21 @@ export default function Neurons() {
   const handleRefresh = () => {
     sync.mutate();
   };
-  const isSyncing = !!useIsMutating({ mutationKey: ["sync", id] });
+  const isSyncing = !!useIsMutating({ mutationKey: ["sync", axonId] });
   const isFetching = isSyncing || isFetchingNeuronIds || isFetchingNeurons;
+  const [selectedNeuronIds, setSelectedNeuronIds] = useState<string[]>([]);
+  const handleToggle = (id: string) => {
+    setSelectedNeuronIds(
+      selectedNeuronIds.includes(id)
+        ? selectedNeuronIds.filter((s) => s !== id)
+        : selectedNeuronIds.concat([id])
+    );
+  };
+  const handleSelectAll = (e) => {
+    setSelectedNeuronIds(
+      selectedNeuronIds.length === neuronIds.length ? [] : neuronIds.map(String)
+    );
+  };
 
   return (
     <Panel className="py-4">
@@ -43,7 +59,6 @@ export default function Neurons() {
             title="Refresh neurons"
           />
         </div>
-        <ManageNeuronModal />
       </div>
       {(errorNeuronIds || errorNeurons) && (
         <div className="px-4">
@@ -53,6 +68,18 @@ export default function Neurons() {
           </ResponseError>
         </div>
       )}
+      <div className="flex gap-3 items-center px-4 pb-2">
+        <input
+          type="checkbox"
+          className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
+          onChange={handleSelectAll}
+          checked={
+            neuronIds?.length > 0 &&
+            selectedNeuronIds.length === neuronIds.length
+          }
+        />
+        <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
+      </div>
       {neuronIds?.length > 0 ? (
         <ul className="divide-y divide-gray-300">
           {neuronIds.map((neuronId) => {
@@ -63,7 +90,18 @@ export default function Neurons() {
 
             return (
               <li key={id}>
-                <NeuronDetails id={id} neuron={neuron} />
+                <ListButton
+                  onClick={() =>
+                    router.push(`/axon/${axonId}/neuron/${id.toString()}`)
+                  }
+                >
+                  <NeuronSummary
+                    id={id}
+                    neuron={neuron}
+                    isSelected={selectedNeuronIds.includes(id)}
+                    onSelect={handleToggle}
+                  />
+                </ListButton>
               </li>
             );
           })}

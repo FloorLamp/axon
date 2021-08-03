@@ -65,14 +65,10 @@ export const useActiveProposals = () => {
   }, [queryResult.data]);
 
   useEffect(() => {
-    if (!isExecuting) {
+    if (id && !isExecuting) {
       queryClient.refetchQueries(["allProposals", id]);
     }
   }, [isExecuting]);
-
-  useEffect(() => {
-    queryResult.remove();
-  }, [axon]);
 
   return queryResult;
 };

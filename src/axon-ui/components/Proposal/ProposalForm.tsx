@@ -12,9 +12,11 @@ import ErrorAlert from "../Labels/ErrorAlert";
 export default function ProposalForm({
   closeModal,
   proposalType,
+  defaultNeuronIds,
 }: {
   closeModal: () => void;
   proposalType: ProposalTypeKey;
+  defaultNeuronIds?: string[];
 }) {
   const { data } = useNeuronIds();
   const [options, setOptions] = useState<ProposalOptions>({});
@@ -47,7 +49,10 @@ export default function ProposalForm({
           <AxonCommandForm setProposal={setProposal} />
         )}
         {proposalType === "NeuronCommand" && (
-          <NeuronCommandForm setProposal={setProposal} />
+          <NeuronCommandForm
+            setProposal={setProposal}
+            defaultNeuronIds={defaultNeuronIds}
+          />
         )}
 
         <ProposalOptionsForm onChangeOptions={setOptions} />

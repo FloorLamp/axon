@@ -29,6 +29,7 @@ module.exports = {
       display: ["group-hover", "hover", "focus"],
       visibility: ["group-hover", "hover", "focus"],
       pointerEvents: ["group-hover", "hover", "focus"],
+      ringWidth: ["hover", "active"],
     },
   },
   plugins: [require("@tailwindcss/forms")],

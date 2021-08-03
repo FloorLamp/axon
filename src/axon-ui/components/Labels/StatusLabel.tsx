@@ -60,7 +60,7 @@ export default function StatusLabel({
       )}
       title={hasExecutionError ? "Executed with errors" : undefined}
     >
-      {statusDisplay(status)}
+      {statusDisplay(status, hasExecutionError)}
     </label>
   );
 }

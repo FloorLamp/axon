@@ -7,16 +7,14 @@ export const dateTimeFromNanos = (n: bigint) =>
 export const dateTimeToNanos = (dt: DateTime) =>
   BigInt(dt.toSeconds()) * BigInt(1e9);
 
-export const secondsToDuration = (n: number | bigint) => {
+export const secondsToDuration = (n: number | bigint): Duration => {
   let seconds = n;
   if (typeof seconds === "bigint") {
     seconds = Number(n);
   }
-  return formatDuration(
-    Duration.fromObject({
-      seconds,
-    }).shiftTo("years", "months", "days", "hours", "minutes")
-  );
+  return Duration.fromObject({
+    seconds,
+  }).shiftTo("years", "months", "days", "hours", "minutes");
 };
 
 export const formatDuration = (d: Duration) => {

@@ -114,9 +114,10 @@ export default function CreateAxonForm() {
       onSubmit={handleSubmit}
     >
       <div className="pb-4">
-        <h3 className="text-xl mb-2">
-          What kind of Axon would you like to create?
-        </h3>
+        <h3 className="text-xl mb-2">What kind of user are you?</h3>
+        <p className="text-sm leading-tight mb-4">
+          This will set the default configuration, which you can modify.
+        </p>
         {UserTypes.map(([value, label]) => (
           <label
             key={value}
@@ -137,7 +138,7 @@ export default function CreateAxonForm() {
             </div>
             <div className="flex-1">
               <strong>{value}</strong>
-              <p className="text-gray-500">{label}</p>
+              <p className="text-sm leading-tight text-gray-500">{label}</p>
             </div>
           </label>
         ))}
@@ -161,7 +162,12 @@ export default function CreateAxonForm() {
           </div>
 
           <div className="py-4">
-            <label className="text-xl mb-2">Ledger</label>
+            <label className="text-xl mb-2">Initial Ledger</label>
+            <p className="text-sm leading-tight mb-4">
+              Specify the principals are able to create proposals and vote.
+              Voting tokens can always be transferred. Additional supply can be
+              minted later through the standard proposal process.
+            </p>
             <LedgerInput values={ledger} onChange={setLedger} />
           </div>
 

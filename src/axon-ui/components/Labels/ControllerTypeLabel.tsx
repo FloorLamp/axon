@@ -17,8 +17,8 @@ export default function ControllerTypeLabel({
       )}
       title={
         type === "Hot Key"
-          ? "Only Vote/Follow commands can be executed"
-          : "All neuron commands can be executed"
+          ? "Axon is Hot Key: Only Vote/Follow commands can be executed"
+          : "Axon is Controller: All neuron commands can be executed"
       }
     >
       {type}

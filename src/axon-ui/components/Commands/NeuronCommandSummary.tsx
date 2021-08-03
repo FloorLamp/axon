@@ -20,7 +20,7 @@ import {
   Split,
 } from "../../declarations/Axon/Axon.did";
 import { accountIdentifierToString } from "../../lib/account";
-import { secondsToDuration } from "../../lib/datetime";
+import { formatDuration, secondsToDuration } from "../../lib/datetime";
 import { Topic, Vote } from "../../lib/governance";
 import { ActionKey, CommandKey, OperationKey } from "../../lib/types";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -214,7 +214,9 @@ function CommandSummary({ command }: { command: Command }) {
           return (
             <DataTable label="Increase Dissolve Delay">
               <span>
-                {secondsToDuration(additional_dissolve_delay_seconds)}
+                {formatDuration(
+                  secondsToDuration(additional_dissolve_delay_seconds)
+                )}
                 <span className="text-gray-500 ml-2">
                   ({additional_dissolve_delay_seconds.toString()}s)
                 </span>

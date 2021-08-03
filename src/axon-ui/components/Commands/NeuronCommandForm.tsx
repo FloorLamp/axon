@@ -5,10 +5,12 @@ import NeuronSelectionForm from "./NeuronSelectionForm";
 
 export default function NeuronCommandForm({
   setProposal,
+  defaultNeuronIds,
 }: {
   setProposal: (at: ProposalType) => void;
+  defaultNeuronIds?: string[];
 }) {
-  const [neuronIds, setNeuronIds] = useState([]);
+  const [neuronIds, setNeuronIds] = useState(defaultNeuronIds);
   const [command, setCommand] = useState(null);
 
   useEffect(() => {

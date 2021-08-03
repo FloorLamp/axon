@@ -45,8 +45,12 @@ export const hasExecutionError = (proposal: ProposalType) => {
       ? "err" in proposal.AxonCommand[1][0]
       : false;
   } else {
+    console.log(proposal.NeuronCommand[1][0]);
+
     return proposal.NeuronCommand[1][0]
-      ? !proposal.NeuronCommand[1][0].every(([_, res]) => "ok" in res)
+      ? !proposal.NeuronCommand[1][0].every(
+          ([_, res]) => "ok" in res && !("Error" in res.ok.command[0])
+        )
       : false;
   }
 };
