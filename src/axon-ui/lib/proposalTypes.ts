@@ -45,8 +45,6 @@ export const hasExecutionError = (proposal: ProposalType) => {
       ? "err" in proposal.AxonCommand[1][0]
       : false;
   } else {
-    console.log(proposal.NeuronCommand[1][0]);
-
     return proposal.NeuronCommand[1][0]
       ? !proposal.NeuronCommand[1][0].every(
           ([_, res]) => "ok" in res && !("Error" in res.ok.command[0])
@@ -121,7 +119,7 @@ export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
             opKey
           ] as SetDissolveTimestamp;
           const dt = DateTime.fromSeconds(
-            Number(dissolve_timestamp_seconds / BigInt(1e9))
+            Number(dissolve_timestamp_seconds)
           ).toLocaleString(DateTime.DATETIME_SHORT);
           return `Set Dissolve to ${dt}`;
       }

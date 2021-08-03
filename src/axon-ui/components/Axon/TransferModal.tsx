@@ -3,6 +3,7 @@ import classNames from "classnames";
 import React, { useState } from "react";
 import { useBalance } from "../../lib/hooks/Axon/useBalance";
 import useTransfer from "../../lib/hooks/Axon/useTransfer";
+import useAxonId from "../../lib/hooks/useAxonId";
 import { formatNumber } from "../../lib/utils";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -13,6 +14,7 @@ export default function TransferModal() {
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
+  const axonId = useAxonId();
   const { data: balance } = useBalance();
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
@@ -53,11 +55,16 @@ export default function TransferModal() {
         isOpen={isOpen}
         openModal={openModal}
         closeModal={closeModal}
-        title="Transfer Votes"
+        title="Transfer Tokens"
       >
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col divide-gray-300 divide-y">
-            <div className="flex flex-col gap-2 py-4">
+            <div className="flex flex-col gap-2 pb-4">
+              <p className="text-sm leading-tight">
+                Transfer <strong>AXON_{axonId}</strong> governance tokens. This
+                is non-reversible.
+              </p>
+
               <label className="block">
                 <span>Recipient</span>
                 <input

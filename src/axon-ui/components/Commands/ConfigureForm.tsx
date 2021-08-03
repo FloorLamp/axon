@@ -1,4 +1,5 @@
 import { Principal } from "@dfinity/principal";
+import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 import { Command, Operation } from "../../declarations/Axon/Axon.did";
 import useDebounce from "../../lib/hooks/useDebounce";
@@ -71,9 +72,19 @@ export function ConfigureForm({
       if (!timestamp) {
         return makeCommand(null);
       }
+
+      let dissolve_timestamp_seconds;
+      try {
+        dissolve_timestamp_seconds = BigInt(
+          DateTime.fromISO(timestamp).toSeconds()
+        );
+      } catch (err) {
+        setError("Invalid dissolve date");
+        return makeCommand(null);
+      }
       op = {
         SetDissolveTimestamp: {
-          dissolve_timestamp_seconds: BigInt(timestamp),
+          dissolve_timestamp_seconds,
         },
       };
     }
@@ -129,7 +140,7 @@ export function ConfigureForm({
         <div>
           <label>Dissolve Timestamp</label>
           <input
-            type="number"
+            type="datetime-local"
             placeholder="Dissolve Timestamp"
             className="w-full mt-1"
             value={timestamp}

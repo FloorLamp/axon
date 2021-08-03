@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import {
   AxonCommandRequest,
@@ -24,8 +25,19 @@ export function VisibilityForm({
   }, [isPublic]);
 
   return (
-    <div className="pt-2 flex flex-col gap-2 leading-tight">
-      <label className="flex">
+    <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Choose who can view full neuron data.
+      </p>
+
+      <label
+        className={classNames(
+          "flex py-2 px-4 rounded-md border border-transparent",
+          {
+            "bg-indigo-100 border-indigo-400": isPublic,
+          }
+        )}
+      >
         <div className="w-6">
           <input
             type="radio"
@@ -35,11 +47,20 @@ export function VisibilityForm({
         </div>
         <div>
           <strong>Public</strong>
-          <p className="text-gray-500">Neuron data can be viewed by anyone</p>
+          <p className="text-sm text-gray-500">
+            Neuron data can be viewed by anyone
+          </p>
         </div>
       </label>
 
-      <label className="flex">
+      <label
+        className={classNames(
+          "flex py-2 px-4 rounded-md border border-transparent",
+          {
+            "bg-indigo-100 border-indigo-400": !isPublic,
+          }
+        )}
+      >
         <div className="w-6">
           <input
             type="radio"
@@ -49,7 +70,9 @@ export function VisibilityForm({
         </div>
         <div>
           <strong>Private</strong>
-          <p className="text-gray-500">Only owners can view neuron data</p>
+          <p className="text-sm text-gray-500">
+            Only owners can view neuron data
+          </p>
         </div>
       </label>
     </div>

@@ -95,6 +95,23 @@ shared actor class AxonService() = this {
     }
   };
 
+  // Get single proposal. If private, only owners can call
+  public query({ caller }) func getProposalById(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal> {
+    let { visibility; ledger; activeProposals; allProposals } = axons[axonId];
+    if (visibility == #Private and not isAuthed(caller, ledger)) {
+      return #err(#Unauthorized)
+    };
+
+    switch (Array.find<T.AxonProposal>(activeProposals, func(p) { p.id == proposalId })) {
+      case (?found) {
+        #ok(found);
+      };
+      case _ {
+        Result.fromOption(Array.find<T.AxonProposal>(allProposals, func(p) { p.id == proposalId }), #NotFound);
+      }
+    }
+  };
+
   // Get all active proposals. If private, only owners can call
   public query({ caller }) func getActiveProposals(id: Nat) : async T.ProposalResult {
     let { visibility; ledger; activeProposals } = axons[id];

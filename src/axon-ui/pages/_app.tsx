@@ -1,3 +1,4 @@
+import "balloon-css";
 import Head from "next/head";
 import "react";
 import React from "react";

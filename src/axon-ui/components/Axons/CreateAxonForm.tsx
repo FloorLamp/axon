@@ -148,7 +148,7 @@ export default function CreateAxonForm() {
         <>
           <div className="py-4">
             <label className="block">
-              <span className="text-xl mb-2">Name of your Axon</span>
+              <h3 className="text-xl mb-2">Name of your Axon</h3>
               <input
                 type="text"
                 name="axon-name"
@@ -162,17 +162,18 @@ export default function CreateAxonForm() {
           </div>
 
           <div className="py-4">
-            <label className="text-xl mb-2">Initial Ledger</label>
+            <h3 className="text-xl mb-2">Initial Ledger</h3>
             <p className="text-sm leading-tight mb-4">
-              Specify the principals are able to create proposals and vote.
-              Voting tokens can always be transferred. Additional supply can be
-              minted later through the standard proposal process.
+              Specify the initial distribution of governance tokens, which allow
+              the owner to create proposals and vote. Tokens can always be
+              transferred. Additional tokens can be minted later through the
+              standard proposal process.
             </p>
             <LedgerInput values={ledger} onChange={setLedger} />
           </div>
 
           <div className="py-4">
-            <label className="text-xl mb-2">Policy</label>
+            <h3 className="text-xl mb-2">Policy</h3>
             <PolicyForm
               key={userType}
               makeCommand={(command) =>

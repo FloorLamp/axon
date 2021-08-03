@@ -63,7 +63,7 @@ export default function AxonCommandSummary({
       const supplyBefore = effects ? effects.from : data?.supply;
       const supplyAfter = effects
         ? effects.to
-        : request.Mint.amount + data?.supply;
+        : request.Mint.amount + (data ? data.supply : BigInt(0));
       const percent = Number(request.Mint.amount) / Number(supplyBefore);
       return (
         <DataTable label={`Mint ${formatNumber(request.Mint.amount)} tokens`}>

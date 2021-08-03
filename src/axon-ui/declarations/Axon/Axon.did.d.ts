@@ -68,6 +68,7 @@ export interface AxonService {
     >,
   'getNeuronIds' : (arg_0: bigint) => Promise<Array<bigint>>,
   'getNeurons' : (arg_0: bigint) => Promise<ListNeuronsResult>,
+  'getProposalById' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
   'ledger' : (arg_0: bigint) => Promise<Array<LedgerEntry>>,
   'propose' : (arg_0: NewProposal) => Promise<Result>,
   'sync' : (arg_0: bigint) => Promise<ListNeuronsResult>,

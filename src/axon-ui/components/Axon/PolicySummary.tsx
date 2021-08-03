@@ -52,8 +52,8 @@ export default function PolicySummary({
       <DataRow labelClassName="w-40" label="Eligible Proposers">
         {owners}
       </DataRow>
-      <DataRow labelClassName="w-40" label="Propose Threshold">
-        {formatNumber(proposeThreshold)}
+      <DataRow labelClassName="w-40" label="Proposer Requirement">
+        {formatNumber(proposeThreshold)} Tokens
       </DataRow>
       {threshold}
     </DataTable>

@@ -2,6 +2,7 @@ import { Disclosure } from "@headlessui/react";
 import classNames from "classnames";
 import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
+import { BiInfoCircle } from "react-icons/bi";
 import { FiChevronRight } from "react-icons/fi";
 import { FOUR_HOUR_SEC } from "../../lib/constants";
 import { ProposalOptions } from "../../lib/types";
@@ -50,7 +51,16 @@ export function ProposalOptionsForm({
           <Disclosure.Panel as="div" className="flex flex-col gap-2 pt-2">
             <div>
               <span className="flex justify-between">
-                <label>Time Start</label>
+                <label className="flex items-center">
+                  Time Start
+                  <span
+                    aria-label="When this proposal will be open for voting"
+                    data-balloon-pos="right"
+                    data-balloon-length="large"
+                  >
+                    <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+                  </span>
+                </label>
                 {!!timeStart && (
                   <button
                     type="reset"
@@ -72,7 +82,16 @@ export function ProposalOptionsForm({
             </div>
 
             <div>
-              <label>Duration (seconds)</label>
+              <label className="flex items-center">
+                Duration (seconds)
+                <span
+                  aria-label="How long this proposal will be open for voting"
+                  data-balloon-pos="right"
+                  data-balloon-length="large"
+                >
+                  <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+                </span>
+              </label>
               <input
                 type="number"
                 placeholder="Duration (seconds)"
@@ -98,6 +117,13 @@ export function ProposalOptionsForm({
                   disabled={!!timeStart}
                 />
                 Execute immediately
+                <span
+                  aria-label="If this proposal is created with enough votes to be accepted, should it execute now?"
+                  data-balloon-pos="right"
+                  data-balloon-length="large"
+                >
+                  <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+                </span>
               </label>
             </div>
           </Disclosure.Panel>

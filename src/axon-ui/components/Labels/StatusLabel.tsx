@@ -55,12 +55,14 @@ export default function StatusLabel({
   return (
     <label
       className={classNames(
-        "block w-20 text-center py-0.5 rounded text-xs uppercase pointer-events-none",
+        "block w-20 text-center py-0.5 rounded text-xs",
         statusColor(status, hasExecutionError)
       )}
-      title={hasExecutionError ? "Executed with errors" : undefined}
+      data-balloon-pos="right"
+      data-balloon-length="medium"
+      aria-label={hasExecutionError ? "Executed with errors" : undefined}
     >
-      {statusDisplay(status, hasExecutionError)}
+      {statusDisplay(status, hasExecutionError).toUpperCase()}
     </label>
   );
 }

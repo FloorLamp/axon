@@ -230,9 +230,7 @@ function CommandSummary({ command }: { command: Command }) {
           return (
             <DataTable label="Set Dissolve Timestamp">
               <TimestampLabel
-                dt={DateTime.fromSeconds(
-                  Number(dissolve_timestamp_seconds / BigInt(1e9))
-                )}
+                dt={DateTime.fromSeconds(Number(dissolve_timestamp_seconds))}
               />
             </DataTable>
           );

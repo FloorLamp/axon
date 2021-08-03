@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import useAxonId from "../../lib/hooks/useAxonId";
 import useDebounce from "../../lib/hooks/useDebounce";
 import { formatNumber } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -10,6 +11,7 @@ export function RedenominateForm({
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
 }) {
+  const axonId = useAxonId();
   const { data } = useInfo();
   const [fromAmount, setFromAmount] = useState("");
   const [toAmount, setToAmount] = useState("");
@@ -37,6 +39,14 @@ export function RedenominateForm({
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Modify the total supply of <strong>AXON_{axonId}</strong> tokens while
+        keeping ownership percentages constant.
+      </p>
+      <p className="text-sm leading-tight">
+        <span className="italic">From 2 to 10</span> is a 5x increase in supply.
+      </p>
+
       <label className="block">
         From
         <input

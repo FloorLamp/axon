@@ -178,13 +178,20 @@ export function PolicyForm({
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Set the parameters for creating and accepting proposals.
+      </p>
+
       <label className="block">
-        <span>
-          Proposers
-          <BiInfoCircle
-            className="ml-1 inline cursor-help"
-            title="Who is eligible to create proposals"
-          />
+        <span className="flex items-center">
+          Proposer Eligibility
+          <span
+            aria-label="Who is eligible to create proposals"
+            data-balloon-pos="right"
+            data-balloon-length="large"
+          >
+            <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+          </span>
         </span>
         <select
           name="proposers"
@@ -217,12 +224,15 @@ export function PolicyForm({
 
       <label className="block">
         <div className="flex justify-between">
-          <span>
-            Proposal Threshold
-            <BiInfoCircle
-              className="ml-1 inline cursor-help"
-              title="Minimum amount of votes required to create a proposal"
-            />
+          <span className="flex items-center">
+            Proposer Balance Requirement
+            <span
+              aria-label="Minimum token balance required to create a proposal"
+              data-balloon-pos="right"
+              data-balloon-length="large"
+            >
+              <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+            </span>
           </span>
           {defaultMaxSupply && (
             <span className="text-gray-400">
@@ -232,7 +242,7 @@ export function PolicyForm({
         </div>
         <input
           type="number"
-          placeholder="Proposal Threshold"
+          placeholder="Proposer Balance Requirement"
           className="w-full mt-1"
           value={proposeThreshold}
           onChange={(e) => setProposeThreshold(e.target.value)}
@@ -244,12 +254,15 @@ export function PolicyForm({
 
       <div>
         <div className="flex justify-between">
-          <span>
+          <span className="flex items-center">
             Acceptance Threshold
-            <BiInfoCircle
-              className="ml-1 inline cursor-help"
-              title="Percentage or absolute number of votes required to accept a proposal"
-            />
+            <span
+              aria-label="Percentage or absolute number of votes required to accept a proposal"
+              data-balloon-pos="right"
+              data-balloon-length="large"
+            >
+              <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+            </span>
           </span>
           {threshold === "Absolute" && defaultMaxSupply && (
             <span className="text-gray-400">
@@ -292,12 +305,15 @@ export function PolicyForm({
       {threshold === "Percent" && (
         <label className="block">
           <div className="flex justify-between">
-            <span>
+            <span className="flex items-center">
               Quorum
-              <BiInfoCircle
-                className="ml-1 inline cursor-help"
-                title="Minimum percentage of votes that must participate before a proposal is accepted"
-              />
+              <span
+                aria-label="Minimum percentage of votes that must participate before a proposal is accepted"
+                data-balloon-pos="right"
+                data-balloon-length="large"
+              >
+                <BiInfoCircle className="ml-1 text-gray-500 cursor-help" />
+              </span>
             </span>
             <span className="text-gray-400">Optional</span>
           </div>

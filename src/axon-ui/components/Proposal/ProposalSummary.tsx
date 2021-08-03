@@ -30,8 +30,8 @@ export const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
 
   return (
     <div className="flex">
-      <div className="flex flex-col sm:flex-row">
-        <div className="flex-1 sm:flex-none sm:w-64 md:w-96 flex gap-2 leading-tight">
+      <div className="flex flex-1 flex-col sm:flex-row">
+        <div className="flex-2 flex gap-2 leading-tight">
           <span className="text-gray-500">#{proposal.id.toString()}</span>
           <span>{proposalTypeToString(proposal.proposal)}</span>
         </div>
@@ -49,7 +49,7 @@ export const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
           )}
         </div>
       </div>
-      <div className="flex-1 flex items-center justify-end pr-2">
+      <div className="flex items-center justify-end pr-2">
         {isEligibleToVote && (
           <>
             <div
@@ -60,7 +60,12 @@ export const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
             >
               <AcceptRejectButtons proposal={proposal} size="small" />
             </div>
-            <span className="w-2 h-2 relative" title="Needs your approval">
+            <span
+              className="w-2 h-2 relative"
+              data-balloon-pos="left"
+              data-balloon-length="medium"
+              aria-label="Needs your vote"
+            >
               <span className="h-full w-full animate-ping absolute inline-flex rounded-full bg-indigo-300 opacity-75" />
               <span className="absolute inline-flex rounded-full h-2 w-2 bg-indigo-400" />
             </span>

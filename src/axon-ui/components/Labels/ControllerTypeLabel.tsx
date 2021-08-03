@@ -8,20 +8,19 @@ export default function ControllerTypeLabel({
 }) {
   return (
     <label
-      className={classNames(
-        "block w-20 text-center py-0.5 rounded uppercase text-xs",
-        {
-          "bg-yellow-200 text-yellow-700": type === "Hot Key",
-          "bg-green-300 text-green-700": type === "Controller",
-        }
-      )}
-      title={
+      className={classNames("w-20 flex justify-center py-0.5 rounded text-xs", {
+        "bg-yellow-200 text-yellow-700": type === "Hot Key",
+        "bg-green-300 text-green-700": type === "Controller",
+      })}
+      data-balloon-pos="right"
+      data-balloon-length="large"
+      aria-label={
         type === "Hot Key"
           ? "Axon is Hot Key: Only Vote/Follow commands can be executed"
           : "Axon is Controller: All neuron commands can be executed"
       }
     >
-      {type}
+      {type.toUpperCase()}
     </label>
   );
 }

@@ -2,6 +2,7 @@ import { Principal } from "@dfinity/principal";
 import React, { useEffect, useState } from "react";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import useAxonId from "../../lib/hooks/useAxonId";
 import useDebounce from "../../lib/hooks/useDebounce";
 import { formatNumber } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -11,6 +12,7 @@ export function MintForm({
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
 }) {
+  const axonId = useAxonId();
   const { data } = useInfo();
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
@@ -42,6 +44,14 @@ export function MintForm({
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Mint new <strong>AXON_{axonId}</strong> tokens.
+      </p>
+      <p className="text-sm leading-tight">
+        If recipient is not specified, tokens will remain in the Axon treasury
+        and can be transferred later.
+      </p>
+
       <label className="block">
         <div className="flex justify-between">
           <span>Recipient</span>

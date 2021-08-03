@@ -2,6 +2,7 @@ import { Principal } from "@dfinity/principal";
 import React, { useEffect, useState } from "react";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import useAxonId from "../../lib/hooks/useAxonId";
 import useDebounce from "../../lib/hooks/useDebounce";
 import { formatNumber } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
@@ -11,6 +12,7 @@ export function TransferForm({
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
 }) {
+  const axonId = useAxonId();
   const { data } = useInfo();
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
@@ -42,6 +44,11 @@ export function TransferForm({
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Transfer <strong>AXON_{axonId}</strong> tokens from the Axon treasury to
+        the specified recipient.
+      </p>
+
       <label className="block">
         <span>Recipient</span>
         <input
