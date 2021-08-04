@@ -18,7 +18,7 @@ export default function Breadcrumbs({ path }: { path: Path[] }) {
   const joined = join(path);
 
   return (
-    <div className="flex items-center gap-2 py-4">
+    <div className="flex items-center gap-2 py-4 overflow-hidden">
       <Link href="/">
         <a
           className={classNames({
@@ -30,12 +30,14 @@ export default function Breadcrumbs({ path }: { path: Path[] }) {
       </Link>
       {joined.map((item, i) => (
         <Fragment key={i}>
-          <FaChevronRight className="opacity-20" />
+          <FaChevronRight className="opacity-20 flex-none" />
           {i === count - 1 ? (
-            <span className="">{item.label}</span>
+            <span className="whitespace-nowrap overflow-hidden overflow-ellipsis">
+              {item.label}
+            </span>
           ) : (
             <Link href={item.url}>
-              <a className="opacity-50 hover:opacity-100 transition-opacity">
+              <a className="opacity-50 hover:opacity-100 transition-opacity whitespace-nowrap">
                 {item.label}
               </a>
             </Link>

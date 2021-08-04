@@ -249,7 +249,11 @@ function CommandSummary({ command }: { command: Command }) {
         <DataTable label="Make Proposal">
           <DataRow labelClassName="w-32" label="URL">
             {url && (
-              <a href={url} target="_blank" className="break-all">
+              <a
+                href={url}
+                target="_blank"
+                className="break-all hover:underline"
+              >
                 {url}
               </a>
             )}

@@ -1,6 +1,5 @@
-import { Disclosure } from "@headlessui/react";
 import classNames from "classnames";
-import React, { Fragment, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { FiChevronRight } from "react-icons/fi";
 
 export function ListButton({
@@ -27,7 +26,7 @@ export function ListButton({
     >
       <div className="flex-1">{children}</div>
       {!disabled && (
-        <div>
+        <div className="hidden xs:block">
           <FiChevronRight
             className={classNames(
               "transform transition-transform duration-75",
@@ -40,18 +39,5 @@ export function ListButton({
         </div>
       )}
     </div>
-  );
-}
-
-export function DisclosureListButton(props: {
-  open?: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
-  children?: ReactNode;
-}) {
-  return (
-    <Disclosure.Button as={Fragment}>
-      <ListButton {...props} />
-    </Disclosure.Button>
   );
 }

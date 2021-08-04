@@ -24,11 +24,17 @@ export default function AddHotKeyForm() {
   return (
     <div className="flex flex-col divide-gray-300 divide-y">
       <div className="flex flex-col gap-2 py-4">
+        <p className="leading-tight">
+          You can add Axon as a hot key for an existing neuron. A hot key is
+          only able to issue <strong>Follow</strong> and <strong>Vote</strong>{" "}
+          commands.
+        </p>
+
         <label className="block">
-          Add existing Neuron
+          Neuron to Add
           <input
             type="number"
-            placeholder="Neuron ID"
+            placeholder="Specify a Neuron ID..."
             className="w-full mt-1"
             value={neuronId}
             onChange={(e) => setNeuronId(e.target.value)}
@@ -37,10 +43,10 @@ export default function AddHotKeyForm() {
           />
         </label>
         <p className="leading-tight">
-          You can add Axon as a hot key for an existing neuron by running the
-          following{" "}
+          The following{" "}
           <code className="px-1 py-0.5 bg-gray-200 rounded text-xs">dfx</code>{" "}
-          command:
+          command will add the Axon canister as a hot key for the specified
+          neuron:
         </p>
 
         <div className="group relative p-2 bg-gray-200 rounded text-xs">

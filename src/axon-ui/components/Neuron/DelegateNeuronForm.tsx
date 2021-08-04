@@ -22,14 +22,19 @@ export default function DelegateNeuronForm() {
   return (
     <div className="flex flex-col divide-gray-300 divide-y">
       <div className="flex flex-col gap-2 py-4">
+        <p className="leading-tight">
+          You can delegate control of a neuron (such as a Genesis neuron in cold
+          storage) to another neuron (in a hot wallet). The "hot" neuron can
+          create NNS proposals to manage the other.
+        </p>
         {isSuccess &&
           (data.length > 0 ? (
             <>
               <label className="block">
-                Delegate Neuron
+                Neuron to Delegate
                 <input
                   type="number"
-                  placeholder="Neuron ID"
+                  placeholder="Specify a Neuron ID..."
                   className="w-full mt-1"
                   value={neuronId}
                   onChange={(e) => setNeuronId(e.target.value)}
@@ -38,12 +43,12 @@ export default function DelegateNeuronForm() {
                 />
               </label>
               <p className="leading-tight">
-                You can delegate control of an existing neuron to Axon by
-                running the following{" "}
+                The following{" "}
                 <code className="px-1 py-0.5 bg-gray-200 rounded text-xs">
                   dfx
                 </code>{" "}
-                command:
+                command will delegate control of the specified neuron to Axon
+                neurons:
               </p>
 
               <div className="group relative p-2 bg-gray-200 rounded text-xs">

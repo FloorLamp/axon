@@ -31,7 +31,7 @@ function BallotsList({
                 />
               </span>
 
-              <span className="flex-1 text-right">
+              <span className="flex-1 text-right pr-2 xs:pr-0">
                 {formatNumber(ballot.votingPower)}
               </span>
 

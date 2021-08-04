@@ -61,7 +61,7 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="xs:flex justify-between items-center">
         <Breadcrumbs
           path={[
             { path: `axon/${axonId}`, label: `Axon ${axonId}` },
@@ -74,7 +74,7 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
         {isEligibleToVote && <AcceptRejectButtons proposal={proposal} />}
         {isCancellable && <CancelButton proposal={proposal} />}
       </div>
-      <div className="flex flex-col gap-8">
+      <div className="pt-4 flex flex-col gap-8">
         <div className="flex flex-col md:flex-row gap-8">
           <Panel className="p-4 flex-1">
             <div className="flex flex-col gap-1">

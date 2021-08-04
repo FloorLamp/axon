@@ -14,7 +14,8 @@ export const getActionTime = (proposal: AxonProposal): DateTime | null => {
     status === "ExecutionFinished" ||
     status === "Rejected" ||
     status === "Accepted" ||
-    status === "Expired"
+    status === "Expired" ||
+    status === "Cancelled"
   ) {
     const ts = Object.values(proposal.status.slice(-1)[0])[0];
     return dateTimeFromNanos(ts);

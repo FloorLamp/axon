@@ -8,7 +8,7 @@ export default function LedgerPage() {
   const id = useAxonId();
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="xs:flex justify-between items-center">
         <Breadcrumbs
           path={[
             { path: `axon/${id}`, label: `Axon ${id}` },

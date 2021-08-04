@@ -1,7 +1,6 @@
 import React from "react";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { useLedger } from "../../lib/hooks/Axon/useLedger";
-import useAxonId from "../../lib/hooks/useAxonId";
 import { formatNumber, formatPercent } from "../../lib/utils";
 import IdentifierLabelWithButtons, {
   renderResponsiveShortId,
@@ -11,13 +10,12 @@ import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 
 export default function Ledger() {
-  const id = useAxonId();
   const { data: info } = useInfo();
   const { data: entries, error, isFetching, refetch, isSuccess } = useLedger();
 
   return (
-    <div className="flex flex-col gap-8">
-      <section className="flex flex-col xs:flex-row gap-8">
+    <div className="flex flex-col gap-4 xs:gap-8">
+      <section className="flex flex-col xs:flex-row gap-4 xs:gap-8">
         <Panel className="flex-1 p-4">
           <label className="text-gray-500 uppercase text-sm">
             Total Holders

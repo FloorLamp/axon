@@ -20,7 +20,7 @@ export default function AxonDetails() {
 
   return (
     <Panel className="flex-1 p-4">
-      <div className="xs:flex justify-between">
+      <div className="xs:flex justify-between mb-2 xs:mb-0 ">
         <div className="flex gap-2 items-center">
           <h2 className="text-xl font-bold leading-tight">
             {data && data.name}

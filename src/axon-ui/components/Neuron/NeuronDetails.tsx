@@ -27,11 +27,11 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
     ? subaccountToAccount(governanceCanister, neuron.account)
     : null;
 
-  const votingPower = neuron?.dissolve_state[0];
+  const votingPower = neuron ? calculateVotingPower(neuron) / 1e8 : null;
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex flex-col md:flex-row gap-8">
+    <div className="flex flex-col gap-4 xs:gap-8">
+      <div className="flex flex-col md:flex-row gap-4 xs:gap-8">
         <Panel className="flex-1 p-4">
           <label className="text-gray-500 uppercase text-sm">Neuron</label>
           <h2 className="text-xl font-bold">{neuronId}</h2>
@@ -58,8 +58,8 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
           <h2 className="text-2xl font-bold">
             {neuron && (
               <>
-                {formatNumber(calculateVotingPower(neuron) / 1e8)}{" "}
-                <span className="text-xs">×10⁸</span>
+                {formatNumber(votingPower)}{" "}
+                {votingPower > 0 && <span className="text-xs">×10⁸</span>}
               </>
             )}
           </h2>
