@@ -8,9 +8,6 @@
     "build": "next build",
     "start": "next start",
     "export": "next export",
-    "predev": "npm run copy:types",
-    "prebuild": "npm run copy:types",
-    "prestart": "npm run copy:types",
     "copy:types": "rsync -avr ../../.dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/** --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --exclude='index.js' --delete declarations"
   },
   "dependencies": {
