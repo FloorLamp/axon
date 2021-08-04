@@ -1,19 +1,7 @@
 import { Actor } from "@dfinity/agent";
 import { idlFactory } from "./Axon.did.js";
 
-import CanisterIds from "../../../../canister_ids.json";
-
-let localCanisterIds;
-try {
-  localCanisterIds = require("../../../../.dfx/local/canister_ids.json");
-} catch (error) {
-  console.warn("local canister_ids.json not found!");
-}
-
-export const canisterId =
-  process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
-    ? localCanisterIds?.Axon.local
-    : CanisterIds.Axon.ic;
+export const canisterId = process.env.AXON_CANISTER_ID;
 
 /**
  *
