@@ -5,6 +5,7 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import Footer from "../components/Layout/Footer";
 import Nav from "../components/Layout/Nav";
+import { Subscriptions } from "../components/Query/Subscriptions";
 import Store from "../components/Store/Store";
 import { ONE_HOUR_MS } from "../lib/constants";
 import "../styles/globals.css";
@@ -24,6 +25,7 @@ export default function App({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Store>
+        <Subscriptions />
         <Head>
           <title>Axon</title>
         </Head>

@@ -1,6 +1,7 @@
 import React from "react";
 import { canisterId as AxonCanisterId } from "../../declarations/Axon";
 import { Neuron } from "../../declarations/Axon/Axon.did";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
 import ControllerTypeLabel from "../Labels/ControllerTypeLabel";
@@ -17,9 +18,11 @@ export default function NeuronSummary({
   onSelect?: (id: string) => void;
   isSelected?: boolean;
 }) {
+  const isProposer = useIsProposer();
+
   return (
     <div className="flex items-center">
-      {onSelect && (
+      {isProposer && onSelect && (
         <input
           type="checkbox"
           className="mr-2 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"

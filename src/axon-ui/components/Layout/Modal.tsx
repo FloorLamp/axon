@@ -1,4 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
+import classNames from "classnames";
 import React, { Fragment, useRef } from "react";
 import { FaTimes } from "react-icons/fa";
 
@@ -8,6 +9,7 @@ export default function Modal({
   openModal,
   closeModal,
   children,
+  className = "w-full max-w-sm",
 }) {
   const cancelButtonRef = useRef();
 
@@ -48,7 +50,12 @@ export default function Modal({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <div className="inline-block w-full max-w-sm p-4 my-8 text-left align-middle transition-all transform bg-gray-100 dark:bg-gray-800 shadow-xl rounded-2xl">
+            <div
+              className={classNames(
+                "inline-block p-4 my-8 text-left align-middle transition-all transform bg-gray-100 dark:bg-gray-800 shadow-xl rounded-2xl",
+                className
+              )}
+            >
               <div className="flex justify-between pb-2">
                 <Dialog.Title
                   as="h3"

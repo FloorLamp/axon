@@ -85,9 +85,12 @@ export const useSetAgent = () => {
   }) => {
     dispatch({ type: "SET_AGENT", agent, isAuthed });
     if (isAuthed) {
+      const principal = await agent.getPrincipal();
+      console.log("authed", principal.toText());
+
       dispatch({
         type: "SET_PRINCIPAL",
-        principal: await agent.getPrincipal(),
+        principal,
       });
     } else {
       dispatch({ type: "SET_PRINCIPAL", principal: null });

@@ -2,6 +2,7 @@ import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { BsInboxFill } from "react-icons/bs";
 import { useIsMutating } from "react-query";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import useSync from "../../lib/hooks/Axon/useSync";
@@ -14,6 +15,7 @@ import ManageNeuronModal from "./ManageNeuronModal";
 import NeuronSummary from "./NeuronSummary";
 
 export default function Neurons() {
+  const isProposer = useIsProposer();
   const axonId = useAxonId();
   const router = useRouter();
   const {
@@ -68,18 +70,20 @@ export default function Neurons() {
           </ResponseError>
         </div>
       )}
-      <div className="flex gap-3 items-center px-4 pb-2">
-        <input
-          type="checkbox"
-          className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
-          onChange={handleSelectAll}
-          checked={
-            neuronIds?.length > 0 &&
-            selectedNeuronIds.length === neuronIds.length
-          }
-        />
-        <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
-      </div>
+      {isProposer && (
+        <div className="flex gap-3 items-center px-4 pb-2">
+          <input
+            type="checkbox"
+            className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
+            onChange={handleSelectAll}
+            checked={
+              neuronIds?.length > 0 &&
+              selectedNeuronIds.length === neuronIds.length
+            }
+          />
+          <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
+        </div>
+      )}
       {neuronIds?.length > 0 ? (
         <ul className="divide-y divide-gray-300">
           {neuronIds.map((neuronId) => {
