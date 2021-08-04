@@ -12,6 +12,7 @@ import {
   Follow,
   IncreaseDissolveDelay,
   ManageNeuron,
+  Motion,
   NeuronCommand,
   Proposal,
   RegisterVote,
@@ -23,6 +24,7 @@ import { accountIdentifierToString } from "../../lib/account";
 import { formatDuration, secondsToDuration } from "../../lib/datetime";
 import { Topic, Vote } from "../../lib/governance";
 import { ActionKey, CommandKey, OperationKey } from "../../lib/types";
+import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
 import { TimestampLabel } from "../Labels/TimestampLabel";
@@ -259,8 +261,6 @@ function CommandSummary({ command }: { command: Command }) {
         </DataTable>
       );
     }
-    // default:
-    //   return <pre className="text-xs">{stringify(command)}</pre>;
   }
 }
 
@@ -294,5 +294,15 @@ const ActionSummary = ({ action }: { action: Action }) => {
           </div>
         </div>
       );
+    case "Motion":
+      const { motion_text } = action[key] as Motion;
+      return (
+        <div>
+          <label className="font-bold block">Motion</label>
+          <p className="leading-tight">{motion_text}</p>
+        </div>
+      );
+    default:
+      return <pre className="text-xs">{stringify(action)}</pre>;
   }
 };

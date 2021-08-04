@@ -3,8 +3,6 @@ import { idlFactory } from "./Axon.did.js";
 
 import CanisterIds from "../../../../canister_ids.json";
 
-console.log({ NEXT_PUBLIC_DFX_NETWORK: process.env.NEXT_PUBLIC_DFX_NETWORK });
-
 export const canisterId =
   process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
     ? require("../../../../.dfx/local/canister_ids.json").Axon.local

@@ -4,9 +4,11 @@ import PlugConnect from "@psychedelic/plug-connect";
 // import { StoicIdentity } from "ic-stoic-identity";
 import React, { useEffect, useState } from "react";
 import { canisterId as AxonCanisterId } from "../../declarations/Axon";
+import { HOST, IDENTITY_PROVIDER } from "../../lib/canisters";
 import { ONE_WEEK_NS } from "../../lib/constants";
 import Modal from "../Layout/Modal";
 import { useGlobalContext, useSetAgent } from "../Store/Store";
+
 declare global {
   interface Window {
     ic: {
@@ -14,15 +16,6 @@ declare global {
     };
   }
 }
-
-const HOST =
-  process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
-    ? "http://localhost:8000"
-    : "https://ic0.app";
-const IDENTITY_PROVIDER =
-  process.env.NEXT_PUBLIC_DFX_NETWORK === "local"
-    ? "http://ryjl3-tyaaa-aaaaa-aaaba-cai.localhost:8000"
-    : undefined;
 
 export default function LoginButton() {
   const [isOpen, setIsOpen] = useState(false);

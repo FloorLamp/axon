@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Command } from "../../declarations/Axon/Axon.did";
 import { ActionKey } from "../../lib/types";
+import ErrorAlert from "../Labels/ErrorAlert";
 import ManageNeuronForm from "./ManageNeuronForm";
+import MotionForm from "./MotionForm";
 
 const actions: [ActionKey, string][] = [
   ["ManageNeuron", "Manage Neuron"],
-  ["ExecuteNnsFunction", "Execute Nns Function"],
-  ["RewardNodeProvider", "Reward Node Provider"],
-  ["SetDefaultFollowees", "Set Default Followees"],
-  ["ManageNetworkEconomics", "Manage Network Economics"],
-  ["ApproveGenesisKyc", "Approve Genesis Kyc"],
-  ["AddOrRemoveNodeProvider", "Add Or Remove Node Provider"],
   ["Motion", "Motion"],
+  // ["ExecuteNnsFunction", "Execute Nns Function"],
+  // ["RewardNodeProvider", "Reward Node Provider"],
+  // ["SetDefaultFollowees", "Set Default Followees"],
+  // ["ManageNetworkEconomics", "Manage Network Economics"],
+  // ["ApproveGenesisKyc", "Approve Genesis Kyc"],
+  // ["AddOrRemoveNodeProvider", "Add Or Remove Node Provider"],
 ];
 
 export default function MakeProposalForm({
@@ -42,6 +44,10 @@ export default function MakeProposalForm({
     switch (actionKey) {
       case "ManageNeuron":
         return <ManageNeuronForm setAction={setAction} />;
+      case "Motion":
+        return <MotionForm setAction={setAction} />;
+      default:
+        return <ErrorAlert>Action {actionKey} not supported</ErrorAlert>;
     }
   };
 

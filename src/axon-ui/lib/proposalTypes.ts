@@ -8,6 +8,7 @@ import {
   DisburseToNeuron,
   Follow,
   IncreaseDissolveDelay,
+  Motion,
   NeuronCommandRequest,
   ProposalType,
   RegisterVote,
@@ -136,6 +137,11 @@ export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
             command[0] ? Object.keys(command[0])[0] : ""
           }`;
         }
+        case "Motion":
+          const { motion_text } = action[actionKey] as Motion;
+          return `Motion: ${motion_text.slice(0, 35)}${
+            motion_text.length > 35 ? "..." : ""
+          }`;
       }
     }
     default:

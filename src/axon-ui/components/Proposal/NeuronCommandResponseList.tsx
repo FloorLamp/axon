@@ -1,10 +1,17 @@
 import React from "react";
 import {
   Command_1,
+  DisburseResponse,
+  MakeProposalResponse,
   NeuronCommandResponse,
+  SpawnResponse,
 } from "../../declarations/Axon/Axon.did";
 import { KeysOfUnion } from "../../lib/types";
-import { errorToString, governanceErrorToString } from "../../lib/utils";
+import {
+  errorToString,
+  governanceErrorToString,
+  stringify,
+} from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { CommandError, CommandSuccess } from "./CommandResponseSummary";
 
@@ -13,6 +20,26 @@ const renderSuccess = (result: Command_1) => {
   switch (key) {
     case "Follow":
       return "Successfully set followees";
+    case "MakeProposal": {
+      const { proposal_id } = result[key] as MakeProposalResponse;
+      return `Created proposal ${proposal_id[0].id}`;
+    }
+    case "Spawn":
+    case "Split":
+    case "DisburseToNeuron": {
+      const { created_neuron_id } = result[key] as SpawnResponse;
+      return `Created neuron ${created_neuron_id[0].id}`;
+    }
+    case "Disburse": {
+      const { transfer_block_height } = result[key] as DisburseResponse;
+      return `Transferred at height ${transfer_block_height}`;
+    }
+    case "Configure":
+      return "Successfully configured";
+    case "RegisterVote":
+      return "Successfully voted";
+    default:
+      return stringify(result);
   }
 };
 
