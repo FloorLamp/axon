@@ -49,7 +49,7 @@ export const ProposalSummary = ({ proposal }: { proposal: AxonProposal }) => {
           )}
         </div>
       </div>
-      <div className="flex items-center justify-end pr-2">
+      <div className="w-20 flex items-center justify-end pr-2">
         {isEligibleToVote && (
           <>
             <div

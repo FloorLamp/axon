@@ -16,6 +16,7 @@ import {
   NeuronCommand,
   Proposal,
   RegisterVote,
+  RemoveHotKey,
   SetDissolveTimestamp,
   Spawn,
   Split,
@@ -193,23 +194,31 @@ function CommandSummary({ command }: { command: Command }) {
       const operation = (command[key] as Configure).operation[0];
       const opKey = Object.keys(operation)[0] as OperationKey;
       switch (opKey) {
-        case "AddHotKey":
-        case "RemoveHotKey":
+        case "RemoveHotKey": {
+          const {
+            hot_key_to_remove: [id],
+          } = operation[opKey] as RemoveHotKey;
+          return (
+            <DataTable label={`Remove Hot Key`}>
+              <IdentifierLabelWithButtons id={id} type="Principal" />
+            </DataTable>
+          );
+        }
+        case "AddHotKey": {
           const {
             new_hot_key: [id],
           } = operation[opKey] as AddHotKey;
           return (
-            <DataTable
-              label={`${opKey === "AddHotKey" ? "Add" : "Remove"} Hot Key`}
-            >
+            <DataTable label={`Add Hot Key`}>
               <IdentifierLabelWithButtons id={id} type="Principal" />
             </DataTable>
           );
+        }
         case "StartDissolving":
           return <DataTable label="Start Dissolving" />;
         case "StopDissolving":
           return <DataTable label="Stop Dissolving" />;
-        case "IncreaseDissolveDelay":
+        case "IncreaseDissolveDelay": {
           const { additional_dissolve_delay_seconds } = operation[
             opKey
           ] as IncreaseDissolveDelay;
@@ -225,7 +234,8 @@ function CommandSummary({ command }: { command: Command }) {
               </span>
             </DataTable>
           );
-        case "SetDissolveTimestamp":
+        }
+        case "SetDissolveTimestamp": {
           const { dissolve_timestamp_seconds } = operation[
             opKey
           ] as SetDissolveTimestamp;
@@ -236,6 +246,7 @@ function CommandSummary({ command }: { command: Command }) {
               />
             </DataTable>
           );
+        }
       }
     }
     case "MakeProposal": {

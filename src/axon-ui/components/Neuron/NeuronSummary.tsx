@@ -1,6 +1,6 @@
 import React from "react";
-import { canisterId as AxonCanisterId } from "../../declarations/Axon";
 import { Neuron } from "../../declarations/Axon/Axon.did";
+import { useControllerType } from "../../lib/hooks/Axon/useControllerType";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
@@ -19,6 +19,7 @@ export default function NeuronSummary({
   isSelected?: boolean;
 }) {
   const isProposer = useIsProposer();
+  const controllerType = useControllerType(neuron);
 
   return (
     <div className="flex items-center">
@@ -33,15 +34,7 @@ export default function NeuronSummary({
       )}
       <div className="flex-1 flex flex-col sm:flex-row">
         <div className="flex-1 sm:flex-none sm:w-72 md:w-96 xs:flex gap-2 items-center">
-          {neuron && (
-            <ControllerTypeLabel
-              type={
-                neuron.controller[0].toText() === AxonCanisterId
-                  ? "Controller"
-                  : "Hot Key"
-              }
-            />
-          )}
+          {controllerType && <ControllerTypeLabel type={controllerType} />}
           <IdentifierLabelWithButtons type="Neuron" id={id} />
         </div>
         <div className="flex-1 flex flex-col sm:flex-row sm:items-center">

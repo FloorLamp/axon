@@ -39,18 +39,25 @@ export function ConfigureForm({
     let op: Operation;
     if (operation === "Add Hot Key" || operation === "Remove Hot Key") {
       if (!hotKey) return makeCommand(null);
-      let new_hot_key;
+      let value;
       try {
-        new_hot_key = [Principal.fromText(hotKey)];
+        value = [Principal.fromText(hotKey)];
       } catch (err) {
         setError("Invalid principal");
         return makeCommand(null);
       }
-      op = {
-        [operation === "Add Hot Key" ? "AddHotKey" : "RemoveHotKey"]: {
-          new_hot_key,
-        },
-      } as Operation;
+      op =
+        operation === "Add Hot Key"
+          ? {
+              AddHotKey: {
+                new_hot_key: value,
+              },
+            }
+          : {
+              RemoveHotKey: {
+                hot_key_to_remove: value,
+              },
+            };
     } else if (operation === "Increase Dissolve Delay") {
       if (!dissolveDelay) {
         return makeCommand(null);

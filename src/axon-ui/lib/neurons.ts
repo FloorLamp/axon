@@ -2,6 +2,8 @@ import { DateTime, Duration } from "luxon";
 import { DissolveState, Neuron } from "../declarations/Axon/Axon.did";
 import { formatDuration, secondsToDuration } from "./datetime";
 
+export type ControllerType = "Hot Key" | "Controller" | null;
+
 export const parseDissolveState = (dissolveState: DissolveState) => {
   let state: string, duration: Duration, seconds: number;
   if ("DissolveDelaySeconds" in dissolveState) {

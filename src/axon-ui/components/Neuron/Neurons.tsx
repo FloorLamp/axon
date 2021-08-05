@@ -72,15 +72,17 @@ export default function Neurons() {
       )}
       {isProposer && (
         <div className="flex gap-3 items-center px-4 pb-2">
-          <input
-            type="checkbox"
-            className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
-            onChange={handleSelectAll}
-            checked={
-              neuronIds?.length > 0 &&
-              selectedNeuronIds.length === neuronIds.length
-            }
-          />
+          {neuronIds?.length > 0 && (
+            <input
+              type="checkbox"
+              className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
+              onChange={handleSelectAll}
+              checked={
+                neuronIds?.length > 0 &&
+                selectedNeuronIds.length === neuronIds.length
+              }
+            />
+          )}
           <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
         </div>
       )}

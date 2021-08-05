@@ -16,11 +16,7 @@ export default function TopupNeuronModal({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openModal}
-        className="w-20 p-2 btn-secondary"
-      >
+      <button type="button" onClick={openModal} className="p-2 btn-secondary">
         Top Up
       </button>
       <Modal
