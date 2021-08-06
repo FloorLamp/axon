@@ -5,6 +5,7 @@ import CreatableSelect from "react-select/creatable";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useNames from "../../lib/hooks/useNames";
+import { formatNumber } from "../../lib/utils";
 import ErrorAlert from "../Labels/ErrorAlert";
 
 export function AddProposersForm({
@@ -12,6 +13,7 @@ export function AddProposersForm({
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
 }) {
+  const { data } = useInfo();
   const [users, setUsers] = useState([]);
   const [inputError, setInputError] = useState("");
 
@@ -36,6 +38,12 @@ export function AddProposersForm({
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Specify the Principals that are able to create proposals, assuming they
+        hold the minimum proposal creation balance (currently{" "}
+        {data ? formatNumber(data.policy.proposeThreshold) : "-"}).
+      </p>
+
       <label className="block">
         <span>Members</span>
         <CreatableSelect
@@ -89,6 +97,11 @@ export function RemoveProposersForm({
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-sm leading-tight">
+        Remove Principals from the set of eligible proposers. Non-proposers are
+        still able to vote.
+      </p>
+
       {members.length > 1 ? (
         <label className="block">
           <span>Proposers</span>

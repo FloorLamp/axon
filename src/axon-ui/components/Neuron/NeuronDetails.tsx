@@ -8,6 +8,7 @@ import {
   useControllerType,
   useManagedNeurons,
 } from "../../lib/hooks/Axon/useControllerType";
+import { useIsMember } from "../../lib/hooks/Axon/useIsMember";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import { calculateVotingPower } from "../../lib/neurons";
 import { formatNumber } from "../../lib/utils";
@@ -22,6 +23,7 @@ import TopupNeuronModal from "./TopupNeuronModal";
 const governanceCanister = Principal.fromText(governanceCanisterId);
 
 export default function NeuronDetails({ neuronId }: { neuronId: string }) {
+  const isMember = useIsMember();
   const neurons = useNeurons();
   const neuron = neurons.data?.full_neurons.find(
     (fn) => fn.id[0].id.toString() === neuronId
@@ -197,7 +199,7 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
           <div className="w-32 font-bold">Actions</div>
           <div className="flex gap-2">
             <TopupNeuronModal account={account} controller={controller} />
-            {controllerType === "Hot Key" && (
+            {isMember && controllerType === "Hot Key" && (
               <RemoveHotkeyModal neuronId={neuronId} />
             )}
           </div>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
 import { useClipboard } from "use-clipboard-copy";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import WarningAlert from "../Labels/WarningAlert";
 import SyncForm from "./SyncForm";
 
 export default function AddHotKeyForm() {
@@ -29,6 +30,14 @@ export default function AddHotKeyForm() {
           only able to issue <strong>Follow</strong> and <strong>Vote</strong>{" "}
           commands.
         </p>
+
+        <WarningAlert>
+          <p className="leading-tight text-sm p-1">
+            <strong>Note:</strong> At this time, neurons created in the{" "}
+            <strong>NNS App</strong> are not able to have hot keys set to a
+            canister. This is a limitation of that UI.
+          </p>
+        </WarningAlert>
 
         <label className="block">
           Neuron to Add

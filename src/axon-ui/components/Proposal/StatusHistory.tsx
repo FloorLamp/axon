@@ -11,6 +11,7 @@ import { AxonProposal, Status } from "../../declarations/Axon/Axon.did";
 import { getStatus } from "../../lib/axonProposal";
 import { dateTimeFromNanos } from "../../lib/datetime";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
+import { hasExecutionError } from "../../lib/proposalTypes";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import { CommandResponseSummary } from "./CommandResponseSummary";
 import ExecuteButton from "./ExecuteButton";
@@ -203,12 +204,27 @@ export default function StatusHistory({
         );
       }
     } else if ("ExecutionFinished" in status) {
+      const isError = hasExecutionError(proposal.proposal);
       return (
         <StatusSummary
           circle={
-            <FaCheckCircle size={CIRCLE_SIZE} className="text-green-400" />
+            <FaCheckCircle
+              size={CIRCLE_SIZE}
+              className={classNames({
+                "text-green-400": !isError,
+                "text-yellow-400": isError,
+              })}
+            />
           }
-          label={<span className="text-green-700">Execution Finished</span>}
+          label={
+            isError ? (
+              <span className="text-yellow-500">
+                Execution Finished with Errors
+              </span>
+            ) : (
+              <span className="text-green-700">Execution Finished</span>
+            )
+          }
           showLine={!isLast}
         >
           <TimestampLabel dt={dateTimeFromNanos(status.ExecutionFinished)} />

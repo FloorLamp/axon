@@ -62,7 +62,11 @@ export default function TopupForm({
         </SpinnerButton>
 
         {(memoError ?? refreshError) && (
-          <ErrorAlert>{memoError ?? refreshError}</ErrorAlert>
+          <ErrorAlert>
+            {memoError && memoError instanceof Error
+              ? memoError.message
+              : refreshError}
+          </ErrorAlert>
         )}
       </div>
     </div>

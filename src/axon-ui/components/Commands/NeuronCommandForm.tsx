@@ -2,6 +2,10 @@ import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { NeuronCommand, ProposalType } from "../../declarations/Axon/Axon.did";
 import { useManagedNeurons } from "../../lib/hooks/Axon/useControllerType";
+import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
+import { principalIsEqual } from "../../lib/utils";
+import WarningAlert from "../Labels/WarningAlert";
 import CommandForm from "./CommandForm";
 import NeuronSelectionForm from "./NeuronSelectionForm";
 
@@ -14,6 +18,9 @@ export default function NeuronCommandForm({
   setProposal: (at: ProposalType) => void;
   defaultNeuronIds?: string[];
 }) {
+  const { data: info } = useInfo();
+  const { data: neurons } = useNeurons();
+
   const [neuronIds, setNeuronIds] = useState(defaultNeuronIds);
   const [command, setCommand] = useState(null);
   const [controlType, setControlType] = useState<typeof ControlTypes[number]>(
@@ -69,6 +76,15 @@ export default function NeuronCommandForm({
     }
   }, [command, neuronIds]);
 
+  const showNonControllerWarning =
+    controlType === "Direct" &&
+    !neurons.full_neurons
+      .filter(
+        (neuron) =>
+          neuronIds.includes(neuron.id[0].id.toString()) || !neuronIds.length
+      )
+      .every((neuron) => principalIsEqual(info.proxy, neuron.controller[0]));
+
   return (
     <div className="flex flex-col divide-y divide-gray-300">
       <div className="py-4">
@@ -113,6 +129,17 @@ export default function NeuronCommandForm({
         )}
       </div>
       <div className="py-4">
+        {showNonControllerWarning && (
+          <div className="pb-4">
+            <WarningAlert>
+              <p className="leading-tight text-sm p-1">
+                Some of the selected neurons are not directly controlled by
+                Axon. For those neurons, Axon is only able to issue{" "}
+                <strong>Follow</strong> and <strong>Vote</strong> commands.
+              </p>
+            </WarningAlert>
+          </div>
+        )}
         <CommandForm setCommand={setCommand} />
       </div>
     </div>
