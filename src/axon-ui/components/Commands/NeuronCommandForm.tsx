@@ -60,7 +60,6 @@ export default function NeuronCommandForm({
           [],
         ];
       }
-      console.log(neuronCommand);
 
       setProposal({
         NeuronCommand: neuronCommand,

@@ -23,6 +23,7 @@ export default function useCancel(proposalId: bigint) {
     {
       onSuccess: (data) => {
         console.log("cancelled", data);
+        queryClient.refetchQueries(["proposal", axonId, proposalId]);
         queryClient.refetchQueries(["activeProposals", axonId]);
         queryClient.refetchQueries(["allProposals", axonId]);
       },

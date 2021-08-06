@@ -6,6 +6,7 @@ import { BiInfoCircle } from "react-icons/bi";
 import { FiChevronRight } from "react-icons/fi";
 import { FOUR_HOUR_SEC } from "../../lib/constants";
 import { ProposalOptions } from "../../lib/types";
+import ErrorAlert from "../Labels/ErrorAlert";
 
 export function ProposalOptionsForm({
   onChangeOptions,
@@ -15,6 +16,7 @@ export function ProposalOptionsForm({
   const [timeStart, setTimeStart] = useState("");
   const [durationSeconds, setDurationSeconds] = useState("");
   const [execute, setExecute] = useState(true);
+  const [error, setError] = useState("");
 
   // Sync state with parent
   useEffect(() => {
@@ -22,11 +24,21 @@ export function ProposalOptionsForm({
     if (timeStart) {
       try {
         maybeTimeStart = BigInt(DateTime.fromISO(timeStart).toSeconds());
-      } catch (err) {}
+      } catch (error) {
+        return setError(error.message);
+      }
+    }
+    let maybeDurationSeconds;
+    if (durationSeconds) {
+      try {
+        maybeDurationSeconds = BigInt(durationSeconds);
+      } catch (error) {
+        return setError(error.message);
+      }
     }
     onChangeOptions({
       timeStart: maybeTimeStart,
-      durationSeconds: durationSeconds ? BigInt(durationSeconds) : undefined,
+      durationSeconds: maybeDurationSeconds,
       execute,
     });
   }, [timeStart, durationSeconds, execute]);
@@ -126,6 +138,8 @@ export function ProposalOptionsForm({
                 </span>
               </label>
             </div>
+
+            {!!error && <ErrorAlert>{error}</ErrorAlert>}
           </Disclosure.Panel>
         </>
       )}

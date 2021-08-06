@@ -34,12 +34,19 @@ export function TransferForm({
       }
     }
 
-    makeCommand({
-      Transfer: {
-        recipient: maybeRecipient,
-        amount: BigInt(debouncedAmount),
-      },
-    });
+    let command: AxonCommandRequest;
+    try {
+      command = {
+        Transfer: {
+          recipient: maybeRecipient,
+          amount: BigInt(debouncedAmount),
+        },
+      };
+    } catch (error) {
+      setError(error.message);
+      return makeCommand(null);
+    }
+    makeCommand(command);
   }, [debouncedAmount, debouncedRecipient]);
 
   return (

@@ -114,8 +114,6 @@ export function PolicyForm({
   const [quorum, setQuorum] = useState(defaultQuorum);
 
   useEffect(() => {
-    const proposeThresholdValue = BigInt(proposeThreshold);
-
     let proposersValue: Policy["proposers"];
     if (proposers === "Closed") {
       if (!users.length) {
@@ -136,21 +134,27 @@ export function PolicyForm({
       proposersValue = { Open: null };
     }
 
-    const policy: Policy = {
-      proposeThreshold: proposeThresholdValue,
-      proposers: proposersValue,
-      acceptanceThreshold:
-        threshold === "Absolute"
-          ? {
-              Absolute: BigInt(acceptanceThreshold),
-            }
-          : {
-              Percent: {
-                percent: percentToBigInt(acceptanceThreshold),
-                quorum: quorum ? [BigInt((Number(quorum) / 100) * 1e8)] : [],
+    let policy: Policy;
+    try {
+      policy = {
+        proposeThreshold: BigInt(proposeThreshold),
+        proposers: proposersValue,
+        acceptanceThreshold:
+          threshold === "Absolute"
+            ? {
+                Absolute: BigInt(acceptanceThreshold),
+              }
+            : {
+                Percent: {
+                  percent: percentToBigInt(acceptanceThreshold),
+                  quorum: quorum ? [BigInt((Number(quorum) / 100) * 1e8)] : [],
+                },
               },
-            },
-    };
+      };
+    } catch (error) {
+      setInputError(error.message);
+      return makeCommand(null);
+    }
     console.log(policy);
 
     makeCommand({

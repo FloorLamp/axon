@@ -65,10 +65,17 @@ export default function CreateAxonForm() {
   const [error, setError] = useState("");
   const [policy, setPolicy] = useState(null);
 
-  const totalSupply = ledger.reduce(
-    (sum, item) => sum + (item?.amount ? BigInt(item.amount) : BigInt(0)),
-    BigInt(0)
-  );
+  const totalSupply = ledger.reduce((sum, item) => {
+    let amount = BigInt(0);
+    if (item?.amount) {
+      try {
+        amount = BigInt(Math.floor(Number(item.amount)));
+      } catch (error) {
+        console.warn(error);
+      }
+    }
+    return sum + amount;
+  }, BigInt(0));
 
   useEffect(() => {
     if (userType === "Individual User") {

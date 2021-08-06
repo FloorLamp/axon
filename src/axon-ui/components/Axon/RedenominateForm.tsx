@@ -19,22 +19,32 @@ export function RedenominateForm({
   const debouncedFromAmount = useDebounce(fromAmount);
   const debouncedToAmount = useDebounce(toAmount);
 
-  const newSupply =
-    data && fromAmount && toAmount
-      ? (data.supply * BigInt(toAmount)) / BigInt(fromAmount)
-      : null;
+  let newSupply;
+  try {
+    newSupply =
+      data && fromAmount && toAmount
+        ? (data.supply * BigInt(toAmount)) / BigInt(fromAmount)
+        : null;
+  } catch (error) {}
 
   useEffect(() => {
     if (!debouncedFromAmount || !debouncedToAmount) return makeCommand(null);
 
     setError("");
 
-    makeCommand({
-      Redenominate: {
-        from: BigInt(debouncedFromAmount),
-        to: BigInt(debouncedToAmount),
-      },
-    });
+    let command: AxonCommandRequest;
+    try {
+      command = {
+        Redenominate: {
+          from: BigInt(debouncedFromAmount),
+          to: BigInt(debouncedToAmount),
+        },
+      };
+    } catch (error) {
+      setError(error.message);
+      return makeCommand(null);
+    }
+    makeCommand(command);
   }, [debouncedFromAmount, debouncedToAmount]);
 
   return (

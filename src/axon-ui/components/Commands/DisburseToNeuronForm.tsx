@@ -21,11 +21,13 @@ export function DisburseToNeuronForm({
   const [error, setError] = useState("");
 
   const debouncedController = useDebounce(controller);
+  const debouncedAmount = useDebounce(amount);
+  const debouncedDissolveDelay = useDebounce(dissolveDelay);
   const debouncedNonce = useDebounce(nonce);
 
   useEffect(() => {
     setError("");
-    let new_controller = [];
+    let new_controller: DisburseToNeuron["new_controller"] = [];
     if (controller) {
       try {
         new_controller = [Principal.fromText(controller)];
@@ -35,11 +37,11 @@ export function DisburseToNeuronForm({
       }
     }
 
-    if (!nonce || !dissolveDelay) {
+    if (!amount || !nonce || !dissolveDelay) {
       return makeCommand(null);
     }
 
-    let nonce_bi: BigInt;
+    let nonce_bi: bigint;
     try {
       nonce_bi = BigInt(nonce);
     } catch (err) {
@@ -47,16 +49,29 @@ export function DisburseToNeuronForm({
       return makeCommand(null);
     }
 
-    makeCommand({
-      DisburseToNeuron: {
-        dissolve_delay_seconds: BigInt(dissolveDelay),
-        kyc_verified: kyc,
-        amount_e8s: BigInt(amount) * BigInt(1e8),
-        new_controller,
-        nonce: nonce_bi,
-      } as DisburseToNeuron,
-    });
-  }, [debouncedController, debouncedNonce]);
+    let command: Command;
+    try {
+      command = {
+        DisburseToNeuron: {
+          dissolve_delay_seconds: BigInt(dissolveDelay),
+          kyc_verified: kyc,
+          amount_e8s: BigInt(amount) * BigInt(1e8),
+          new_controller,
+          nonce: nonce_bi,
+        },
+      };
+    } catch (error) {
+      setError(error.message);
+      return makeCommand(null);
+    }
+
+    makeCommand(command);
+  }, [
+    debouncedController,
+    debouncedAmount,
+    debouncedDissolveDelay,
+    debouncedNonce,
+  ]);
 
   return (
     <>

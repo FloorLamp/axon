@@ -20,7 +20,9 @@ export default function ActionsMenu({
   );
   return (
     <div>
-      <NavButtons values={ACTIONS} selected={action} onChange={setAction} />
+      {!(defaultNeuronIds?.length === 1) && (
+        <NavButtons values={ACTIONS} selected={action} onChange={setAction} />
+      )}
 
       {action === "Manage" && (
         <ProposalForm

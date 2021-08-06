@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Command } from "../../declarations/Axon/Axon.did";
+import ErrorAlert from "../Labels/ErrorAlert";
 
 export function SplitForm({
   makeCommand,
@@ -9,15 +10,24 @@ export function SplitForm({
   stake?: bigint;
 }) {
   const [amount, setAmount] = useState("");
+  const [error, setError] = useState();
 
   useEffect(() => {
     if (!amount) return makeCommand(null);
 
-    makeCommand({
-      Split: {
-        amount_e8s: BigInt(amount) * BigInt(1e8),
-      },
-    });
+    let command: Command;
+    try {
+      command = {
+        Split: {
+          amount_e8s: BigInt(amount) * BigInt(1e8),
+        },
+      };
+    } catch (error) {
+      setError(error.message);
+      return makeCommand(null);
+    }
+
+    makeCommand(command);
   }, [amount]);
 
   return (
@@ -34,6 +44,8 @@ export function SplitForm({
           required
         />
       </label>
+
+      {!!error && <ErrorAlert>{error}</ErrorAlert>}
     </div>
   );
 }

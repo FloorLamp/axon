@@ -30,7 +30,9 @@ export default function ManageNeuronModal({
         isOpen={isOpen}
         openModal={openModal}
         closeModal={closeModal}
-        title="Manage Neurons"
+        title={`Manage ${
+          defaultNeuronIds?.length === 1 ? "Neuron" : "Neurons"
+        }`}
       >
         <ActionsMenu
           closeModal={closeModal}

@@ -146,7 +146,7 @@ export default function StatusHistory({
             >
               {isOwner && (
                 <div className="mt-2 border-t border-gray-300 pt-3">
-                  <ExecuteButton id={proposal.id} />
+                  <ExecuteButton proposalId={proposal.id} />
                 </div>
               )}
             </StatusSummary>

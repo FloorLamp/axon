@@ -3,13 +3,13 @@ import SpinnerButton from "../Buttons/SpinnerButton";
 import { CommandError } from "./CommandResponseSummary";
 
 export default function ExecuteButton({
-  id,
+  proposalId,
   isDisabled,
 }: {
-  id: bigint;
+  proposalId: bigint;
   isDisabled?: boolean;
 }) {
-  const { mutate, isLoading, isError, error } = useExecute();
+  const { mutate, isLoading, isError, error } = useExecute(proposalId);
 
   return (
     <div className="flex flex-col gap-2">
@@ -20,7 +20,7 @@ export default function ExecuteButton({
           isDisabled={isDisabled}
           activeClassName="btn-cta"
           disabledClassName="btn-cta-disabled"
-          onClick={() => mutate({ id })}
+          onClick={() => mutate()}
         >
           Execute
         </SpinnerButton>
