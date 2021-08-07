@@ -7,7 +7,7 @@ import DelegateNeuronForm from "./DelegateNeuronForm";
 
 const ACTIONS = ["Manage", "Add Hot Key", "Delegate Neuron"] as const;
 
-export default function ActionsMenu({
+export default function NeuronActionsMenu({
   closeModal,
   defaultNeuronIds,
 }: {
