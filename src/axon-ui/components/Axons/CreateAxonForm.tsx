@@ -184,7 +184,9 @@ export default function CreateAxonForm() {
             <PolicyForm
               key={userType}
               makeCommand={(command) =>
-                setPolicy("SetPolicy" in command ? command.SetPolicy : null)
+                setPolicy(
+                  command && "SetPolicy" in command ? command.SetPolicy : null
+                )
               }
               defaultMaxSupply={totalSupply}
               {...defaultPolicyForType(userType, principal)}

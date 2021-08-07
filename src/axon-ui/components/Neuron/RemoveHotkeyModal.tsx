@@ -13,7 +13,7 @@ export default function RemoveHotkeyModal({ neuronId }: { neuronId: string }) {
 
   const dfxCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
     neuronId || "$NEURON_ID"
-  }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {AddHotKey=record {new_hot_key=opt principal \\"${
+  }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {RemoveHotKey=record {hot_key_to_remove=opt principal \\"${
     data?.proxy
   }\\"}})})})})"`;
 

@@ -45,7 +45,7 @@ export function AddProposersForm({
       </p>
 
       <label className="block">
-        <span>Members</span>
+        <span>Proposers</span>
         <CreatableSelect
           isMulti={true}
           onChange={(values) => setUsers(values.map(({ value }) => value))}

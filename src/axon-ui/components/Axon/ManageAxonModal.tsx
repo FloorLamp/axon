@@ -4,12 +4,12 @@ import Modal from "../Layout/Modal";
 import ProposalForm from "../Proposal/ProposalForm";
 
 export default function ManageAxonModal() {
-  const isOwner = useIsProposer();
+  const isProposer = useIsProposer();
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  if (!isOwner) {
+  if (!isProposer) {
     return null;
   }
 

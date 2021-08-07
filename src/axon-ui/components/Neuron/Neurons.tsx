@@ -114,10 +114,13 @@ export default function Neurons() {
         </ul>
       ) : (
         isSuccess && (
-          <div className="h-32 flex flex-col items-center justify-center">
-            <BsInboxFill size={48} />
-            <p className="py-2">No neurons</p>
-            <p className="text-gray-500">Add your first neuron!</p>
+          <div className="h-48 flex flex-col items-center justify-center">
+            <BsInboxFill size={48} className="text-gray-800" />
+            <p className="pb-8">No neurons</p>
+            <ManageNeuronModal
+              buttonClassName="btn-cta px-4 py-2"
+              buttonText="Add your first neuron"
+            />
           </div>
         )
       )}
