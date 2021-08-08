@@ -21,7 +21,8 @@ export const useControllerType = (neuron: Neuron): ControllerType => {
   return null;
 };
 
-export const useManagedNeurons = (): Record<string, string[]> => {
+export type ManagedNeurons = Record<string, string[]>;
+export const useManagedNeurons = (): ManagedNeurons => {
   const { data: neurons } = useNeurons();
   const { data: neuronIds } = useNeuronIds();
 

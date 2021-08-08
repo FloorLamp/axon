@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
-import { pluralize } from "../../lib/utils";
 import Modal from "../Layout/Modal";
 import NeuronActionsMenu from "./NeuronActionsMenu";
 
@@ -33,7 +32,8 @@ export default function ManageNeuronModal({
         isOpen={isOpen}
         openModal={openModal}
         closeModal={closeModal}
-        title={`Manage ${pluralize("Neuron", defaultNeuronIds?.length)}`}
+        title="Manage Neurons"
+        className="w-full max-w-screen-md"
       >
         <NeuronActionsMenu
           closeModal={closeModal}

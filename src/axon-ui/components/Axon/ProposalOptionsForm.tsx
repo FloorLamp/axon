@@ -48,7 +48,7 @@ export function ProposalOptionsForm({
       {({ open }) => (
         <>
           <Disclosure.Button className="group leading-none inline-flex items-center cursor-pointer px-2 py-1">
-            Options
+            Proposal Options
             <FiChevronRight
               className={classNames(
                 "transform transition-transform transition-100",

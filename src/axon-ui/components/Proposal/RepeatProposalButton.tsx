@@ -29,6 +29,9 @@ export default function RepeatProposalButton({
         openModal={openModal}
         closeModal={closeModal}
         title="Repeat Proposal"
+        className={
+          "NeuronCommand" in proposal ? "w-full max-w-screen-md" : undefined
+        }
       >
         {"AxonCommand" in proposal && (
           <ProposalForm
