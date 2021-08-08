@@ -200,10 +200,12 @@ export const idlFactory = ({ IDL }) => {
     }),
     'acceptanceThreshold' : Threshold,
   });
-  const Axon = IDL.Record({
+  const AxonPublic = IDL.Record({
     'id' : IDL.Nat,
     'balance' : IDL.Nat,
     'name' : IDL.Text,
+    'tokenHolders' : IDL.Nat,
+    'totalStake' : IDL.Nat,
     'supply' : IDL.Nat,
     'proxy' : Proxy,
     'visibility' : Visibility,
@@ -339,7 +341,7 @@ export const idlFactory = ({ IDL }) => {
     'visibility' : Visibility,
     'policy' : Policy,
   });
-  const Result_3 = IDL.Variant({ 'ok' : Axon, 'err' : Error });
+  const Result_3 = IDL.Variant({ 'ok' : AxonPublic, 'err' : Error });
   const ProposalResult = IDL.Variant({
     'ok' : IDL.Vec(AxonProposal),
     'err' : Error,
@@ -361,7 +363,7 @@ export const idlFactory = ({ IDL }) => {
     'proposalId' : IDL.Nat,
   });
   const AxonService = IDL.Service({
-    'axonById' : IDL.Func([IDL.Nat], [Axon], ['query']),
+    'axonById' : IDL.Func([IDL.Nat], [AxonPublic], ['query']),
     'axonStatusById' : IDL.Func([IDL.Nat], [CanisterStatusResult], []),
     'balanceOf' : IDL.Func(
         [IDL.Nat, IDL.Opt(IDL.Principal)],
@@ -383,8 +385,10 @@ export const idlFactory = ({ IDL }) => {
     'getNeurons' : IDL.Func([IDL.Nat], [ListNeuronsResult], ['query']),
     'getProposalById' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], ['query']),
     'ledger' : IDL.Func([IDL.Nat], [IDL.Vec(LedgerEntry)], ['query']),
+    'myAxons' : IDL.Func([], [IDL.Vec(AxonPublic)], ['query']),
     'propose' : IDL.Func([NewProposal], [Result_2], []),
     'sync' : IDL.Func([IDL.Nat], [ListNeuronsResult], []),
+    'topAxons' : IDL.Func([], [IDL.Vec(AxonPublic)], ['query']),
     'transfer' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [Result], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),
     'wallet_receive' : IDL.Func([], [IDL.Nat], []),

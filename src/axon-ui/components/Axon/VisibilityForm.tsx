@@ -4,7 +4,7 @@ import {
   AxonCommandRequest,
   Visibility,
 } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 
 export function VisibilityForm({
   makeCommand,
@@ -13,7 +13,7 @@ export function VisibilityForm({
   makeCommand: (cmd: AxonCommandRequest | null) => void;
   defaults?: Visibility;
 }) {
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [isPublic, setIsPublic] = useState(
     defaults ? "Public" in defaults : "Public" in data?.visibility ?? true
   );

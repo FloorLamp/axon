@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
 import { useClipboard } from "use-clipboard-copy";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import WarningAlert from "../Labels/WarningAlert";
 import SyncForm from "./SyncForm";
 
 export default function AddHotKeyForm() {
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [neuronId, setNeuronId] = useState("");
   const dfxCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
     neuronId || "$NEURON_ID"

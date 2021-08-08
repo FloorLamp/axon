@@ -6,12 +6,12 @@ import Breadcrumbs from "../../../components/Navigation/Breadcrumbs";
 import Neurons from "../../../components/Neuron/Neurons";
 import NnsProposals from "../../../components/NnsProposal/NnsProposals";
 import Proposals from "../../../components/Proposal/Proposals";
-import { useInfo } from "../../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../../lib/hooks/Axon/useAxonById";
 import useAxonId from "../../../lib/hooks/useAxonId";
 
 export default function AxonPage() {
   const id = useAxonId();
-  const { isLoadingError } = useInfo();
+  const { isLoadingError } = useAxonById();
 
   return (
     <>

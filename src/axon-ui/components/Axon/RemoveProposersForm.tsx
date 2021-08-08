@@ -2,7 +2,7 @@ import { Principal } from "@dfinity/principal";
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import useNames from "../../lib/hooks/useNames";
 
 export function RemoveProposersForm({
@@ -16,7 +16,7 @@ export function RemoveProposersForm({
   >["RemoveMembers"];
 }) {
   const { principalName } = useNames();
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [users, setUsers] = useState(defaults?.map((p) => p.toText()) ?? []);
   const [inputError, setInputError] = useState("");
 

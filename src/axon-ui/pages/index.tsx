@@ -1,10 +1,16 @@
 import Link from "next/link";
 import React from "react";
 import { FaArrowRight } from "react-icons/fa";
-import Axons from "../components/Axons/Axons";
+import AllAxons from "../components/Axons/AllAxons";
+import MyAxons from "../components/Axons/MyAxons";
 import Panel from "../components/Containers/Panel";
+import { useGlobalContext } from "../components/Store/Store";
 
 export default function Home() {
+  const {
+    state: { isAuthed },
+  } = useGlobalContext();
+
   return (
     <div className="flex flex-col gap-8 pt-8">
       <Panel className="p-8 text-xl">
@@ -21,7 +27,9 @@ export default function Home() {
         </div>
       </Panel>
 
-      <Axons />
+      {isAuthed && <MyAxons />}
+
+      <AllAxons />
     </div>
   );
 }

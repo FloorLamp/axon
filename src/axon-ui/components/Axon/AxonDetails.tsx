@@ -1,7 +1,7 @@
 import { Principal } from "@dfinity/principal";
 import React from "react";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { useCanisterStatus } from "../../lib/hooks/Axon/useCanisterStatus";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import useAxonId from "../../lib/hooks/useAxonId";
 import { formatNumber } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -16,7 +16,7 @@ import PolicySummary from "./PolicySummary";
 export default function AxonDetails() {
   const id = useAxonId();
   const status = useCanisterStatus();
-  const { data, error, isFetching, refetch } = useInfo();
+  const { data, error, isFetching, refetch } = useAxonById();
 
   return (
     <Panel className="flex-1 p-4">

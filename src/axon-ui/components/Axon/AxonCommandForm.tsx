@@ -3,7 +3,7 @@ import {
   AxonCommandRequest,
   ProposalType,
 } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { KeysOfUnion } from "../../lib/types";
 import { AddProposersForm } from "./AddProposersForm";
 import { MintForm } from "./MintForm";
@@ -35,7 +35,7 @@ export default function AxonCommandForm({
   setProposal: (at: ProposalType) => void;
   defaultCommand?: AxonCommandRequest;
 }) {
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [commandName, setCommandName] = useState<AxonCommandName>(
     defaultCommand
       ? (Object.keys(defaultCommand)[0] as AxonCommandName)

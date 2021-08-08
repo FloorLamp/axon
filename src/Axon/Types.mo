@@ -12,7 +12,8 @@ module {
     manage_neuron : shared GT.ManageNeuron -> async GT.ManageNeuronResponse;
   };
 
-  public type Axon = {
+  // Publicly exposed Axon that includes treasury balance, total neuron stake, and token holders
+  public type AxonPublic = {
     id: Nat;
     proxy: Proxy;
     name: Text;
@@ -20,6 +21,8 @@ module {
     supply: Nat;
     policy: Policy;
     balance: Nat;
+    totalStake: Nat;
+    tokenHolders: Nat;
   };
 
   public type AxonFull = {
@@ -31,6 +34,7 @@ module {
     ledger: Ledger;
     policy: Policy;
     neurons: ?GT.ListNeuronsResponse;
+    totalStake: Nat;
     allProposals: [AxonProposal];
     activeProposals: [AxonProposal];
     lastProposalId: Nat;

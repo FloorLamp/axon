@@ -1,10 +1,10 @@
 import { useGlobalContext } from "../../../components/Store/Store";
 import { principalIsEqual } from "../../utils";
+import { useAxonById } from "./useAxonById";
 import { useBalance } from "./useBalance";
-import { useInfo } from "./useInfo";
 
 export const useIsProposer = () => {
-  const { data: info } = useInfo();
+  const { data: info } = useAxonById();
   const { data: balance } = useBalance();
   const {
     state: { principal },

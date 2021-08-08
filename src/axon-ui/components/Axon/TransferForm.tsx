@@ -1,7 +1,7 @@
 import { Principal } from "@dfinity/principal";
 import React, { useEffect, useState } from "react";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import useAxonId from "../../lib/hooks/useAxonId";
 import useDebounce from "../../lib/hooks/useDebounce";
 import { formatNumber } from "../../lib/utils";
@@ -15,7 +15,7 @@ export function TransferForm({
   defaults?: Extract<AxonCommandRequest, { Transfer: {} }>["Transfer"];
 }) {
   const axonId = useAxonId();
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [amount, setAmount] = useState(defaults?.amount.toString() ?? "");
   const [recipient, setRecipient] = useState(
     defaults?.recipient.toText() ?? ""

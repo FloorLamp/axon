@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect } from "react";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { ManagedNeurons } from "../../lib/hooks/Axon/useControllerType";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import { pluralize, principalIsEqual } from "../../lib/utils";
@@ -24,7 +24,7 @@ export default function NeuronSelectionForm({
   setControlType: (arg: ControlType) => void;
   managedNeurons: ManagedNeurons;
 }) {
-  const { data: info } = useInfo();
+  const { data: info } = useAxonById();
   const { data: neurons } = useNeurons();
   const { data: allNeuronIds } = useNeuronIds();
 

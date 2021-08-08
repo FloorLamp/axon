@@ -1,12 +1,12 @@
 import { Neuron } from "../../../declarations/Axon/Axon.did";
 import { ControllerType } from "../../neurons";
 import { principalIsEqual } from "../../utils";
-import { useInfo } from "./useInfo";
+import { useAxonById } from "./useAxonById";
 import { useNeuronIds } from "./useNeuronIds";
 import { useNeurons } from "./useNeurons";
 
 export const useControllerType = (neuron: Neuron): ControllerType => {
-  const { data: info } = useInfo();
+  const { data: info } = useAxonById();
 
   if (!info || !neuron) {
     return null;

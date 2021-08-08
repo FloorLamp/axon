@@ -3,7 +3,7 @@ import React from "react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { AxonProposal } from "../../declarations/Axon/Axon.did";
 import { getStatus } from "../../lib/axonProposal";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { percentFromBigInt } from "../../lib/percents";
 import { StatusKey } from "../../lib/types";
 import { formatNumber, formatPercent } from "../../lib/utils";
@@ -19,7 +19,7 @@ export default function VoteSummary({
     votePower: bigint;
   };
 }) {
-  const { data } = useInfo();
+  const { data } = useAxonById();
 
   if (!data) {
     return null;

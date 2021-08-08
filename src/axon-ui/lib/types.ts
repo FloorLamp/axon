@@ -15,7 +15,7 @@ export type Modify<T, R> = Omit<T, keyof R> & R;
 export type KeysOfUnion<T> = T extends T ? keyof T : never;
 
 export type AxonService = ActorSubclass<Axon._SERVICE>;
-export type AxonWithProxy = Modify<Axon.Axon, { proxy: Principal }>;
+export type AxonWithProxy = Modify<Axon.AxonPublic, { proxy: Principal }>;
 
 export type StatusKey = KeysOfUnion<Status>;
 export type ProposalTypeKey = KeysOfUnion<ProposalType>;

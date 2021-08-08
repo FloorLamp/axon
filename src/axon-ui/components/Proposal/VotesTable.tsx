@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useState } from "react";
 import { AxonProposal, Ballot } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { formatNumber, formatPercent, pluralize } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 
@@ -52,7 +52,7 @@ const VoteTypes = ["For", "Against", "Not Voted"] as const;
 type VoteType = typeof VoteTypes[number];
 
 export default function Votes({ proposal }: { proposal: AxonProposal }) {
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const ballots = proposal.ballots.filter(({ vote }) => !!vote[0]);
   const yesBallots = ballots.filter(({ vote: [v] }) => "Yes" in v);
   const noBallots = ballots.filter(({ vote: [v] }) => "No" in v);

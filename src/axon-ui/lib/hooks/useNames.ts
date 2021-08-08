@@ -1,14 +1,14 @@
 import { useGlobalContext } from "../../components/Store/Store";
 import { canisterId as AxonCanisterId } from "../../declarations/Axon";
 import { DEFAULT_NEURONS } from "../names";
-import { useInfo } from "./Axon/useInfo";
+import { useAxonById } from "./Axon/useAxonById";
 
 /** Stub for address book */
 export default function useNames() {
   const {
     state: { principal },
   } = useGlobalContext();
-  const { data } = useInfo();
+  const { data } = useAxonById();
 
   const neurons = DEFAULT_NEURONS;
   const principals = {

@@ -1,7 +1,8 @@
 import { Principal } from "@dfinity/principal";
 import assert from "assert";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
+import { AxonPublic } from "../../../declarations/Axon/Axon.did";
 import { AxonWithProxy } from "../../types";
 import { tryCall } from "../../utils";
 import useAxonId from "../useAxonId";
@@ -10,9 +11,11 @@ function isPrincipal(arg: any): asserts arg is Principal {
   assert(arg instanceof Principal);
 }
 
-export const useInfo = () => {
+export const useAxonById = () => {
   const id = useAxonId();
   const axon = useAxon();
+  const queryClient = useQueryClient();
+
   return useQuery(
     ["info", id],
     async () => {
@@ -25,6 +28,16 @@ export const useInfo = () => {
     },
     {
       enabled: !!id,
+      initialData: () => {
+        return (queryClient
+          .getQueryData<AxonPublic[]>(["topAxons"])
+          ?.find((ap) => ap.id.toString() === id) ??
+          queryClient
+            .getQueryData<AxonPublic[]>(["myAxons"])
+            ?.find(
+              (ap) => ap.id.toString() === id
+            )) as unknown as AxonWithProxy;
+      },
     }
   );
 };

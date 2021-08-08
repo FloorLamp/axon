@@ -1,5 +1,5 @@
 import React from "react";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { useLedger } from "../../lib/hooks/Axon/useLedger";
 import { formatNumber, formatPercent } from "../../lib/utils";
 import IdentifierLabelWithButtons, {
@@ -10,7 +10,7 @@ import Panel from "../Containers/Panel";
 import ResponseError from "../Labels/ResponseError";
 
 export default function Ledger() {
-  const { data: info } = useInfo();
+  const { data: info } = useAxonById();
   const { data: entries, error, isFetching, refetch, isSuccess } = useLedger();
 
   return (

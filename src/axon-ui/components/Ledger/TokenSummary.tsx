@@ -1,7 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { FiChevronRight } from "react-icons/fi";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { useLedger } from "../../lib/hooks/Axon/useLedger";
 import useAxonId from "../../lib/hooks/useAxonId";
 import { formatNumber, formatPercent } from "../../lib/utils";
@@ -13,7 +13,7 @@ import { DataRow, DataTable } from "../Proposal/DataTable";
 
 export default function TokenSummary() {
   const axonId = useAxonId();
-  const { data: info } = useInfo();
+  const { data: info } = useAxonById();
   const { data: ledger, error, isFetching, refetch, isSuccess } = useLedger();
   const topHolders = ledger?.slice(0, 5);
 

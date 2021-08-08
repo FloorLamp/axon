@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { BsCheck, BsClipboard } from "react-icons/bs";
 import { useClipboard } from "use-clipboard-copy";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import Modal from "../Layout/Modal";
 import SyncForm from "./SyncForm";
 
 export default function RemoveHotkeyModal({ neuronId }: { neuronId: string }) {
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);

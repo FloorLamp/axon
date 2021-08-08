@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AxonCommandRequest } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import useAxonId from "../../lib/hooks/useAxonId";
 import useDebounce from "../../lib/hooks/useDebounce";
 import { formatNumber } from "../../lib/utils";
@@ -14,7 +14,7 @@ export function RedenominateForm({
   defaults?: Extract<AxonCommandRequest, { Redenominate: {} }>["Redenominate"];
 }) {
   const axonId = useAxonId();
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const [fromAmount, setFromAmount] = useState(defaults?.from.toString() ?? "");
   const [toAmount, setToAmount] = useState(defaults?.to.toString() ?? "");
   const [error, setError] = useState("");

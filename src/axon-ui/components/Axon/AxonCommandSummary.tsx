@@ -2,7 +2,7 @@ import { Principal } from "@dfinity/principal";
 import assert from "assert";
 import React from "react";
 import { AxonCommand } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import useNames from "../../lib/hooks/useNames";
 import { AxonCommandKey } from "../../lib/types";
 import { formatNumber, formatPercent } from "../../lib/utils";
@@ -16,7 +16,7 @@ export default function AxonCommandSummary({
   axonCommand: AxonCommand;
 }) {
   const { principalName } = useNames();
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const key = Object.keys(request)[0] as AxonCommandKey;
   switch (key) {
     case "AddMembers":

@@ -7,7 +7,7 @@ import {
   Policy,
   Threshold,
 } from "../../declarations/Axon/Axon.did";
-import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import useNames from "../../lib/hooks/useNames";
 import { percentFromBigInt, percentToBigInt } from "../../lib/percents";
 import { KeysOfUnion } from "../../lib/types";
@@ -30,7 +30,7 @@ export function PolicyFormWithDefaults({
   makeCommand: (cmd: AxonCommandRequest | null) => void;
   defaults?: Policy;
 }) {
-  const { data } = useInfo();
+  const { data } = useAxonById();
   const policy = defaults ?? data?.policy;
 
   if (policy) {
