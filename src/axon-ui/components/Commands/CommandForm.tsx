@@ -15,8 +15,7 @@ const commands: [CommandKey, string][] = [
   ["Split", "Split"],
   ["Follow", "Follow"],
   ["Configure", "Configure"],
-  // Voting is done from the NNS Proposals section
-  // ["RegisterVote", "Register Vote"],
+  ["RegisterVote", "Register Vote"],
   ["DisburseToNeuron", "Disburse To Neuron"],
   ["MakeProposal", "Make Proposal"],
   ["Disburse", "Disburse"],

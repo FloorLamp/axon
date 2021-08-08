@@ -4,21 +4,20 @@ import {
   Configure,
   Operation,
 } from "../../declarations/Axon/Axon.did";
+import { OperationKey } from "../../lib/types";
 import { AddHotkeyForm } from "./AddHotkeyForm";
 import { IncreaseDissolveDelayForm } from "./IncreaseDissolveDelayForm";
 import { RemoveHotkeyForm } from "./RemoveHotkeyForm";
 import { SetDissolveTimestampForm } from "./SetDissolveTimestampForm";
 
-const operations = [
-  "Add Hot Key",
-  "Remove Hot Key",
-  "Start Dissolving",
-  "Stop Dissolving",
-  "Increase Dissolve Delay",
-  "Set Dissolve Timestamp",
-] as const;
-
-type OperationName = typeof operations[number];
+const operations: [OperationKey, string][] = [
+  ["AddHotKey", "Add Hot Key"],
+  ["RemoveHotKey", "Remove Hot Key"],
+  ["StartDissolving", "Start Dissolving"],
+  ["StopDissolving", "Stop Dissolving"],
+  ["IncreaseDissolveDelay", "Increase Dissolve Delay"],
+  ["SetDissolveTimestamp", "Set Dissolve Timestamp"],
+];
 
 export function ConfigureForm({
   makeCommand,
@@ -29,10 +28,10 @@ export function ConfigureForm({
   defaults?: Configure;
   neuronIds: string[];
 }) {
-  const [operationName, setOperationName] = useState<OperationName>(
+  const [operationKey, setOperationKey] = useState<OperationKey>(
     defaults
-      ? (Object.keys(defaults.operation[0])[0] as OperationName)
-      : operations[0]
+      ? (Object.keys(defaults.operation[0])[0] as OperationKey)
+      : operations[0][0]
   );
 
   const [operation, setOperation] = useState<Operation>(null);
@@ -48,8 +47,8 @@ export function ConfigureForm({
   }, [operation]);
 
   const renderForm = () => {
-    switch (operationName) {
-      case "Increase Dissolve Delay":
+    switch (operationKey) {
+      case "IncreaseDissolveDelay":
         return (
           <IncreaseDissolveDelayForm
             makeOperation={setOperation}
@@ -61,7 +60,7 @@ export function ConfigureForm({
           />
         );
 
-      case "Set Dissolve Timestamp":
+      case "SetDissolveTimestamp":
         return (
           <SetDissolveTimestampForm
             makeOperation={setOperation}
@@ -73,7 +72,7 @@ export function ConfigureForm({
           />
         );
 
-      case "Add Hot Key":
+      case "AddHotKey":
         return (
           <AddHotkeyForm
             makeOperation={setOperation}
@@ -84,7 +83,7 @@ export function ConfigureForm({
             }
           />
         );
-      case "Remove Hot Key":
+      case "RemoveHotKey":
         return (
           <RemoveHotkeyForm
             makeOperation={setOperation}
@@ -96,8 +95,8 @@ export function ConfigureForm({
             neuronIds={neuronIds}
           />
         );
-      case "Start Dissolving":
-      case "Stop Dissolving":
+      case "StartDissolving":
+      case "StopDissolving":
         return null;
     }
   };
@@ -108,12 +107,12 @@ export function ConfigureForm({
         <label>Operation</label>
         <select
           className="w-full mt-1"
-          onChange={(e) => setOperationName(e.target.value as OperationName)}
-          value={operationName}
+          onChange={(e) => setOperationKey(e.target.value as OperationKey)}
+          value={operationKey}
         >
-          {operations.map((operation) => (
-            <option key={operation} value={operation}>
-              {operation}
+          {operations.map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
             </option>
           ))}
         </select>

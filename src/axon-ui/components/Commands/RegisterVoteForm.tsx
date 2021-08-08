@@ -23,6 +23,10 @@ export function RegisterVoteForm({
 
   useEffect(() => {
     setError("");
+    if (!proposal) {
+      return makeCommand(null);
+    }
+
     let command;
     try {
       command = {
@@ -53,10 +57,11 @@ export function RegisterVoteForm({
         />
       </label>
 
-      <label className="block">
-        Vote
+      <div>
+        <label>Vote</label>
         <div className="flex rounded-md overflow-hidden">
-          <button
+          <input
+            type="button"
             className={classNames(
               "rounded-none p-1 flex-1 text-white transition-colors",
               {
@@ -68,10 +73,10 @@ export function RegisterVoteForm({
               e.preventDefault();
               setVote(1);
             }}
-          >
-            Yes
-          </button>
-          <button
+            value="Yes"
+          />
+          <input
+            type="button"
             className={classNames(
               "rounded-none p-1 flex-1 text-white transition-colors",
               {
@@ -83,11 +88,10 @@ export function RegisterVoteForm({
               e.preventDefault();
               setVote(2);
             }}
-          >
-            No
-          </button>
+            value="No"
+          />
         </div>
-      </label>
+      </div>
 
       {!!error && <ErrorAlert>{error}</ErrorAlert>}
     </div>

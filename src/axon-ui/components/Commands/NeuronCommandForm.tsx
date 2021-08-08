@@ -143,7 +143,8 @@ export default function NeuronCommandForm({
               <p className="leading-tight text-sm p-1">
                 Some of the selected neurons are not directly controlled by
                 Axon. For those neurons, Axon is only able to issue{" "}
-                <strong>Follow</strong> and <strong>Vote</strong> commands.
+                <strong>Follow, Vote</strong>, and{" "}
+                <strong>Make Proposal</strong> commands.
               </p>
             </WarningAlert>
           </div>
