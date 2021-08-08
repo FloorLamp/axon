@@ -1,6 +1,10 @@
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
-import { NeuronCommand, ProposalType } from "../../declarations/Axon/Axon.did";
+import {
+  NeuronCommand,
+  NeuronCommandRequest,
+  ProposalType,
+} from "../../declarations/Axon/Axon.did";
 import { useManagedNeurons } from "../../lib/hooks/Axon/useControllerType";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
@@ -14,15 +18,19 @@ const ControlTypes = ["Direct", "Delegated"] as const;
 export default function NeuronCommandForm({
   setProposal,
   defaultNeuronIds,
+  defaultCommand,
 }: {
-  setProposal: (at: ProposalType) => void;
+  setProposal: (arg: ProposalType) => void;
   defaultNeuronIds?: string[];
+  defaultCommand?: NeuronCommandRequest;
 }) {
   const { data: info } = useInfo();
   const { data: neurons } = useNeurons();
 
-  const [neuronIds, setNeuronIds] = useState(defaultNeuronIds);
-  const [command, setCommand] = useState(null);
+  const [neuronIds, setNeuronIds] = useState(
+    defaultCommand?.neuronIds.map(String) ?? defaultNeuronIds
+  );
+  const [command, setCommand] = useState(defaultCommand?.command);
   const [controlType, setControlType] = useState<typeof ControlTypes[number]>(
     ControlTypes[0]
   );
@@ -78,7 +86,7 @@ export default function NeuronCommandForm({
 
   const showNonControllerWarning =
     controlType === "Direct" &&
-    !neurons.full_neurons
+    !neurons?.full_neurons
       .filter(
         (neuron) =>
           neuronIds.includes(neuron.id[0].id.toString()) || !neuronIds.length
@@ -140,7 +148,11 @@ export default function NeuronCommandForm({
             </WarningAlert>
           </div>
         )}
-        <CommandForm setCommand={setCommand} />
+        <CommandForm
+          setCommand={setCommand}
+          defaultCommand={defaultCommand?.command}
+          neuronIds={neuronIds}
+        />
       </div>
     </div>
   );

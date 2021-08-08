@@ -5,10 +5,11 @@ import {
 } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
 import { KeysOfUnion } from "../../lib/types";
+import { AddProposersForm } from "./AddProposersForm";
 import { MintForm } from "./MintForm";
 import { PolicyFormWithDefaults } from "./PolicyForm";
-import { AddProposersForm, RemoveProposersForm } from "./ProposersForm";
 import { RedenominateForm } from "./RedenominateForm";
+import { RemoveProposersForm } from "./RemoveProposersForm";
 import { TransferForm } from "./TransferForm";
 import { VisibilityForm } from "./VisibilityForm";
 
@@ -29,12 +30,16 @@ type AxonCommandName = KeysOfUnion<AxonCommandRequest>;
 
 export default function AxonCommandForm({
   setProposal,
+  defaultCommand,
 }: {
   setProposal: (at: ProposalType) => void;
+  defaultCommand?: AxonCommandRequest;
 }) {
   const { data } = useInfo();
   const [commandName, setCommandName] = useState<AxonCommandName>(
-    commands[0][0]
+    defaultCommand
+      ? (Object.keys(defaultCommand)[0] as AxonCommandName)
+      : commands[0][0]
   );
 
   function setCommand(command: AxonCommandRequest) {
@@ -50,19 +55,82 @@ export default function AxonCommandForm({
   const renderForm = () => {
     switch (commandName) {
       case "AddMembers":
-        return <AddProposersForm makeCommand={setCommand} />;
+        return (
+          <AddProposersForm
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "AddMembers" in defaultCommand
+                ? defaultCommand.AddMembers
+                : undefined
+            }
+          />
+        );
       case "RemoveMembers":
-        return <RemoveProposersForm makeCommand={setCommand} />;
+        return (
+          <RemoveProposersForm
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "RemoveMembers" in defaultCommand
+                ? defaultCommand.RemoveMembers
+                : undefined
+            }
+          />
+        );
       case "SetVisibility":
-        return <VisibilityForm makeCommand={setCommand} />;
+        return (
+          <VisibilityForm
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "SetVisibility" in defaultCommand
+                ? defaultCommand.SetVisibility
+                : undefined
+            }
+          />
+        );
       case "SetPolicy":
-        return <PolicyFormWithDefaults makeCommand={setCommand} />;
+        return (
+          <PolicyFormWithDefaults
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "SetPolicy" in defaultCommand
+                ? defaultCommand.SetPolicy
+                : undefined
+            }
+          />
+        );
       case "Mint":
-        return <MintForm makeCommand={setCommand} />;
+        return (
+          <MintForm
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "Mint" in defaultCommand
+                ? defaultCommand.Mint
+                : undefined
+            }
+          />
+        );
       case "Transfer":
-        return <TransferForm makeCommand={setCommand} />;
+        return (
+          <TransferForm
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "Transfer" in defaultCommand
+                ? defaultCommand.Transfer
+                : undefined
+            }
+          />
+        );
       case "Redenominate":
-        return <RedenominateForm makeCommand={setCommand} />;
+        return (
+          <RedenominateForm
+            makeCommand={setCommand}
+            defaults={
+              defaultCommand && "Redenominate" in defaultCommand
+                ? defaultCommand.Redenominate
+                : undefined
+            }
+          />
+        );
     }
   };
 

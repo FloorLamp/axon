@@ -6,10 +6,14 @@ import ErrorAlert from "../Labels/ErrorAlert";
 
 export function SpawnForm({
   makeCommand,
+  defaults,
 }: {
   makeCommand: (cmd: Command | null) => void;
+  defaults?: Spawn;
 }) {
-  const [controller, setController] = useState("");
+  const [controller, setController] = useState(
+    defaults?.new_controller[0] ? defaults.new_controller[0].toText() : ""
+  );
   const [error, setError] = useState("");
   const debouncedController = useDebounce(controller);
 

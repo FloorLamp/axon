@@ -1,7 +1,9 @@
+import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { ProposalType } from "../../declarations/Axon/Axon.did";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import usePropose from "../../lib/hooks/Axon/usePropose";
+import useAxonId from "../../lib/hooks/useAxonId";
 import { ProposalOptions, ProposalTypeKey } from "../../lib/types";
 import AxonCommandForm from "../Axon/AxonCommandForm";
 import { ProposalOptionsForm } from "../Axon/ProposalOptionsForm";
@@ -12,12 +14,16 @@ import ErrorAlert from "../Labels/ErrorAlert";
 export default function ProposalForm({
   closeModal,
   proposalType,
+  defaultProposal,
   defaultNeuronIds,
 }: {
   closeModal: () => void;
   proposalType: ProposalTypeKey;
+  defaultProposal?: ProposalType;
   defaultNeuronIds?: string[];
 }) {
+  const router = useRouter();
+  const axonId = useAxonId();
   const { data } = useNeuronIds();
   const [options, setOptions] = useState<ProposalOptions>({});
   const [proposal, setProposal] = useState<ProposalType>(null);
@@ -29,7 +35,10 @@ export default function ProposalForm({
 
     if (proposal) {
       mutate(proposal, {
-        onSuccess: closeModal,
+        onSuccess: (data) => {
+          closeModal();
+          router.push(`/axon/${axonId}/proposal/${data.id.toString()}`);
+        },
       });
     }
   }
@@ -46,12 +55,24 @@ export default function ProposalForm({
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col divide-gray-300 divide-y">
         {proposalType === "AxonCommand" && (
-          <AxonCommandForm setProposal={setProposal} />
+          <AxonCommandForm
+            defaultCommand={
+              defaultProposal && "AxonCommand" in defaultProposal
+                ? defaultProposal.AxonCommand[0]
+                : undefined
+            }
+            setProposal={setProposal}
+          />
         )}
         {proposalType === "NeuronCommand" && (
           <NeuronCommandForm
             setProposal={setProposal}
             defaultNeuronIds={defaultNeuronIds}
+            defaultCommand={
+              defaultProposal && "NeuronCommand" in defaultProposal
+                ? defaultProposal.NeuronCommand[0]
+                : undefined
+            }
           />
         )}
 

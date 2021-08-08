@@ -25,44 +25,41 @@ const proposersOptions: [ProposersKey, string][] = [
 
 export function PolicyFormWithDefaults({
   makeCommand,
+  defaults,
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
+  defaults?: Policy;
 }) {
   const { data } = useInfo();
+  const policy = defaults ?? data?.policy;
 
-  if (data?.policy) {
+  if (policy) {
     return (
       <PolicyForm
         makeCommand={makeCommand}
         defaultMaxSupply={data.supply}
-        defaultProposersKey={
-          Object.keys(data.policy.proposers)[0] as ProposersKey
-        }
+        defaultProposersKey={Object.keys(policy.proposers)[0] as ProposersKey}
         defaultProposers={
-          "Closed" in data.policy.proposers
-            ? data.policy.proposers.Closed.map((p) => p.toText())
+          "Closed" in policy.proposers
+            ? policy.proposers.Closed.map((p) => p.toText())
             : []
         }
-        defaultProposeThreshold={data.policy.proposeThreshold.toString()}
+        defaultProposeThreshold={policy.proposeThreshold.toString()}
         defaultAcceptanceThresholdKey={
-          Object.keys(data.policy.acceptanceThreshold)[0] as ThresholdKey
+          Object.keys(policy.acceptanceThreshold)[0] as ThresholdKey
         }
         defaultAcceptanceThreshold={
-          "Absolute" in data.policy.acceptanceThreshold
-            ? data.policy.acceptanceThreshold.Absolute.toString()
+          "Absolute" in policy.acceptanceThreshold
+            ? policy.acceptanceThreshold.Absolute.toString()
             : String(
-                percentFromBigInt(
-                  data.policy.acceptanceThreshold.Percent.percent
-                )
+                percentFromBigInt(policy.acceptanceThreshold.Percent.percent)
               )
         }
         defaultQuorum={
-          "Percent" in data.policy.acceptanceThreshold &&
-          data.policy.acceptanceThreshold.Percent.quorum[0]
+          "Percent" in policy.acceptanceThreshold &&
+          policy.acceptanceThreshold.Percent.quorum[0]
             ? String(
-                percentFromBigInt(
-                  data.policy.acceptanceThreshold.Percent.quorum[0]
-                )
+                percentFromBigInt(policy.acceptanceThreshold.Percent.quorum[0])
               )
             : ""
         }

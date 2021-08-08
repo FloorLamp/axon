@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Command } from "../../declarations/Axon/Axon.did";
+import { Command, Split } from "../../declarations/Axon/Axon.did";
 import ErrorAlert from "../Labels/ErrorAlert";
 
 export function SplitForm({
   makeCommand,
   stake,
+  defaults,
 }: {
   makeCommand: (cmd: Command | null) => void;
   stake?: bigint;
+  defaults?: Split;
 }) {
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(defaults?.amount_e8s.toString() ?? "");
   const [error, setError] = useState();
 
   useEffect(() => {

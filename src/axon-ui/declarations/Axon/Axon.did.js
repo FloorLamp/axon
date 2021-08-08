@@ -383,7 +383,7 @@ export const idlFactory = ({ IDL }) => {
     'getNeurons' : IDL.Func([IDL.Nat], [ListNeuronsResult], ['query']),
     'getProposalById' : IDL.Func([IDL.Nat, IDL.Nat], [Result_2], ['query']),
     'ledger' : IDL.Func([IDL.Nat], [IDL.Vec(LedgerEntry)], ['query']),
-    'propose' : IDL.Func([NewProposal], [Result], []),
+    'propose' : IDL.Func([NewProposal], [Result_2], []),
     'sync' : IDL.Func([IDL.Nat], [ListNeuronsResult], []),
     'transfer' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [Result], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),

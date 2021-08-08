@@ -8,13 +8,15 @@ import ErrorAlert from "../Labels/ErrorAlert";
 
 export function RedenominateForm({
   makeCommand,
+  defaults,
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
+  defaults?: Extract<AxonCommandRequest, { Redenominate: {} }>["Redenominate"];
 }) {
   const axonId = useAxonId();
   const { data } = useInfo();
-  const [fromAmount, setFromAmount] = useState("");
-  const [toAmount, setToAmount] = useState("");
+  const [fromAmount, setFromAmount] = useState(defaults?.from.toString() ?? "");
+  const [toAmount, setToAmount] = useState(defaults?.to.toString() ?? "");
   const [error, setError] = useState("");
   const debouncedFromAmount = useDebounce(fromAmount);
   const debouncedToAmount = useDebounce(toAmount);

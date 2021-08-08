@@ -9,15 +9,21 @@ import ErrorAlert from "../Labels/ErrorAlert";
 export function DisburseToNeuronForm({
   stake,
   makeCommand,
+  defaults,
 }: {
   stake?: bigint;
   makeCommand: (cmd: Command | null) => void;
+  defaults?: DisburseToNeuron;
 }) {
-  const [kyc, setKyc] = useState(true);
-  const [dissolveDelay, setDissolveDelay] = useState("");
-  const [controller, setController] = useState("");
-  const [amount, setAmount] = useState("");
-  const [nonce, setNonce] = useState("");
+  const [kyc, setKyc] = useState(defaults?.kyc_verified ?? true);
+  const [dissolveDelay, setDissolveDelay] = useState(
+    defaults?.dissolve_delay_seconds.toString() ?? ""
+  );
+  const [controller, setController] = useState(
+    defaults?.new_controller[0] ? defaults.new_controller[0].toText() : ""
+  );
+  const [amount, setAmount] = useState(defaults?.amount_e8s.toString() ?? "");
+  const [nonce, setNonce] = useState(defaults?.nonce.toString() ?? "");
   const [error, setError] = useState("");
 
   const debouncedController = useDebounce(controller);

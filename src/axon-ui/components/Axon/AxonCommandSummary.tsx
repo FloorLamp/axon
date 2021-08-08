@@ -3,6 +3,7 @@ import assert from "assert";
 import React from "react";
 import { AxonCommand } from "../../declarations/Axon/Axon.did";
 import { useInfo } from "../../lib/hooks/Axon/useInfo";
+import useNames from "../../lib/hooks/useNames";
 import { AxonCommandKey } from "../../lib/types";
 import { formatNumber, formatPercent } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -14,6 +15,7 @@ export default function AxonCommandSummary({
 }: {
   axonCommand: AxonCommand;
 }) {
+  const { principalName } = useNames();
   const { data } = useInfo();
   const key = Object.keys(request)[0] as AxonCommandKey;
   switch (key) {
@@ -75,7 +77,7 @@ export default function AxonCommandSummary({
                 type="Principal"
               />
             ) : (
-              "Axon"
+              `${data ? principalName(data.proxy.toText()) : ""} Treasury`
             )}
           </DataRow>
           <DataRow labelClassName="w-40" label="Supply Before">

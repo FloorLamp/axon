@@ -7,12 +7,20 @@ import ErrorAlert from "../Labels/ErrorAlert";
 export function DisburseForm({
   makeCommand,
   stake,
+  defaults,
 }: {
   makeCommand: (cmd: Command | null) => void;
   stake?: bigint;
+  defaults: Disburse;
 }) {
-  const [account, setAccount] = useState("");
-  const [amount, setAmount] = useState("");
+  const [account, setAccount] = useState(
+    defaults?.to_account[0]
+      ? Buffer.from(defaults.to_account[0].hash).toString("hex")
+      : ""
+  );
+  const [amount, setAmount] = useState(
+    defaults ? (Number(defaults.amount[0].e8s) / 1e8).toString() : ""
+  );
   const [error, setError] = useState("");
 
   const debouncedAccount = useDebounce(account);

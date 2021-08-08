@@ -9,13 +9,17 @@ import ErrorAlert from "../Labels/ErrorAlert";
 
 export function TransferForm({
   makeCommand,
+  defaults,
 }: {
   makeCommand: (cmd: AxonCommandRequest | null) => void;
+  defaults?: Extract<AxonCommandRequest, { Transfer: {} }>["Transfer"];
 }) {
   const axonId = useAxonId();
   const { data } = useInfo();
-  const [amount, setAmount] = useState("");
-  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState(defaults?.amount.toString() ?? "");
+  const [recipient, setRecipient] = useState(
+    defaults?.recipient.toText() ?? ""
+  );
   const [error, setError] = useState("");
   const debouncedRecipient = useDebounce(recipient);
   const debouncedAmount = useDebounce(amount);

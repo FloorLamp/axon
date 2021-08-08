@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import CreatableSelect from "react-select/creatable";
-import { Command } from "../../declarations/Axon/Axon.did";
+import { Command, Follow } from "../../declarations/Axon/Axon.did";
 import { Topic } from "../../lib/governance";
 import useDebounce from "../../lib/hooks/useDebounce";
 import useNeuronOptions from "../../lib/hooks/useNeuronOptions";
@@ -9,11 +9,15 @@ import ErrorAlert from "../Labels/ErrorAlert";
 
 export default function FollowForm({
   makeCommand,
+  defaults,
 }: {
   makeCommand: (cmd: Command | null) => void;
+  defaults?: Follow;
 }) {
-  const [topic, setTopic] = useState(Topic["All Topics"]);
-  const [neurons, setNeurons] = useState<string[]>([]);
+  const [topic, setTopic] = useState(defaults?.topic ?? Topic["All Topics"]);
+  const [neurons, setNeurons] = useState<string[]>(
+    defaults?.followees.map(({ id }) => id.toString()) ?? []
+  );
   const [error, setError] = useState("");
 
   const neuronOptions = useNeuronOptions();

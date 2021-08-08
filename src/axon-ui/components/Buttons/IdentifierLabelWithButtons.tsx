@@ -63,7 +63,7 @@ export default function IdentifierLabelWithButtons({
 }) {
   const { neuronName, principalName } = useNames();
   const rawId =
-    id instanceof Principal
+    typeof id === "object" && "_isPrincipal" in id
       ? id.toText()
       : typeof id === "bigint"
       ? id.toString()

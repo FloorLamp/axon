@@ -259,7 +259,9 @@ export default function StatusHistory({
           }
           label={<span className="text-gray-400">Expired</span>}
           showLine={!isLast}
-        />
+        >
+          <TimestampLabel dt={dateTimeFromNanos(status.Expired)} />
+        </StatusSummary>
       );
     } else {
       console.warn("status not rendered", status);

@@ -197,7 +197,7 @@ shared actor class AxonService() = this {
   };
 
   // Submit a new Axon proposal
-  public shared({ caller }) func propose(request: T.NewProposal) : async T.Result<()> {
+  public shared({ caller }) func propose(request: T.NewProposal) : async T.Result<T.AxonProposal> {
     let axon = axons[request.axonId];
     if (not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized);
@@ -288,7 +288,7 @@ shared actor class AxonService() = this {
       case _ {}
     };
 
-    #ok
+    #ok(newProposal)
   };
 
   // Vote on an active proposal

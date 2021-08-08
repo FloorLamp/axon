@@ -1,18 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
 import { AxonProposal } from "../../../declarations/Axon/Axon.did";
 import { getStatus } from "../../axonProposal";
 import { ONE_MINUTES_MS } from "../../constants";
-import { dateTimeFromNanos } from "../../datetime";
 import { errorToString, tryCall } from "../../utils";
 import useAxonId from "../useAxonId";
-import useCleanup from "./useCleanup";
 
 export const useProposal = (proposalId: string) => {
   const axonId = useAxonId();
   const axon = useAxon();
-  const cleanup = useCleanup();
   const queryClient = useQueryClient();
 
   const queryResult = useQuery(
@@ -44,8 +41,7 @@ export const useProposal = (proposalId: string) => {
     }
   );
 
-  // If any proposals are executing, poll for updates
-  const [isExecuting, setIsExecuting] = useState(false);
+  // If this proposal is executing, poll for updates
   useEffect(() => {
     if (!queryResult.data) {
       return;
@@ -53,28 +49,9 @@ export const useProposal = (proposalId: string) => {
     const status = getStatus(queryResult.data);
     if (status === "ExecutionQueued" || status === "ExecutionStarted") {
       console.log("is Executing", queryResult.data);
-      setIsExecuting(true);
       setTimeout(queryResult.refetch, 1000);
-    } else {
-      setIsExecuting(false);
-    }
-
-    // Check for expired and call cleanup
-    if (
-      (status === "Active" &&
-        dateTimeFromNanos(queryResult.data.timeEnd).diffNow().toMillis() < 0) ||
-      (status === "Created" &&
-        dateTimeFromNanos(queryResult.data.timeStart).diffNow().toMillis() < 0)
-    ) {
-      cleanup.mutate();
     }
   }, [queryResult.data]);
-
-  useEffect(() => {
-    if (axonId && !isExecuting) {
-      queryClient.refetchQueries(["proposal", axonId, proposalId]);
-    }
-  }, [isExecuting]);
 
   return queryResult;
 };

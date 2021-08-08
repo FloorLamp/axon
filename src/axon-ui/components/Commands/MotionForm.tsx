@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Action } from "../../declarations/Governance/Governance.did.d";
+import { Action, Motion } from "../../declarations/Axon/Axon.did";
 import useDebounce from "../../lib/hooks/useDebounce";
 
 export default function MotionForm({
   setAction,
+  defaults,
 }: {
   setAction: (cmd: Action | null) => void;
+  defaults?: Motion;
 }) {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(defaults?.motion_text ?? "");
 
   const debouncedText = useDebounce(text);
 

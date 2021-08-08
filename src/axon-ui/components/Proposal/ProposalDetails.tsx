@@ -1,6 +1,7 @@
 import React from "react";
 import { ProposalType } from "../../declarations/Axon/Axon.did";
 import { getActionTime, getStatus } from "../../lib/axonProposal";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { useMyBallot } from "../../lib/hooks/Axon/useMyBallot";
 import { useProposal } from "../../lib/hooks/Axon/useProposal";
 import useAxonId from "../../lib/hooks/useAxonId";
@@ -21,6 +22,7 @@ import Breadcrumbs from "../Navigation/Breadcrumbs";
 import { useGlobalContext } from "../Store/Store";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 import CancelButton from "./CancelButton";
+import RepeatProposalButton from "./RepeatProposalButton";
 import StatusHistory from "./StatusHistory";
 import VotesTable from "./VotesTable";
 import VoteSummary from "./VoteSummary";
@@ -36,6 +38,7 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
     isFetching,
     isError,
   } = useProposal(proposalId);
+  const isProposer = useIsProposer();
 
   const myBallot = useMyBallot(proposal);
   const status = proposal ? getStatus(proposal) : null;
@@ -71,8 +74,13 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
             },
           ]}
         />
-        {isEligibleToVote && <AcceptRejectButtons proposal={proposal} />}
-        {isCancellable && <CancelButton proposal={proposal} />}
+        <div className="flex gap-2">
+          {isEligibleToVote && <AcceptRejectButtons proposal={proposal} />}
+          {isCancellable && <CancelButton proposal={proposal} />}
+          {isProposer && proposal && (
+            <RepeatProposalButton proposal={proposal.proposal} />
+          )}
+        </div>
       </div>
       <div className="pt-4 flex flex-col gap-8">
         <div className="flex flex-col md:flex-row gap-8">

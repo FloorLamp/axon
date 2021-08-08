@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Command } from "../../declarations/Axon/Axon.did";
+import { Action, Command, Proposal } from "../../declarations/Axon/Axon.did";
 import { ActionKey } from "../../lib/types";
 import ErrorAlert from "../Labels/ErrorAlert";
 import ManageNeuronForm from "./ManageNeuronForm";
@@ -18,13 +18,17 @@ const actions: [ActionKey, string][] = [
 
 export default function MakeProposalForm({
   makeCommand,
+  defaults,
 }: {
   makeCommand: (cmd: Command | null) => void;
+  defaults?: Proposal;
 }) {
-  const [url, setUrl] = useState("");
-  const [summary, setSummary] = useState("");
-  const [actionKey, setActionKey] = useState<ActionKey>(actions[0][0]);
-  const [action, setAction] = useState(null);
+  const [url, setUrl] = useState(defaults?.url ?? "");
+  const [summary, setSummary] = useState(defaults?.summary ?? "");
+  const [actionKey, setActionKey] = useState<ActionKey>(
+    defaults ? (Object.keys(defaults.action[0])[0] as ActionKey) : actions[0][0]
+  );
+  const [action, setAction] = useState<Action>(defaults?.action[0] ?? null);
 
   useEffect(() => {
     if (action) {
@@ -43,9 +47,27 @@ export default function MakeProposalForm({
   const renderForm = () => {
     switch (actionKey) {
       case "ManageNeuron":
-        return <ManageNeuronForm setAction={setAction} />;
+        return (
+          <ManageNeuronForm
+            setAction={setAction}
+            defaults={
+              defaults && "ManageNeuron" in defaults.action[0]
+                ? defaults.action[0].ManageNeuron
+                : undefined
+            }
+          />
+        );
       case "Motion":
-        return <MotionForm setAction={setAction} />;
+        return (
+          <MotionForm
+            setAction={setAction}
+            defaults={
+              defaults && "Motion" in defaults.action[0]
+                ? defaults.action[0].Motion
+                : undefined
+            }
+          />
+        );
       default:
         return <ErrorAlert>Action {actionKey} not supported</ErrorAlert>;
     }
