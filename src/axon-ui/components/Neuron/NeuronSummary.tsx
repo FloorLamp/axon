@@ -32,7 +32,7 @@ export default function NeuronSummary({
           checked={isSelected}
         />
       )}
-      <div className="flex-1 flex flex-col sm:flex-row">
+      <div className="flex-1 flex flex-col md:flex-row">
         <div className="flex-1 sm:flex-none sm:w-72 md:w-96 xs:flex gap-2 items-center">
           {controllerType && <ControllerTypeLabel type={controllerType} />}
           <IdentifierLabelWithButtons type="Neuron" id={id} />

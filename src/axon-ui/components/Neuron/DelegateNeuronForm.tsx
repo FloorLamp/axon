@@ -1,18 +1,28 @@
 import classNames from "classnames";
 import React, { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
+import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import CodeBlockWithCopy from "../Inputs/CodeBlockWithCopy";
 import SyncForm from "./SyncForm";
 
 export default function DelegateNeuronForm() {
-  const { data, isSuccess } = useNeuronIds();
-  const hasNeurons = isSuccess && data.length > 0;
-  const ids = data.map((id) => `record{id=${id.toString()}:nat64}`).join("; ");
+  const { data } = useAxonById();
+  const { data: neuronIds, isSuccess } = useNeuronIds();
+  const hasNeurons = isSuccess && neuronIds.length > 0;
+  const ids = neuronIds
+    .map((id) => `record{id=${id.toString()}:nat64}`)
+    .join("; ");
   const [neuronId, setNeuronId] = useState("");
-  const dfxCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
+  const dfxFollowCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
     neuronId || "$NEURON_ID"
   }:nat64}); command=opt (variant {Follow=record {topic=1:int32; followees=vec {${ids}}}})})"`;
+
+  const dfxAddHotKeyCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
+    neuronId || "$NEURON_ID"
+  }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {AddHotKey=record {new_hot_key=opt principal \\"${
+    data?.proxy
+  }\\"}})})})})"`;
 
   return (
     <div className="flex flex-col divide-gray-300 divide-y">
@@ -74,7 +84,19 @@ export default function DelegateNeuronForm() {
               it to follow your hot key for the <em>Manage Neuron</em> topic.
             </p>
 
-            {hasNeurons && <CodeBlockWithCopy value={dfxCommand} />}
+            {hasNeurons && <CodeBlockWithCopy value={dfxFollowCommand} />}
+          </li>
+          <li
+            className={classNames("pl-2 transition-colors", {
+              "text-gray-400": !hasNeurons || !neuronId,
+            })}
+          >
+            <p className="leading-tight pb-4">
+              Next, run this command to add Axon as a hot key, which will allow
+              you to view neuron details in the UI.
+            </p>
+
+            {hasNeurons && <CodeBlockWithCopy value={dfxAddHotKeyCommand} />}
           </li>
           <li
             className={classNames("pl-2 transition-colors", {

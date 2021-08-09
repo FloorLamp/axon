@@ -7,6 +7,7 @@ import { useNeurons } from "./useNeurons";
 
 export const useControllerType = (neuron: Neuron): ControllerType => {
   const { data: info } = useAxonById();
+  const managedNeurons = useManagedNeurons();
 
   if (!info || !neuron) {
     return null;
@@ -14,6 +15,9 @@ export const useControllerType = (neuron: Neuron): ControllerType => {
 
   if (principalIsEqual(info.proxy, neuron.controller[0])) {
     return "Controller";
+  }
+  if (managedNeurons[neuron.id[0].id.toString()]) {
+    return "Delegated";
   }
   if (neuron.hot_keys.find((p) => principalIsEqual(info.proxy, p))) {
     return "Hot Key";

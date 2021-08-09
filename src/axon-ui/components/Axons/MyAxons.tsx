@@ -28,12 +28,12 @@ export default function MyAxons() {
               <Link key={id.toString()} href={`/axon/${id}`}>
                 <a className="p-4 bg-gradient-to-br from-green-300 via-blue-500 to-purple-600 rounded-xl text-xl text-white h-48 hover:shadow-xl transition">
                   <h3 className="text-2xl font-bold">{name}</h3>
-                  <label className="block">Axon {id.toString()}</label>
+                  <p>Axon {id.toString()}</p>
                   <BalanceLabel value={totalStake} />
-                  <label className="block">
+                  <p>
                     {formatNumber(tokenHolders)}{" "}
                     {pluralize("Holder", Number(tokenHolders))}
-                  </label>
+                  </p>
                 </a>
               </Link>
             ))}

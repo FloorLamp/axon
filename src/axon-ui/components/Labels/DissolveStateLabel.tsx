@@ -14,9 +14,9 @@ export function DissolveStateLabel({
     <span className="inline-flex gap-2 items-center">
       <label
         className={classNames(
-          "block w-20 text-center py-0.5 rounded text-xs uppercase",
+          "block w-28 text-center py-0.5 rounded text-xs uppercase",
           {
-            "bg-green-300 text-green-700": state === "Locked",
+            "bg-green-300 text-green-700": state === "Non-Dissolving",
             "bg-yellow-200 text-yellow-700": state === "Dissolving",
             "bg-gray-300 text-gray-700": state === "Dissolved",
           }
