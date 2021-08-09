@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { BsCheck, BsClipboard } from "react-icons/bs";
-import { useClipboard } from "use-clipboard-copy";
 import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
+import CodeBlockWithCopy from "../Inputs/CodeBlockWithCopy";
 import Modal from "../Layout/Modal";
 import SyncForm from "./SyncForm";
 
@@ -16,14 +15,6 @@ export default function RemoveHotkeyModal({ neuronId }: { neuronId: string }) {
   }:nat64}); command=opt (variant {Configure=(record {operation=opt (variant {RemoveHotKey=record {hot_key_to_remove=opt principal \\"${
     data?.proxy
   }\\"}})})})})"`;
-
-  const clipboard = useClipboard({
-    copiedTimeout: 1000,
-  });
-
-  const handleCopy = (e) => {
-    clipboard.copy(dfxCommand);
-  };
 
   return (
     <>
@@ -47,15 +38,8 @@ export default function RemoveHotkeyModal({ neuronId }: { neuronId: string }) {
               neuron:
             </p>
 
-            <div className="group relative p-2 bg-gray-200 rounded text-xs">
-              <button
-                onClick={handleCopy}
-                className="hidden group-hover:block absolute right-2 top-2 z-10 p-2 bg-gray-300 text-gray-800 fill-current focus:outline-none rounded border border-gray-400 border-0.5"
-              >
-                {clipboard.copied ? <BsCheck /> : <BsClipboard />}
-              </button>
-              <code>{dfxCommand}</code>
-            </div>
+            <CodeBlockWithCopy value={dfxCommand} />
+
             <p className="leading-tight">
               Then, click the button to sync Axon with the new neuron.
             </p>

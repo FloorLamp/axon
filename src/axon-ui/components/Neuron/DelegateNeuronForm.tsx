@@ -1,23 +1,18 @@
+import classNames from "classnames";
 import React, { useState } from "react";
-import { BsCheck, BsClipboard } from "react-icons/bs";
-import { useClipboard } from "use-clipboard-copy";
+import { FaCheckCircle } from "react-icons/fa";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
+import CodeBlockWithCopy from "../Inputs/CodeBlockWithCopy";
+import SyncForm from "./SyncForm";
 
 export default function DelegateNeuronForm() {
   const { data, isSuccess } = useNeuronIds();
+  const hasNeurons = isSuccess && data.length > 0;
   const ids = data.map((id) => `record{id=${id.toString()}:nat64}`).join("; ");
   const [neuronId, setNeuronId] = useState("");
   const dfxCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
     neuronId || "$NEURON_ID"
   }:nat64}); command=opt (variant {Follow=record {topic=1:int32; followees=vec {${ids}}}})})"`;
-
-  const clipboard = useClipboard({
-    copiedTimeout: 1000,
-  });
-
-  const handleCopy = (e) => {
-    clipboard.copy(dfxCommand);
-  };
 
   return (
     <div className="flex flex-col divide-gray-300 divide-y">
@@ -27,14 +22,35 @@ export default function DelegateNeuronForm() {
           storage) to another neuron (in a hot wallet). The "hot" neuron can
           create NNS proposals to manage the other.
         </p>
-        {isSuccess &&
-          (data.length > 0 ? (
-            <>
+        <ol className="list-decimal pl-6 flex flex-col gap-2">
+          <li className="pl-2">
+            Create a new neuron using a Principal that can be kept "hot". Only
+            the minimum ICP stake is required.
+          </li>
+          <li className="pl-2">
+            Add Axon as a hot key for that canister to issue commands.
+            <p className="py-2 text-sm flex items-center">
+              {hasNeurons ? (
+                <>
+                  <FaCheckCircle className="text-green-400 mr-1" />
+                  Hot keys have been added.
+                </>
+              ) : (
+                "No hot keys have been added yet."
+              )}
+            </p>
+          </li>
+          <li
+            className={classNames("pl-2 transition-colors", {
+              "text-gray-400": !hasNeurons,
+            })}
+          >
+            Specify the Neuron ID you want to delegate:
+            {hasNeurons && (
               <label className="block">
-                Neuron to Delegate
                 <input
                   type="number"
-                  placeholder="Specify a Neuron ID..."
+                  placeholder="Neuron ID"
                   className="w-full mt-1"
                   value={neuronId}
                   onChange={(e) => setNeuronId(e.target.value)}
@@ -42,35 +58,46 @@ export default function DelegateNeuronForm() {
                   required
                 />
               </label>
-              <p className="leading-tight">
-                The following{" "}
-                <code className="px-1 py-0.5 bg-gray-200 rounded text-xs">
-                  dfx
-                </code>{" "}
-                command will delegate control of the specified neuron to Axon
-                neurons:
-              </p>
-
-              <div className="group relative p-2 bg-gray-200 rounded text-xs">
-                <button
-                  onClick={handleCopy}
-                  className="hidden group-hover:block absolute right-2 top-2 z-10 p-2 bg-gray-300 text-gray-800 fill-current focus:outline-none rounded border border-gray-400 border-0.5"
-                >
-                  {clipboard.copied ? <BsCheck /> : <BsClipboard />}
-                </button>
-                <code>{dfxCommand}</code>
-              </div>
-              <p className="leading-tight">
-                Axon will then be able to use NNS proposals to control that
-                neuron.
-              </p>
-            </>
-          ) : (
-            <p className="py-12 text-center text-gray-500 text-sm">
-              This Axon doesn't have any neurons yet.
-              <br /> Try adding a neuron before delegating.
+            )}
+          </li>
+          <li
+            className={classNames("pl-2 transition-colors", {
+              "text-gray-400": !hasNeurons || !neuronId,
+            })}
+          >
+            <p className="leading-tight pb-4">
+              Run the{" "}
+              <code className="px-1 py-0.5 bg-gray-200 rounded text-xs">
+                dfx
+              </code>{" "}
+              command from the Principal that controls the neuron. This will set
+              it to follow your hot key for the <em>Manage Neuron</em> topic.
             </p>
-          ))}
+
+            {hasNeurons && <CodeBlockWithCopy value={dfxCommand} />}
+          </li>
+          <li
+            className={classNames("pl-2 transition-colors", {
+              "text-gray-400": !hasNeurons || !neuronId,
+            })}
+          >
+            Click to sync Axon with the latest neuron data.
+            <SyncForm
+              buttonClassName={classNames("transition-colors", {
+                "btn-secondary": hasNeurons && neuronId,
+                "bg-gray-200 text-gray-400 cursor-not-allowed":
+                  !hasNeurons || !neuronId,
+              })}
+            />
+          </li>
+          <li
+            className={classNames("pl-2 transition-colors", {
+              "text-gray-400": !hasNeurons || !neuronId,
+            })}
+          >
+            Axon will then be able to use NNS proposals to control that neuron.
+          </li>
+        </ol>
       </div>
     </div>
   );

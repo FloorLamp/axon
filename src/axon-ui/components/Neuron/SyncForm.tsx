@@ -3,7 +3,11 @@ import useSync from "../../lib/hooks/Axon/useSync";
 import SpinnerButton from "../Buttons/SpinnerButton";
 import ErrorAlert from "../Labels/ErrorAlert";
 
-export default function SyncForm() {
+export default function SyncForm({
+  buttonClassName,
+}: {
+  buttonClassName?: string;
+}) {
   const { mutate, isLoading, error } = useSync();
 
   const handleSubmit = (e) => {
@@ -14,7 +18,11 @@ export default function SyncForm() {
   return (
     <form onSubmit={handleSubmit}>
       <div className="flex flex-col py-4 gap-2">
-        <SpinnerButton className="w-16 p-2" isLoading={isLoading}>
+        <SpinnerButton
+          className="w-16 p-2"
+          activeClassName={buttonClassName}
+          isLoading={isLoading}
+        >
           Sync
         </SpinnerButton>
 
