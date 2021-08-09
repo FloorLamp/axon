@@ -40,6 +40,21 @@ module {
     lastProposalId: Nat;
   };
 
+  public type AxonFull_v2 = {
+    id: Nat;
+    proxy: Proxy;
+    name: Text;
+    visibility: Visibility;
+    supply: Nat;
+    ledger: Ledger;
+    policy: Policy;
+    neurons: ?GT.ListNeuronsResponse;
+    totalStake: Nat;
+    allProposals: [AxonProposal_v2];
+    activeProposals: [AxonProposal_v2];
+    lastProposalId: Nat;
+  };
+
   public type AxonEntries = {
     id: Nat;
     proxy: Proxy;
@@ -49,8 +64,9 @@ module {
     ledgerEntries: [LedgerEntry];
     policy: Policy;
     neurons: ?GT.ListNeuronsResponse;
-    allProposals: [AxonProposal];
-    activeProposals: [AxonProposal];
+    totalStake: Nat;
+    allProposals: [AxonProposal_v2];
+    activeProposals: [AxonProposal_v2];
     lastProposalId: Nat;
   };
 
@@ -139,7 +155,7 @@ module {
     axonId: Nat;
     durationSeconds: ?Nat;
     timeStart: ?Int;
-    proposal: ProposalType;
+    proposal: ProposalType_v2;
     execute: ?Bool;
   };
 
@@ -184,6 +200,18 @@ module {
     policy: Policy;
   };
 
+  public type AxonProposal_v2 = {
+    id: Nat;
+    ballots: [Ballot];
+    totalVotes: Votes;
+    timeStart: Int;
+    timeEnd: Int;
+    creator: Principal;
+    proposal: ProposalType_v2;
+    status: [Status];
+    policy: Policy;
+  };
+
   public type PartialAxonProposal = {
     totalVotes: ?Votes;
     proposal: ?ProposalType;
@@ -198,6 +226,10 @@ module {
     #AxonCommand: AxonCommand;
     #NeuronCommand: NeuronCommand;
   };
+  public type ProposalType_v2 = {
+    #AxonCommand: AxonCommand;
+    #NeuronCommand: (NeuronCommandRequest, ?[NeuronCommandResponse_v2]);
+  };
 
   public type NeuronCommandRequest = {
     neuronIds: ?[Nat64];
@@ -205,8 +237,14 @@ module {
   };
   public type NeuronCommandResponse = (Nat64, Result<GT.ManageNeuronResponse>);
 
+  public type ManageNeuronResponseOrProposal = {
+    #ManageNeuronResponse: Result<GT.ManageNeuronResponse>;
+    #ProposalInfo: Result<?GT.ProposalInfo>;
+  };
+  public type NeuronCommandResponse_v2 = (Nat64, [ManageNeuronResponseOrProposal]);
+
   public type Result<T> = Result.Result<T, Error>;
   public type ListNeuronsResult = Result<GT.ListNeuronsResponse>;
-  public type ProposalResult = Result<[AxonProposal]>;
+  public type ProposalResult = Result<[AxonProposal_v2]>;
   public type SyncResult = Result<[Nat64]>;
 }

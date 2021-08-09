@@ -33,12 +33,12 @@ module {
   };
 
   // Applies a status like Accepted, Rejected or Expired based on current conditions
-  public func _applyNewStatus(proposal: T.AxonProposal): T.AxonProposal {
+  public func _applyNewStatus(proposal: T.AxonProposal_v2): T.AxonProposal_v2 {
     let now = Time.now();
     _applyNewStatusWithTime(proposal, now);
   };
 
-  public func _applyNewStatusWithTime(proposal: T.AxonProposal, now: Int): T.AxonProposal {
+  public func _applyNewStatusWithTime(proposal: T.AxonProposal_v2, now: Int): T.AxonProposal_v2 {
     switch (currentStatus(proposal.status)) {
       case (#Created(_)) {
         if (now >= proposal.timeStart) {
@@ -124,7 +124,7 @@ module {
   };
 
   // If proposal is accepted and conditions are met, return it with status ExecutionQueued
-  public func _applyExecutingStatusConditionally(proposal: T.AxonProposal, conditions: Bool) : T.AxonProposal {
+  public func _applyExecutingStatusConditionally(proposal: T.AxonProposal_v2, conditions: Bool) : T.AxonProposal_v2 {
     switch (currentStatus(proposal.status), conditions) {
       case (#Accepted(_), true) {
         withNewStatus(proposal, #ExecutionQueued(Time.now()));
@@ -133,7 +133,7 @@ module {
     };
   };
 
-  public func withNewStatus(proposal: T.AxonProposal, status: T.Status): T.AxonProposal {
+  public func withNewStatus(proposal: T.AxonProposal_v2, status: T.Status): T.AxonProposal_v2 {
     {
       id = proposal.id;
       totalVotes = proposal.totalVotes;

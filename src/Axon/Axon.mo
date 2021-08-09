@@ -28,10 +28,12 @@ shared actor class AxonService() = this {
   stable var axonEntries: [T.AxonEntries] = [];
   stable var lastAxonId: Nat = 0;
   var axons: [var T.AxonFull] = [var];
+  var axons_v2: [var T.AxonFull_v2] = [var];
 
   // ---- Constants
 
   let ic = actor "aaaaa-aa" : IC.Self;
+  let Governance = actor "rrkah-fqaaa-aaaaa-aaaaq-cai" : GT.Service;
 
   // Default voting period for active proposals, 1 day
   let DEFAULT_DURATION_SEC = 24 * 60 * 60;
@@ -50,7 +52,7 @@ shared actor class AxonService() = this {
   };
 
   public query func topAxons() : async [T.AxonPublic] {
-    let filtered = Array.mapFilter<T.AxonFull, T.AxonPublic>(Array.freeze(axons), func(axon) {
+    let filtered = Array.mapFilter<T.AxonFull_v2, T.AxonPublic>(Array.freeze(axons_v2), func(axon) {
       switch (axon.visibility, axon.neurons) {
         case (#Public, ?{full_neurons}) {
           ?getAxonPublic(axon)
@@ -64,12 +66,12 @@ shared actor class AxonService() = this {
   };
 
   public query func axonById(id: Nat) : async T.AxonPublic {
-    let axon = axons[id];
+    let axon = axons_v2[id];
     getAxonPublic(axon)
   };
 
   public shared func axonStatusById(id: Nat) : async IC.CanisterStatusResult {
-    let axon = axons[id];
+    let axon = axons_v2[id];
     await ic.canister_status({ canister_id = Principal.fromActor(axon.proxy) });
   };
 
@@ -78,12 +80,12 @@ shared actor class AxonService() = this {
   };
 
   public query({ caller }) func balanceOf(id: Nat, principal: ?Principal) : async Nat {
-    let {ledger} = axons[id];
+    let {ledger} = axons_v2[id];
     Option.get(ledger.get(Option.get(principal, caller)), 0)
   };
 
   public query({ caller }) func ledger(id: Nat) : async [T.LedgerEntry] {
-    let {ledger} = axons[id];
+    let {ledger} = axons_v2[id];
     // sort descending
     Array.sort<T.LedgerEntry>(Iter.toArray(ledger.entries()), func (a, b) {
       if (b.1 > a.1) { #greater } else { #less }
@@ -95,7 +97,7 @@ shared actor class AxonService() = this {
 
   // Get axons where caller has balance
   public query({ caller }) func myAxons() : async [T.AxonPublic] {
-    Array.mapFilter<T.AxonFull, T.AxonPublic>(Array.freeze(axons), func(axon) {
+    Array.mapFilter<T.AxonFull_v2, T.AxonPublic>(Array.freeze(axons_v2), func(axon) {
       switch (axon.ledger.get(caller)) {
         case (?balance) {
           ?getAxonPublic(axon)
@@ -107,7 +109,7 @@ shared actor class AxonService() = this {
 
   // Get all full neurons. If private, only owners can call
   public query({ caller }) func getNeurons(id: Nat) : async T.ListNeuronsResult {
-    let { visibility; ledger; neurons } = axons[id];
+    let { visibility; ledger; neurons } = axons_v2[id];
     if (visibility == #Private and not isAuthed(caller, ledger)) {
       return #err(#Unauthorized)
     };
@@ -121,25 +123,25 @@ shared actor class AxonService() = this {
   };
 
   // Get single proposal. If private, only owners can call
-  public query({ caller }) func getProposalById(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal> {
-    let { visibility; ledger; activeProposals; allProposals } = axons[axonId];
+  public query({ caller }) func getProposalById(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal_v2> {
+    let { visibility; ledger; activeProposals; allProposals } = axons_v2[axonId];
     if (visibility == #Private and not isAuthed(caller, ledger)) {
       return #err(#Unauthorized)
     };
 
-    switch (Array.find<T.AxonProposal>(activeProposals, func(p) { p.id == proposalId })) {
+    switch (Array.find<T.AxonProposal_v2>(activeProposals, func(p) { p.id == proposalId })) {
       case (?found) {
         #ok(found);
       };
       case _ {
-        Result.fromOption(Array.find<T.AxonProposal>(allProposals, func(p) { p.id == proposalId }), #NotFound);
+        Result.fromOption(Array.find<T.AxonProposal_v2>(allProposals, func(p) { p.id == proposalId }), #NotFound);
       }
     }
   };
 
   // Get all active proposals. If private, only owners can call
   public query({ caller }) func getActiveProposals(id: Nat) : async T.ProposalResult {
-    let { visibility; ledger; activeProposals } = axons[id];
+    let { visibility; ledger; activeProposals } = axons_v2[id];
     if (visibility == #Private and not isAuthed(caller, ledger)) {
       return #err(#Unauthorized)
     };
@@ -149,14 +151,14 @@ shared actor class AxonService() = this {
 
   // Get last 100 proposals, optionally before the specified id. If private, only owners can call
   public query({ caller }) func getAllProposals(id: Nat, before: ?Nat) : async T.ProposalResult {
-    let { visibility; ledger; allProposals } = axons[id];
+    let { visibility; ledger; allProposals } = axons_v2[id];
     if (visibility == #Private and not isAuthed(caller, ledger)) {
       return #err(#Unauthorized)
     };
 
     let filtered = switch(before) {
       case (?before_) {
-        Array.filter<T.AxonProposal>(allProposals, func(p) {
+        Array.filter<T.AxonProposal_v2>(allProposals, func(p) {
           p.id < before_
         });
       };
@@ -167,7 +169,7 @@ shared actor class AxonService() = this {
       return #ok([]);
     };
 
-    #ok(Array.tabulate<T.AxonProposal>(Nat.min(100, size), func (i) {
+    #ok(Array.tabulate<T.AxonProposal_v2>(Nat.min(100, size), func (i) {
       filtered.get(size - i - 1);
     }));
   };
@@ -183,7 +185,7 @@ shared actor class AxonService() = this {
 
   // Transfer tokens
   public shared({ caller }) func transfer(id: Nat, dest: Principal, amount: Nat) : async T.Result<()> {
-    let {ledger} = axons[id];
+    let {ledger} = axons_v2[id];
     let balance = Option.get(ledger.get(caller), 0);
     if (amount > balance) {
       #err(#InsufficientBalance)
@@ -203,7 +205,7 @@ shared actor class AxonService() = this {
 
     let supply = Array.foldLeft<(Principal,Nat), Nat>(init.ledgerEntries, 0, func(sum, c) { sum + c.1 });
     Cycles.add(1_500_000_000_000);
-    let axon: T.AxonFull = {
+    let axon: T.AxonFull_v2 = {
       id = lastAxonId;
       proxy = await Proxy.Proxy(Principal.fromActor(this));
       name = init.name;
@@ -217,14 +219,14 @@ shared actor class AxonService() = this {
       activeProposals = [];
       lastProposalId = 0;
     };
-    axons := Array.thaw(Array.append(Array.freeze(axons), [axon]));
+    axons_v2 := Array.thaw(Array.append(Array.freeze(axons_v2), [axon]));
     lastAxonId += 1;
     #ok(getAxonPublic(axon))
   };
 
   // Submit a new Axon proposal
-  public shared({ caller }) func propose(request: T.NewProposal) : async T.Result<T.AxonProposal> {
-    let axon = axons[request.axonId];
+  public shared({ caller }) func propose(request: T.NewProposal) : async T.Result<T.AxonProposal_v2> {
+    let axon = axons_v2[request.axonId];
     if (not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized);
     };
@@ -270,7 +272,7 @@ shared actor class AxonService() = this {
       now, now + secsToNanos(MAXIMUM_FUTURE_START)
     );
     // Create the proposal, count ballots, then execute if conditions are met
-    let newProposal: T.AxonProposal = A._applyExecutingStatusConditionally(A._applyNewStatus({
+    let newProposal: T.AxonProposal_v2 = A._applyExecutingStatusConditionally(A._applyNewStatus({
       id = axon.lastProposalId;
       timeStart = timeStart;
       timeEnd = timeStart + secsToNanos(clamp(
@@ -292,7 +294,7 @@ shared actor class AxonService() = this {
       policy = axon.policy;
     }), request.execute == ?true and timeStart <= now);
 
-    axons[axon.id] := {
+    axons_v2[axon.id] := {
       id = axon.id;
       proxy = axon.proxy;
       name = axon.name;
@@ -320,15 +322,15 @@ shared actor class AxonService() = this {
 
   // Vote on an active proposal
   public shared({ caller }) func vote(request: T.VoteRequest) : async T.Result<()> {
-    let axon = axons[request.axonId];
+    let axon = axons_v2[request.axonId];
     if (not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized)
     };
 
     let now = Time.now();
     var result: T.Result<()> = #err(#NotFound);
-    var proposal: ?T.AxonProposal = null;
-    let activeProposals = Array.map<T.AxonProposal, T.AxonProposal>(axon.activeProposals, func(p) {
+    var proposal: ?T.AxonProposal_v2 = null;
+    let activeProposals = Array.map<T.AxonProposal_v2, T.AxonProposal_v2>(axon.activeProposals, func(p) {
       if (p.id != request.proposalId) {
         return p;
       };
@@ -389,13 +391,13 @@ shared actor class AxonService() = this {
         // Remove from active list if rejected
         case (#Rejected(_)) {
           (Array.append(axon.allProposals, [updatedProposal]),
-          Array.filter<T.AxonProposal>(activeProposals, func(p) {
+          Array.filter<T.AxonProposal_v2>(activeProposals, func(p) {
             p.id != updatedProposal.id
           }))
         };
         case _ { (axon.allProposals, activeProposals) };
       };
-      axons[axon.id] := {
+      axons_v2[axon.id] := {
         id = axon.id;
         proxy = axon.proxy;
         name = axon.name;
@@ -423,15 +425,15 @@ shared actor class AxonService() = this {
   };
 
   // Cancel an active proposal created by caller
-  public shared({ caller }) func cancel(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal> {
-    let axon = axons[axonId];
+  public shared({ caller }) func cancel(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal_v2> {
+    let axon = axons_v2[axonId];
     if (not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized)
     };
 
     let now = Time.now();
-    var maybeProposal: ?T.AxonProposal = null;
-    let updatedActiveProposals = Array.map<T.AxonProposal, T.AxonProposal>(axon.activeProposals, func(proposal) {
+    var maybeProposal: ?T.AxonProposal_v2 = null;
+    let updatedActiveProposals = Array.map<T.AxonProposal_v2, T.AxonProposal_v2>(axon.activeProposals, func(proposal) {
       if (proposal.id == proposalId) {
         switch (A.isCancellable(A.currentStatus(proposal.status)), proposal.creator) {
           case (true, caller) {
@@ -449,7 +451,7 @@ shared actor class AxonService() = this {
 
     // Update proposals arrays
     let proposal = Option.unwrap(maybeProposal);
-    axons[axon.id] := {
+    axons_v2[axon.id] := {
       id = axon.id;
       proxy = axon.proxy;
       name = axon.name;
@@ -460,7 +462,7 @@ shared actor class AxonService() = this {
       neurons = axon.neurons;
       totalStake = axon.totalStake;
       allProposals = Array.append(axon.allProposals, [proposal]);
-      activeProposals = Array.filter<T.AxonProposal>(updatedActiveProposals, func(p) {
+      activeProposals = Array.filter<T.AxonProposal_v2>(updatedActiveProposals, func(p) {
         p.id != proposal.id
       });
       lastProposalId = axon.lastProposalId;
@@ -470,14 +472,14 @@ shared actor class AxonService() = this {
   };
 
   // Queue proposal for execution
-  public shared({ caller }) func execute(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal> {
-    let axon = axons[axonId];
+  public shared({ caller }) func execute(axonId: Nat, proposalId: Nat) : async T.Result<T.AxonProposal_v2> {
+    let axon = axons_v2[axonId];
     if (not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized)
     };
 
-    var found: ?T.AxonProposal = null;
-    let activeProposals = Array.map<T.AxonProposal, T.AxonProposal>(axon.activeProposals, func(p) {
+    var found: ?T.AxonProposal_v2 = null;
+    let activeProposals = Array.map<T.AxonProposal_v2, T.AxonProposal_v2>(axon.activeProposals, func(p) {
       if (p.id != proposalId) {
         return p;
       };
@@ -491,7 +493,7 @@ shared actor class AxonService() = this {
       Option.unwrap(found)
     });
 
-    axons[axon.id] := {
+    axons_v2[axon.id] := {
       id = axon.id;
       proxy = axon.proxy;
       name = axon.name;
@@ -513,13 +515,13 @@ shared actor class AxonService() = this {
 
   // Call list_neurons() and save the list of neurons that this axon's proxy controls
   public shared({ caller }) func sync(id: Nat) : async T.ListNeuronsResult {
-    let axon = axons[id];
+    let axon = axons_v2[id];
     if (axon.visibility == #Private and not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized)
     };
 
     let response = await axon.proxy.list_neurons();
-    axons[id] := {
+    axons_v2[id] := {
       id = axon.id;
       proxy = axon.proxy;
       name = axon.name;
@@ -544,23 +546,23 @@ shared actor class AxonService() = this {
 
   // Update proposal statuses and move from active to all if needed. Called by sync
   public shared({ caller }) func cleanup(axonId: Nat) : async T.Result<()> {
-    let axon = axons[axonId];
+    let axon = axons_v2[axonId];
     if (not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized)
     };
 
-    let finished = Buffer.Buffer<T.AxonProposal>(0);
-    let toExecute = Buffer.Buffer<T.AxonProposal>(0);
+    let finished = Buffer.Buffer<T.AxonProposal_v2>(0);
+    let toExecute = Buffer.Buffer<T.AxonProposal_v2>(0);
     let now = Time.now();
     var hasChanges = false;
-    let updatedActiveProposals = Array.map<T.AxonProposal, T.AxonProposal>(axon.activeProposals, func(proposal) {
+    let updatedActiveProposals = Array.map<T.AxonProposal_v2, T.AxonProposal_v2>(axon.activeProposals, func(proposal) {
       let after = A._applyExecutingStatusConditionally(A._applyNewStatus(proposal), true);
       if (after.status != proposal.status) {
         hasChanges := true
       };
       after
     });
-    let filteredActiveProposals = Array.filter<T.AxonProposal>(updatedActiveProposals, func(proposal) {
+    let filteredActiveProposals = Array.filter<T.AxonProposal_v2>(updatedActiveProposals, func(proposal) {
       let shouldKeep = switch (A.currentStatus(proposal.status)) {
         case (#Expired(_)) { false };
         case (#ExecutionQueued(_)) {
@@ -578,7 +580,7 @@ shared actor class AxonService() = this {
     // Move finished proposals from active to all
     if (hasChanges or finished.size() > 0) {
       let finishedArr = finished.toArray();
-      axons[axon.id] := {
+      axons_v2[axon.id] := {
         id = axon.id;
         proxy = axon.proxy;
         name = axon.name;
@@ -617,8 +619,49 @@ shared actor class AxonService() = this {
         ledgerEntries = Iter.toArray(axon.ledger.entries());
         policy = axon.policy;
         neurons = axon.neurons;
-        allProposals = axon.allProposals;
-        activeProposals = axon.activeProposals;
+        totalStake = axon.totalStake;
+        allProposals = Array.map<T.AxonProposal, T.AxonProposal_v2>(axon.allProposals, func (p) {
+          {
+            id = p.id;
+            ballots = p.ballots;
+            totalVotes = p.totalVotes;
+            timeStart = p.timeStart;
+            timeEnd = p.timeEnd;
+            creator = p.creator;
+            proposal = switch (p.proposal) {
+              case (#NeuronCommand((req, ?(res)))) {
+                #NeuronCommand((req, ?(Array.map<T.NeuronCommandResponse, T.NeuronCommandResponse_v2>(res, func ((nid, nres)) {
+                  (nid, [#ManageNeuronResponse(nres)])
+                }))))
+              };
+              case (#NeuronCommand((res, null))) { #NeuronCommand((res, null)) };
+              case (#AxonCommand(cmd)) { #AxonCommand(cmd) };
+            };
+            status = p.status;
+            policy = p.policy;
+          }
+        });
+        activeProposals = Array.map<T.AxonProposal, T.AxonProposal_v2>(axon.activeProposals, func (p) {
+          {
+            id = p.id;
+            ballots = p.ballots;
+            totalVotes = p.totalVotes;
+            timeStart = p.timeStart;
+            timeEnd = p.timeEnd;
+            creator = p.creator;
+            proposal = switch (p.proposal) {
+              case (#NeuronCommand((req, ?(res)))) {
+                #NeuronCommand((req, ?(Array.map<T.NeuronCommandResponse, T.NeuronCommandResponse_v2>(res, func ((nid, nres)) {
+                  (nid, [#ManageNeuronResponse(nres)])
+                }))))
+              };
+              case (#NeuronCommand((res, null))) { #NeuronCommand((res, null)) };
+              case (#AxonCommand(cmd)) { #AxonCommand(cmd) };
+            };
+            status = p.status;
+            policy = p.policy;
+          }
+        });
         lastProposalId = axon.lastProposalId;
       }
     });
@@ -626,7 +669,7 @@ shared actor class AxonService() = this {
 
   system func postupgrade() {
     // Restore ledger hashmap from entries
-    axons := Array.thaw(Array.map<T.AxonEntries, T.AxonFull>(axonEntries, func(axon) {
+    axons_v2 := Array.thaw(Array.map<T.AxonEntries, T.AxonFull_v2>(axonEntries, func(axon) {
       // Remove 0-balance entries
       let filteredEntries = Array.filter<T.LedgerEntry>(axon.ledgerEntries, func((_, balance)) { balance > 0 });
       {
@@ -634,20 +677,11 @@ shared actor class AxonService() = this {
         proxy = axon.proxy;
         name = axon.name;
         visibility = axon.visibility;
-        // supply = Array.foldLeft<(Principal,Nat), Nat>(axon.ledgerEntries, 0, func(sum, c) { sum + c.1 });
         supply = axon.supply;
         ledger = HashMap.fromIter<Principal, Nat>(filteredEntries.vals(), filteredEntries.size(), Principal.equal, Principal.hash);
         policy = axon.policy;
         neurons = axon.neurons;
-        // totalStake = axon.totalStake;
-        totalStake = switch (axon.neurons) {
-          case (?{full_neurons}) {
-            Array.foldLeft<GT.Neuron, Nat>(full_neurons, 0, func(sum, c) {
-              sum + Nat64.toNat(c.cached_neuron_stake_e8s)
-            });
-          };
-          case _ { 0 };
-        };
+        totalStake = axon.totalStake;
         allProposals = axon.allProposals;
         activeProposals = axon.activeProposals;
         lastProposalId = axon.lastProposalId;
@@ -660,18 +694,18 @@ shared actor class AxonService() = this {
   // ---- Internal functions
 
   // Execute accepted proposal
-  func _doExecute(axonId: Nat, proposal: T.AxonProposal) : async T.AxonProposal {
+  func _doExecute(axonId: Nat, proposal: T.AxonProposal_v2) : async T.AxonProposal_v2 {
     switch (A.currentStatus(proposal.status)) {
       case (#ExecutionQueued(_)) {};
       // Trap if status is not ExecutionQueued
       case _ { assert(false) }
     };
 
-    let axon = axons[axonId];
+    let axon = axons_v2[axonId];
 
     // Set proposal status to ExecutionStarted. Proposal state is cached during execution
     let startedProposal = A.withNewStatus(proposal, #ExecutionStarted(Time.now()));
-    axons[axon.id] := {
+    axons_v2[axon.id] := {
       id = axon.id;
       proxy = axon.proxy;
       name = axon.name;
@@ -682,28 +716,43 @@ shared actor class AxonService() = this {
       neurons = axon.neurons;
       totalStake = axon.totalStake;
       allProposals = axon.allProposals;
-      activeProposals = Array.map<T.AxonProposal, T.AxonProposal>(axon.activeProposals, func(p) {
+      activeProposals = Array.map<T.AxonProposal_v2, T.AxonProposal_v2>(axon.activeProposals, func(p) {
         if (p.id == proposal.id ) { startedProposal }
         else p
       });
       lastProposalId = axon.lastProposalId;
     };
 
-    var maybeNewAxon: ?T.AxonFull = null;
+    var maybeNewAxon: ?T.AxonFull_v2 = null;
     let proposalType = switch (startedProposal.proposal) {
       case (#NeuronCommand((command,_))) {
         // Forward command to specified neurons, or all
         let neuronIds = neuronIdsFromInfos(axon.id);
-        let proposalResponses = Buffer.Buffer<T.NeuronCommandResponse>(neuronIds.size());
+        let proposalResponses = Buffer.Buffer<T.NeuronCommandResponse_v2>(neuronIds.size());
         let specifiedNeuronIds = Option.get(command.neuronIds, neuronIds);
         for (id in specifiedNeuronIds.vals()) {
+          let neuronResponses = Buffer.Buffer<T.ManageNeuronResponseOrProposal>(1);
           try {
             let response = await axon.proxy.manage_neuron({id = ?{id = id}; command = ?command.command});
-            proposalResponses.add((id, #ok(response)));
+            neuronResponses.add(#ManageNeuronResponse(#ok(response)));
           } catch (error) {
             // TODO: Command failed to deliver, retry if possible?
-            proposalResponses.add((id, #err(makeError(error))));
+            neuronResponses.add(#ManageNeuronResponse(#err(makeError(error))));
           };
+
+          // Save proposal info if MakeProposal command
+          switch (neuronResponses.get(0)) {
+            case (#ManageNeuronResponse(#ok({command = ?#MakeProposal({ proposal_id = ?({id}) })}))) {
+              try {
+                let proposalInfo = await Governance.get_proposal_info(id);
+                neuronResponses.add(#ProposalInfo(#ok(proposalInfo)));
+              } catch (error) {
+                // Failed to fetch proposal, do nothing?
+              };
+            };
+            case _ {}
+          };
+          proposalResponses.add((id, neuronResponses.toArray()));
         };
         #NeuronCommand((command, ?proposalResponses.toArray()))
       };
@@ -712,18 +761,18 @@ shared actor class AxonService() = this {
         switch (response) {
           case (#ok((newAxon,_))) {
             maybeNewAxon := ?newAxon;
-            axons[newAxon.id] := newAxon;
+            axons_v2[newAxon.id] := newAxon;
           };
           case _ {}
         };
-        #AxonCommand((command, ?Result.mapOk<(T.AxonFull, T.AxonCommandExecution), T.AxonCommandExecution, T.Error>(response, func(t) { t.1 })))
+        #AxonCommand((command, ?Result.mapOk<(T.AxonFull_v2, T.AxonCommandExecution), T.AxonCommandExecution, T.Error>(response, func(t) { t.1 })))
       };
     };
     // Re-select axon
-    let newAxon = Option.get(maybeNewAxon, axons[axonId]);
+    let newAxon = Option.get(maybeNewAxon, axons_v2[axonId]);
 
     // Save responses and set status to ExecutionFinished
-    let finishedProposal: T.AxonProposal = {
+    let finishedProposal: T.AxonProposal_v2 = {
       id = startedProposal.id;
       totalVotes = startedProposal.totalVotes;
       ballots = startedProposal.ballots;
@@ -736,7 +785,7 @@ shared actor class AxonService() = this {
     };
 
     // Move executed proposal from active to all
-    axons[newAxon.id] := {
+    axons_v2[newAxon.id] := {
       id = newAxon.id;
       proxy = newAxon.proxy;
       name = newAxon.name;
@@ -747,14 +796,14 @@ shared actor class AxonService() = this {
       neurons = newAxon.neurons;
       totalStake = newAxon.totalStake;
       allProposals = Array.append(newAxon.allProposals, [finishedProposal]);
-      activeProposals = Array.filter<T.AxonProposal>(newAxon.activeProposals, func(p) { p.id != finishedProposal.id });
+      activeProposals = Array.filter<T.AxonProposal_v2>(newAxon.activeProposals, func(p) { p.id != finishedProposal.id });
       lastProposalId = newAxon.lastProposalId;
     };
 
     finishedProposal
   };
 
-  func _applyAxonCommand(axon: T.AxonFull, request: T.AxonCommandRequest) : T.Result<(T.AxonFull, T.AxonCommandExecution)> {
+  func _applyAxonCommand(axon: T.AxonFull_v2, request: T.AxonCommandRequest) : T.Result<(T.AxonFull_v2, T.AxonCommandExecution)> {
     switch(request) {
       case (#SetPolicy(policy)) {
         switch (policy.proposers) {
@@ -941,7 +990,7 @@ shared actor class AxonService() = this {
 
   // Return neuron IDs from stored neuron_infos
   func neuronIdsFromInfos(id: Nat) : [Nat64] {
-    switch (axons[id].neurons) {
+    switch (axons_v2[id].neurons) {
       case (?data) {
         Array.map<(Nat64, GT.NeuronInfo), Nat64>(data.neuron_infos, func(i) { i.0 })
       };
@@ -950,7 +999,7 @@ shared actor class AxonService() = this {
   };
 
   // Return Axon with own balance
-  func getAxonPublic(axon: T.AxonFull): T.AxonPublic {
+  func getAxonPublic(axon: T.AxonFull_v2): T.AxonPublic {
     {
       id = axon.id;
       proxy = axon.proxy;
