@@ -1,15 +1,54 @@
 import React, { useEffect, useState } from "react";
 import {
+  Command,
   NeuronCommand,
   NeuronCommandRequest,
   ProposalType,
 } from "../../declarations/Axon/Axon.did";
-import { useManagedNeurons } from "../../lib/hooks/Axon/useControllerType";
+import {
+  ManagedNeurons,
+  useManagedNeurons,
+} from "../../lib/hooks/Axon/useControllerType";
 import CommandForm from "./CommandForm";
 import NeuronSelectionForm, {
   ControlType,
   ControlTypes,
 } from "./NeuronSelectionForm";
+
+const parseDelegated = ({
+  defaultNeuronIds,
+  defaultCommand,
+  managedNeurons,
+}: {
+  defaultNeuronIds?: string[];
+  defaultCommand?: NeuronCommandRequest;
+  managedNeurons: ManagedNeurons;
+}) => {
+  let targetNeuronIds =
+    defaultCommand?.neuronIds.map(String) ?? defaultNeuronIds ?? [];
+
+  let managed: string;
+  let parsedCommand: Command = defaultCommand?.command;
+  if (
+    defaultCommand &&
+    "MakeProposal" in defaultCommand.command &&
+    "ManageNeuron" in defaultCommand.command.MakeProposal.action[0]
+  ) {
+    managed =
+      defaultCommand.command.MakeProposal.action[0].ManageNeuron.id[0].id.toString();
+    targetNeuronIds = [managed];
+    parsedCommand =
+      defaultCommand.command.MakeProposal.action[0].ManageNeuron.command[0];
+  } else if (targetNeuronIds.length === 1) {
+    managed = targetNeuronIds[0];
+  }
+
+  return {
+    targetNeuronIds,
+    isDelegated: managed ? !!managedNeurons[managed] : false,
+    parsedCommand,
+  };
+};
 
 export default function NeuronCommandForm({
   setProposal,
@@ -20,18 +59,19 @@ export default function NeuronCommandForm({
   defaultNeuronIds?: string[];
   defaultCommand?: NeuronCommandRequest;
 }) {
-  const defaultNeuronIdsState =
-    defaultCommand?.neuronIds.map(String) ?? defaultNeuronIds ?? [];
-  const [neuronIds, setNeuronIds] = useState(defaultNeuronIdsState);
   const managedNeurons = useManagedNeurons();
+  const { targetNeuronIds, isDelegated, parsedCommand } = parseDelegated({
+    defaultNeuronIds,
+    defaultCommand,
+    managedNeurons,
+  });
+
+  const [neuronIds, setNeuronIds] = useState(targetNeuronIds);
   const [controlType, setControlType] = useState<ControlType>(
-    defaultNeuronIdsState.length === 1 &&
-      managedNeurons[defaultNeuronIdsState[0]]
-      ? ControlTypes[1]
-      : ControlTypes[0]
+    isDelegated ? ControlTypes[1] : ControlTypes[0]
   );
 
-  const [command, setCommand] = useState(defaultCommand?.command);
+  const [command, setCommand] = useState(parsedCommand);
 
   useEffect(() => {
     if (command) {
@@ -100,7 +140,7 @@ export default function NeuronCommandForm({
       <div className="flex-1 py-4 sm:pl-4">
         <CommandForm
           setCommand={setCommand}
-          defaultCommand={defaultCommand?.command}
+          defaultCommand={parsedCommand}
           neuronIds={neuronIds}
         />
       </div>

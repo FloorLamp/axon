@@ -43,13 +43,8 @@ export default function ProposalForm({
     }
   }
 
-  if (proposalType === "NeuronCommand" && !data?.length) {
-    return (
-      <p className="py-12 text-center text-gray-500 text-sm">
-        No neurons to manage.
-      </p>
-    );
-  }
+  const isDisabled =
+    !proposal || (proposalType === "NeuronCommand" && !data?.length);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -84,7 +79,7 @@ export default function ProposalForm({
             activeClassName="btn-cta"
             disabledClassName="btn-cta-disabled"
             isLoading={isLoading}
-            isDisabled={!proposal}
+            isDisabled={isDisabled}
           >
             Submit
           </SpinnerButton>

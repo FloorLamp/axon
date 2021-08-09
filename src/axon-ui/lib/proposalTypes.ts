@@ -3,15 +3,16 @@ import { DateTime } from "luxon";
 import {
   AddHotKey,
   AxonCommandRequest,
+  Command,
   Configure,
   Disburse,
   DisburseToNeuron,
   Follow,
   IncreaseDissolveDelay,
   Motion,
-  NeuronCommandRequest,
   ProposalType,
   RegisterVote,
+  RemoveHotKey,
   SetDissolveTimestamp,
   Spawn,
   Split,
@@ -36,7 +37,7 @@ export const proposalTypeToString = (proposal: ProposalType) => {
   if ("AxonCommand" in proposal) {
     return axonCommandToString(proposal.AxonCommand[0]);
   } else {
-    return neuronCommandToString(proposal.NeuronCommand[0]);
+    return commandToString(proposal.NeuronCommand[0].command);
   }
 };
 
@@ -54,7 +55,7 @@ export const hasExecutionError = (proposal: ProposalType) => {
   }
 };
 
-export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
+export const commandToString = (command: Command) => {
   const key = Object.keys(command)[0] as CommandKey;
   switch (key) {
     case "RegisterVote": {
@@ -98,14 +99,18 @@ export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
       const operation = (command[key] as Configure).operation[0];
       const opKey = Object.keys(operation)[0] as OperationKey;
       switch (opKey) {
-        case "AddHotKey":
-        case "RemoveHotKey":
+        case "AddHotKey": {
           const {
             new_hot_key: [id],
           } = operation[opKey] as AddHotKey;
-          return `${
-            opKey === "AddHotKey" ? "Add" : "Remove"
-          } Hot Key ${shortPrincipal(id)}`;
+          return `Add Hot Key ${shortPrincipal(id)}`;
+        }
+        case "RemoveHotKey": {
+          const {
+            hot_key_to_remove: [id],
+          } = operation[opKey] as RemoveHotKey;
+          return `Remove Hot Key ${shortPrincipal(id)}`;
+        }
         case "StartDissolving":
           return "Start Dissolving";
         case "StopDissolving":
@@ -132,10 +137,16 @@ export const neuronCommandToString = ({ command }: NeuronCommandRequest) => {
       const actionKey = Object.keys(action)[0] as ActionKey;
       switch (actionKey) {
         case "ManageNeuron": {
-          const { id, command } = action[actionKey] as ManageNeuron;
-          return `Manage Neuron ${id[0]?.id.toString()}: ${
-            command[0] ? Object.keys(command[0])[0] : ""
-          }`;
+          const {
+            id,
+            command: [delegatedCommand],
+          } = action[actionKey] as ManageNeuron;
+
+          return delegatedCommand
+            ? `${id[0]?.id.toString()}: ${commandToString(delegatedCommand)}`
+            : `Manage Neuron ${id[0]?.id.toString()}: ${
+                Object.keys(delegatedCommand)[0]
+              }`;
         }
         case "Motion":
           const { motion_text } = action[actionKey] as Motion;

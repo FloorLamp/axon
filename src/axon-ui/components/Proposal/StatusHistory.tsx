@@ -208,13 +208,14 @@ export default function StatusHistory({
       return (
         <StatusSummary
           circle={
-            <FaCheckCircle
-              size={CIRCLE_SIZE}
-              className={classNames({
-                "text-green-400": !isError,
-                "text-yellow-400": isError,
-              })}
-            />
+            isError ? (
+              <FaExclamationCircle
+                size={CIRCLE_SIZE}
+                className="text-yellow-400"
+              />
+            ) : (
+              <FaCheckCircle size={CIRCLE_SIZE} className="text-green-400" />
+            )
           }
           label={
             isError ? (

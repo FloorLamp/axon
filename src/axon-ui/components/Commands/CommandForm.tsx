@@ -1,25 +1,48 @@
-import React, { useState } from "react";
-import { Command } from "../../declarations/Axon/Axon.did";
-import { CommandKey } from "../../lib/types";
-import { ConfigureForm } from "./ConfigureForm";
+import React, { useEffect, useState } from "react";
+import Select from "react-select";
+import { Command, Operation } from "../../declarations/Axon/Axon.did";
+import { CommandKey, OperationKey } from "../../lib/types";
+import { AddHotkeyForm } from "./AddHotkeyForm";
 import { DisburseForm } from "./DisburseForm";
 import { DisburseToNeuronForm } from "./DisburseToNeuronForm";
 import FollowForm from "./FollowForm";
+import { IncreaseDissolveDelayForm } from "./IncreaseDissolveDelayForm";
 import MakeProposalForm from "./MakeProposalForm";
 import { RegisterVoteForm } from "./RegisterVoteForm";
+import { RemoveHotkeyForm } from "./RemoveHotkeyForm";
+import { SetDissolveTimestampForm } from "./SetDissolveTimestampForm";
 import { SpawnForm } from "./SpawnForm";
 import { SplitForm } from "./SplitForm";
 
-const commands: [CommandKey, string][] = [
-  ["Spawn", "Spawn"],
-  ["Split", "Split"],
-  ["Follow", "Follow"],
-  ["Configure", "Configure"],
-  ["RegisterVote", "Register Vote"],
-  ["DisburseToNeuron", "Disburse To Neuron"],
-  ["MakeProposal", "Make Proposal"],
-  ["Disburse", "Disburse"],
+type CommandOrOperationKey = CommandKey | OperationKey;
+
+const commands: { value: CommandOrOperationKey; label: string }[] = [
+  { value: "Follow", label: "Follow" },
+  { value: "RegisterVote", label: "Register Vote" },
+  { value: "MakeProposal", label: "Make Proposal" },
+  { value: "AddHotKey", label: "Add Hot Key" },
+  { value: "RemoveHotKey", label: "Remove Hot Key" },
+  { value: "StartDissolving", label: "Start Dissolving" },
+  { value: "StopDissolving", label: "Stop Dissolving" },
+  { value: "IncreaseDissolveDelay", label: "Increase Dissolve Delay" },
+  { value: "SetDissolveTimestamp", label: "Set Dissolve Timestamp" },
+  { value: "Spawn", label: "Spawn" },
+  { value: "Split", label: "Split" },
+  { value: "Disburse", label: "Disburse" },
+  { value: "DisburseToNeuron", label: "Disburse To Neuron" },
 ];
+
+const getDefaultKey = (defaultCommand?: Command) => {
+  if (defaultCommand) {
+    if ("Configure" in defaultCommand) {
+      return Object.keys(
+        defaultCommand.Configure.operation[0]
+      )[0] as OperationKey;
+    }
+    return Object.keys(defaultCommand)[0] as CommandKey;
+  }
+  return commands[0].value;
+};
 
 export default function CommandForm({
   setCommand,
@@ -30,11 +53,20 @@ export default function CommandForm({
   defaultCommand?: Command;
   neuronIds: string[];
 }) {
-  const [commandKey, setCommandKey] = useState<CommandKey>(
-    defaultCommand
-      ? (Object.keys(defaultCommand)[0] as CommandKey)
-      : commands[0][0]
+  const [commandKey, setCommandKey] = useState<CommandOrOperationKey>(
+    getDefaultKey(defaultCommand)
   );
+
+  const [operation, setOperation] = useState<Operation>(null);
+  useEffect(() => {
+    if (operation) {
+      setCommand({
+        Configure: { operation: [operation] },
+      });
+    } else {
+      setCommand(null);
+    }
+  }, [operation]);
 
   const renderForm = () => {
     switch (commandKey) {
@@ -47,18 +79,6 @@ export default function CommandForm({
                 ? defaultCommand.Follow
                 : undefined
             }
-          />
-        );
-      case "Configure":
-        return (
-          <ConfigureForm
-            makeCommand={setCommand}
-            defaults={
-              defaultCommand && "Configure" in defaultCommand
-                ? defaultCommand.Configure
-                : undefined
-            }
-            neuronIds={neuronIds}
           />
         );
       case "Spawn":
@@ -127,6 +147,68 @@ export default function CommandForm({
             }
           />
         );
+      case "IncreaseDissolveDelay":
+        return (
+          <IncreaseDissolveDelayForm
+            makeOperation={setOperation}
+            defaults={
+              defaultCommand &&
+              "Configure" in defaultCommand &&
+              "IncreaseDissolveDelay" in defaultCommand.Configure.operation[0]
+                ? defaultCommand.Configure.operation[0].IncreaseDissolveDelay
+                : undefined
+            }
+          />
+        );
+
+      case "SetDissolveTimestamp":
+        return (
+          <SetDissolveTimestampForm
+            makeOperation={setOperation}
+            defaults={
+              defaultCommand &&
+              "Configure" in defaultCommand &&
+              defaultCommand &&
+              "SetDissolveTimestamp" in defaultCommand.Configure.operation[0]
+                ? defaultCommand.Configure.operation[0].SetDissolveTimestamp
+                : undefined
+            }
+          />
+        );
+
+      case "AddHotKey":
+        return (
+          <AddHotkeyForm
+            makeOperation={setOperation}
+            defaults={
+              defaultCommand &&
+              "Configure" in defaultCommand &&
+              defaultCommand &&
+              "AddHotKey" in defaultCommand.Configure.operation[0]
+                ? defaultCommand.Configure.operation[0].AddHotKey
+                : undefined
+            }
+          />
+        );
+      case "RemoveHotKey":
+        return (
+          <RemoveHotkeyForm
+            makeOperation={setOperation}
+            defaults={
+              defaultCommand &&
+              "Configure" in defaultCommand &&
+              defaultCommand &&
+              "RemoveHotKey" in defaultCommand.Configure.operation[0]
+                ? defaultCommand.Configure.operation[0].RemoveHotKey
+                : undefined
+            }
+            neuronIds={neuronIds}
+          />
+        );
+      case "StartDissolving":
+      case "StopDissolving":
+      case "Configure":
+        return null;
     }
   };
 
@@ -134,17 +216,12 @@ export default function CommandForm({
     <div className="flex flex-col gap-2">
       <div>
         <label>Command</label>
-        <select
+        <Select
           className="w-full mt-1"
-          onChange={(e) => setCommandKey(e.target.value as CommandKey)}
-          value={commandKey}
-        >
-          {commands.map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+          onChange={({ value }) => setCommandKey(value as CommandKey)}
+          options={commands}
+          defaultValue={commands.find(({ value }) => value === commandKey)}
+        />
       </div>
 
       {renderForm()}

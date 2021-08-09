@@ -26,7 +26,7 @@ export default function NeuronSelectionForm({
 }) {
   const { data: info } = useAxonById();
   const { data: neurons } = useNeurons();
-  const { data: allNeuronIds } = useNeuronIds();
+  const { data: allNeuronIds, isSuccess } = useNeuronIds();
 
   const set = new Set(neuronIds);
 
@@ -61,7 +61,11 @@ export default function NeuronSelectionForm({
     );
   };
 
-  return (
+  return isSuccess && !allNeuronIds.length ? (
+    <p className="flex items-center justify-center h-full text-gray-500 text-sm">
+      No neurons to manage.
+    </p>
+  ) : (
     <>
       <div className="flex rounded-md overflow-hidden">
         {ControlTypes.map((ct) => (

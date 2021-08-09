@@ -14,7 +14,11 @@ export function SetDissolveTimestampForm({
   defaults?: SetDissolveTimestamp;
 }) {
   const [timestamp, setTimestamp] = useState(
-    defaults ? defaults.dissolve_timestamp_seconds.toString() : ""
+    defaults
+      ? DateTime.fromSeconds(
+          Number(defaults.dissolve_timestamp_seconds)
+        ).toFormat("yyyy-MM-dd'T'hh:mm")
+      : ""
   );
   const [error, setError] = useState("");
 
