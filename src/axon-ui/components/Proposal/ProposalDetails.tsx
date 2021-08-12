@@ -22,6 +22,7 @@ import Breadcrumbs from "../Navigation/Breadcrumbs";
 import { useGlobalContext } from "../Store/Store";
 import AcceptRejectButtons from "./AcceptRejectButtons";
 import CancelButton from "./CancelButton";
+import ExecuteButton from "./ExecuteButton";
 import RepeatProposalButton from "./RepeatProposalButton";
 import StatusHistory from "./StatusHistory";
 import VotesTable from "./VotesTable";
@@ -60,11 +61,12 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
 
   const isCancellable =
     principalIsEqual(proposal?.creator, principal) &&
-    (status === "Active" || status === "Created");
+    (status === "Accepted" || status === "Active" || status === "Created");
+  const isExecutable = isProposer && status === "Accepted";
 
   return (
     <>
-      <div className="xs:flex justify-between items-center">
+      <div className="sm:flex justify-between items-center">
         <Breadcrumbs
           path={[
             { path: `axon/${axonId}`, label: `Axon ${axonId}` },
@@ -76,6 +78,7 @@ export const ProposalDetails = ({ proposalId }: { proposalId: string }) => {
         />
         <div className="flex gap-2">
           {isEligibleToVote && <AcceptRejectButtons proposal={proposal} />}
+          {isExecutable && <ExecuteButton proposalId={proposal.id} />}
           {isCancellable && <CancelButton proposal={proposal} />}
           {isProposer && proposal && (
             <RepeatProposalButton proposal={proposal.proposal} />

@@ -52,7 +52,7 @@ export default function StatusHistory({
 }: {
   proposal: AxonProposal;
 }) {
-  const isOwner = useIsProposer();
+  const isProposer = useIsProposer();
 
   const statuses = proposal.status.length;
   const currentStatus = getStatus(proposal);
@@ -137,7 +137,7 @@ export default function StatusHistory({
           >
             <TimestampLabel dt={dateTimeFromNanos(status.Accepted)} />
           </StatusSummary>
-          {currentStatus === "Active" && (
+          {currentStatus === "Accepted" && (
             <StatusSummary
               circle={
                 <FaDotCircle size={CIRCLE_SIZE} className="text-gray-300" />
@@ -145,7 +145,7 @@ export default function StatusHistory({
               label={<span className="text-gray-400">Execute</span>}
               showLine={!isLast}
             >
-              {isOwner && (
+              {isProposer && (
                 <div className="mt-2 border-t border-gray-300 pt-3">
                   <ExecuteButton proposalId={proposal.id} />
                 </div>

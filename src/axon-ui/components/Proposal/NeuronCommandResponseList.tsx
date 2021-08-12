@@ -4,9 +4,12 @@ import {
   DisburseResponse,
   MakeProposalResponse,
   NeuronCommandResponse,
+  ProposalInfo,
   SpawnResponse,
 } from "../../declarations/Axon/Axon.did";
-import { KeysOfUnion } from "../../lib/types";
+import { Status } from "../../lib/governance";
+import { commandToString } from "../../lib/proposalTypes";
+import { CommandResponseKey } from "../../lib/types";
 import {
   errorToString,
   governanceErrorToString,
@@ -15,8 +18,8 @@ import {
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import { CommandError, CommandSuccess } from "./CommandResponseSummary";
 
-const renderSuccess = (result: Command_1) => {
-  const key = Object.keys(result)[0] as KeysOfUnion<Command_1>;
+const renderCommandResponse = (result: Command_1) => {
+  const key = Object.keys(result)[0] as CommandResponseKey;
   switch (key) {
     case "Follow":
       return "Successfully set followees";
@@ -43,19 +46,61 @@ const renderSuccess = (result: Command_1) => {
   }
 };
 
-const Result = ({ id, result }: { id: string; result: Command_1 }) => {
+const Result = ({
+  id,
+  result,
+  proposal,
+}: {
+  id: string;
+  result?: Command_1;
+  proposal?: ProposalInfo;
+}) => {
   const label = (
     <IdentifierLabelWithButtons id={id} type="Neuron" showButtons={false} />
   );
-  if ("Error" in result) {
-    return (
-      <CommandError label={label}>
-        {governanceErrorToString(result.Error)}
-      </CommandError>
-    );
+  if (result) {
+    if ("Error" in result) {
+      return (
+        <CommandError label={label}>
+          {governanceErrorToString(result.Error)}
+        </CommandError>
+      );
+    } else {
+      return (
+        <CommandSuccess label={label}>
+          {renderCommandResponse(result)}
+        </CommandSuccess>
+      );
+    }
+  } else {
+    const status = Status[proposal.status];
+    const manageNeuron =
+      "ManageNeuron" in proposal.proposal[0].action[0]
+        ? proposal.proposal[0].action[0].ManageNeuron
+        : null;
+    const delegatedId = manageNeuron?.id[0].id.toString() ?? label;
+    if (proposal.status === Status.Executed) {
+      return (
+        <CommandSuccess label={delegatedId}>
+          <strong>{status}: </strong>
+          {commandToString(manageNeuron.command[0])}
+        </CommandSuccess>
+      );
+    } else if (proposal.status === Status.Failed) {
+      return (
+        <CommandError label={delegatedId}>
+          {governanceErrorToString(proposal.failure_reason[0])}
+        </CommandError>
+      );
+    } else {
+      return (
+        <CommandSuccess label={delegatedId}>
+          <div>{status}</div>
+          <pre className="text-xs">{stringify(proposal)}</pre>
+        </CommandSuccess>
+      );
+    }
   }
-
-  return <CommandSuccess label={label}>{renderSuccess(result)}</CommandSuccess>;
 };
 
 export default function NeuronCommandResponseList({
@@ -66,7 +111,7 @@ export default function NeuronCommandResponseList({
   return (
     <ul className="flex flex-col gap-2">
       {responses.flatMap(([neuronId, responsesOrProposals]) =>
-        responsesOrProposals.map((res) => {
+        responsesOrProposals.map((res, i) => {
           const id = neuronId.toString();
           let display: JSX.Element;
           if ("ManageNeuronResponse" in res) {
@@ -84,8 +129,18 @@ export default function NeuronCommandResponseList({
                 />
               );
             }
+          } else {
+            if ("err" in res.ProposalInfo) {
+              display = (
+                <CommandError label={id}>
+                  {errorToString(res.ProposalInfo.err)}
+                </CommandError>
+              );
+            } else {
+              display = <Result id={id} proposal={res.ProposalInfo.ok[0]} />;
+            }
           }
-          return <li key={id}>{display}</li>;
+          return <li key={`${id}-${i}`}>{display}</li>;
         })
       )}
     </ul>

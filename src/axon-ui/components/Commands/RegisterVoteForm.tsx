@@ -1,16 +1,13 @@
 import classNames from "classnames";
 import React, { useEffect, useState } from "react";
 import { Command, RegisterVote } from "../../declarations/Axon/Axon.did";
-import useDebounce from "../../lib/hooks/useDebounce";
 import ErrorAlert from "../Labels/ErrorAlert";
 
 export function RegisterVoteForm({
   makeCommand,
-  stake,
   defaults,
 }: {
   makeCommand: (cmd: Command | null) => void;
-  stake?: bigint;
   defaults: RegisterVote;
 }) {
   const [proposal, setProposal] = useState(
@@ -18,8 +15,6 @@ export function RegisterVoteForm({
   );
   const [vote, setVote] = useState(defaults?.vote ?? 0);
   const [error, setError] = useState("");
-
-  const debouncedProposal = useDebounce(proposal);
 
   useEffect(() => {
     setError("");
@@ -41,7 +36,7 @@ export function RegisterVoteForm({
     }
 
     makeCommand(command);
-  }, [debouncedProposal, vote]);
+  }, [proposal, vote]);
 
   return (
     <div className="flex flex-col gap-2">

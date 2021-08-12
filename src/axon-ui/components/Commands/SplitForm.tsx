@@ -11,7 +11,9 @@ export function SplitForm({
   stake?: bigint;
   defaults?: Split;
 }) {
-  const [amount, setAmount] = useState(defaults?.amount_e8s.toString() ?? "");
+  const [amount, setAmount] = useState(
+    defaults ? (Number(defaults.amount_e8s) / 1e8).toString() : ""
+  );
   const [error, setError] = useState();
 
   useEffect(() => {

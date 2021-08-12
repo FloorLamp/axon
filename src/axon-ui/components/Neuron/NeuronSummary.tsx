@@ -33,7 +33,7 @@ export default function NeuronSummary({
         />
       )}
       <div className="flex-1 flex flex-col md:flex-row">
-        <div className="flex-1 sm:flex-none sm:w-72 md:w-96 xs:flex gap-2 items-center">
+        <div className="flex-1 md:flex-none md:w-80 xs:flex gap-2 items-center">
           {controllerType && <ControllerTypeLabel type={controllerType} />}
           <IdentifierLabelWithButtons type="Neuron" id={id} />
         </div>

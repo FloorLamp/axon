@@ -151,6 +151,7 @@ module {
     switch (s) {
       case (#Created(_)) { true };
       case (#Active(_)) { true };
+      case (#Accepted(_)) { true };
       case _ { false };
     }
   };

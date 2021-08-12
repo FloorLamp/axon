@@ -22,7 +22,7 @@ import {
   Proposal,
 } from "../declarations/Governance/Governance.did.d";
 import { accountIdentifierToString } from "./account";
-import { Topic, Vote } from "./governance";
+import { Status, Topic, Vote } from "./governance";
 import { ActionKey, AxonCommandKey, CommandKey, OperationKey } from "./types";
 import {
   formatE8s,
@@ -54,6 +54,8 @@ export const hasExecutionError = (proposal: ProposalType) => {
               ? "ok" in res.ManageNeuronResponse &&
                 !("Error" in res.ManageNeuronResponse.ok.command[0])
               : "ok" in res.ProposalInfo
+              ? res.ProposalInfo.ok[0].status !== Status.Failed
+              : false
           )
         )
       : false;

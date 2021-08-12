@@ -59,12 +59,21 @@ export default function CommandForm({
 
   const [operation, setOperation] = useState<Operation>(null);
   useEffect(() => {
-    if (operation) {
-      setCommand({
-        Configure: { operation: [operation] },
-      });
-    } else {
-      setCommand(null);
+    if (
+      commandKey === "IncreaseDissolveDelay" ||
+      commandKey === "SetDissolveTimestamp" ||
+      commandKey === "AddHotKey" ||
+      commandKey === "RemoveHotKey" ||
+      commandKey === "StartDissolving" ||
+      commandKey === "StopDissolving"
+    ) {
+      if (operation) {
+        setCommand({
+          Configure: { operation: [operation] },
+        });
+      } else {
+        setCommand(null);
+      }
     }
   }, [operation]);
 

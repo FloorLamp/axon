@@ -5,10 +5,8 @@ import ProposalForm from "./ProposalForm";
 
 export default function RepeatProposalButton({
   proposal,
-  buttonClassName = "px-2 py-1 bg-transparent border-gray-800 border-2 transition-opacity opacity-50 hover:opacity-100",
 }: {
   proposal: ProposalType;
-  buttonClassName?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
@@ -16,14 +14,16 @@ export default function RepeatProposalButton({
 
   return (
     <>
-      <button
-        type="button"
-        onClick={openModal}
-        className={buttonClassName}
-        title="Create a new copy of this proposal"
-      >
-        Repeat
-      </button>
+      <div>
+        <button
+          type="button"
+          onClick={openModal}
+          className="leading-none w-20 p-2 bg-transparent ring-gray-800 ring-inset ring-2 transition-opacity opacity-50 hover:opacity-100"
+          title="Create a new copy of this proposal"
+        >
+          Repeat
+        </button>
+      </div>
       <Modal
         isOpen={isOpen}
         openModal={openModal}
