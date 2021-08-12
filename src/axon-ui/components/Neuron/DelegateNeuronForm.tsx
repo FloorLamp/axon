@@ -4,6 +4,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import CodeBlockWithCopy from "../Inputs/CodeBlockWithCopy";
+import { DfxCreateNeuronForm } from "./DfxCreateNeuronForm";
 import SyncForm from "./SyncForm";
 
 export default function DelegateNeuronForm() {
@@ -36,6 +37,7 @@ export default function DelegateNeuronForm() {
           <li className="pl-2">
             Create a new neuron using a Principal that can be kept "hot". Only
             the minimum ICP stake is required.
+            <DfxCreateNeuronForm />
           </li>
           <li className="pl-2">
             Add Axon as a hot key for that canister to issue commands.
