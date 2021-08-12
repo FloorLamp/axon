@@ -48,8 +48,13 @@ export const hasExecutionError = (proposal: ProposalType) => {
       : false;
   } else {
     return proposal.NeuronCommand[1][0]
-      ? !proposal.NeuronCommand[1][0].every(
-          ([_, res]) => "ok" in res && !("Error" in res.ok.command[0])
+      ? !proposal.NeuronCommand[1][0].every(([_, reses]) =>
+          reses.every((res) =>
+            "ManageNeuronResponse" in res
+              ? "ok" in res.ManageNeuronResponse &&
+                !("Error" in res.ManageNeuronResponse.ok.command[0])
+              : "ok" in res.ProposalInfo
+          )
         )
       : false;
   }

@@ -65,18 +65,29 @@ export default function NeuronCommandResponseList({
 }) {
   return (
     <ul className="flex flex-col gap-2">
-      {responses.map(([neuronId, res]) => {
-        const id = neuronId.toString();
-        let display: JSX.Element;
-        if ("err" in res) {
-          display = (
-            <CommandError label={id}>{errorToString(res.err)}</CommandError>
-          );
-        } else {
-          display = <Result id={id} result={res.ok.command[0]} />;
-        }
-        return <li key={id}>{display}</li>;
-      })}
+      {responses.flatMap(([neuronId, responsesOrProposals]) =>
+        responsesOrProposals.map((res) => {
+          const id = neuronId.toString();
+          let display: JSX.Element;
+          if ("ManageNeuronResponse" in res) {
+            if ("err" in res.ManageNeuronResponse) {
+              display = (
+                <CommandError label={id}>
+                  {errorToString(res.ManageNeuronResponse.err)}
+                </CommandError>
+              );
+            } else {
+              display = (
+                <Result
+                  id={id}
+                  result={res.ManageNeuronResponse.ok.command[0]}
+                />
+              );
+            }
+          }
+          return <li key={id}>{display}</li>;
+        })
+      )}
     </ul>
   );
 }

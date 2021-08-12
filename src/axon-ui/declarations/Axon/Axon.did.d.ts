@@ -37,7 +37,7 @@ export interface AxonProposal {
   'id' : bigint,
   'status' : Array<Status>,
   'creator' : Principal,
-  'ballots' : Array<Ballot>,
+  'ballots' : Array<Ballot__1>,
   'timeStart' : bigint,
   'totalVotes' : Votes,
   'proposal' : ProposalType,
@@ -59,21 +59,21 @@ export interface AxonService {
   'axonById' : (arg_0: bigint) => Promise<AxonPublic>,
   'axonStatusById' : (arg_0: bigint) => Promise<CanisterStatusResult>,
   'balanceOf' : (arg_0: bigint, arg_1: [] | [Principal]) => Promise<bigint>,
-  'cancel' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
+  'cancel' : (arg_0: bigint, arg_1: bigint) => Promise<Result_3>,
   'cleanup' : (arg_0: bigint) => Promise<Result>,
   'count' : () => Promise<bigint>,
-  'create' : (arg_0: Initialization) => Promise<Result_3>,
-  'execute' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
+  'create' : (arg_0: Initialization) => Promise<Result_4>,
+  'execute' : (arg_0: bigint, arg_1: bigint) => Promise<Result_3>,
   'getActiveProposals' : (arg_0: bigint) => Promise<ProposalResult>,
   'getAllProposals' : (arg_0: bigint, arg_1: [] | [bigint]) => Promise<
       ProposalResult
     >,
   'getNeuronIds' : (arg_0: bigint) => Promise<Array<bigint>>,
   'getNeurons' : (arg_0: bigint) => Promise<ListNeuronsResult>,
-  'getProposalById' : (arg_0: bigint, arg_1: bigint) => Promise<Result_2>,
+  'getProposalById' : (arg_0: bigint, arg_1: bigint) => Promise<Result_3>,
   'ledger' : (arg_0: bigint) => Promise<Array<LedgerEntry>>,
   'myAxons' : () => Promise<Array<AxonPublic>>,
-  'propose' : (arg_0: NewProposal) => Promise<Result_2>,
+  'propose' : (arg_0: NewProposal) => Promise<Result_3>,
   'sync' : (arg_0: bigint) => Promise<ListNeuronsResult>,
   'topAxons' : () => Promise<Array<AxonPublic>>,
   'transfer' : (arg_0: bigint, arg_1: Principal, arg_2: bigint) => Promise<
@@ -82,12 +82,13 @@ export interface AxonService {
   'vote' : (arg_0: VoteRequest) => Promise<Result>,
   'wallet_receive' : () => Promise<bigint>,
 }
-export interface Ballot {
+export interface Ballot { 'vote' : number, 'voting_power' : bigint }
+export interface BallotInfo { 'vote' : number, 'proposal_id' : [] | [NeuronId] }
+export interface Ballot__1 {
   'principal' : Principal,
   'votingPower' : bigint,
   'vote' : [] | [Vote],
 }
-export interface BallotInfo { 'vote' : number, 'proposal_id' : [] | [NeuronId] }
 export interface CanisterStatusResult {
   'status' : { 'stopped' : null } |
     { 'stopping' : null } |
@@ -181,6 +182,8 @@ export interface ManageNeuron {
   'command' : [] | [Command],
 }
 export interface ManageNeuronResponse { 'command' : [] | [Command_1] }
+export type ManageNeuronResponseOrProposal = { 'ProposalInfo' : Result_2 } |
+  { 'ManageNeuronResponse' : Result_1 };
 export interface Motion { 'motion_text' : string }
 export interface NetworkEconomics {
   'neuron_minimum_stake_e8s' : bigint,
@@ -217,7 +220,10 @@ export interface NeuronCommandRequest {
   'command' : Command,
   'neuronIds' : [] | [Array<bigint>],
 }
-export type NeuronCommandResponse = [bigint, Result_1];
+export type NeuronCommandResponse = [
+  bigint,
+  Array<ManageNeuronResponseOrProposal>,
+];
 export interface NeuronId { 'id' : bigint }
 export interface NeuronInfo {
   'dissolve_delay_seconds' : bigint,
@@ -262,6 +268,23 @@ export interface Proposal {
   'action' : [] | [Action],
   'summary' : string,
 }
+export interface ProposalInfo {
+  'id' : [] | [NeuronId],
+  'status' : number,
+  'topic' : number,
+  'failure_reason' : [] | [GovernanceError],
+  'ballots' : Array<[bigint, Ballot]>,
+  'proposal_timestamp_seconds' : bigint,
+  'reward_event_round' : bigint,
+  'failed_timestamp_seconds' : bigint,
+  'reject_cost_e8s' : bigint,
+  'latest_tally' : [] | [Tally],
+  'reward_status' : number,
+  'decided_timestamp_seconds' : bigint,
+  'proposal' : [] | [Proposal],
+  'proposer' : [] | [NeuronId],
+  'executed_timestamp_seconds' : bigint,
+}
 export type ProposalResult = { 'ok' : Array<AxonProposal> } |
   { 'err' : Error };
 export type ProposalType = { 'NeuronCommand' : NeuronCommand } |
@@ -276,9 +299,11 @@ export type Result = { 'ok' : null } |
   { 'err' : Error };
 export type Result_1 = { 'ok' : ManageNeuronResponse } |
   { 'err' : Error };
-export type Result_2 = { 'ok' : AxonProposal } |
+export type Result_2 = { 'ok' : [] | [ProposalInfo] } |
   { 'err' : Error };
-export type Result_3 = { 'ok' : AxonPublic } |
+export type Result_3 = { 'ok' : AxonProposal } |
+  { 'err' : Error };
+export type Result_4 = { 'ok' : AxonPublic } |
   { 'err' : Error };
 export type RewardMode = { 'RewardToNeuron' : RewardToNeuron } |
   { 'RewardToAccount' : RewardToAccount };
@@ -305,6 +330,12 @@ export type Status = { 'Active' : bigint } |
   { 'Cancelled' : bigint } |
   { 'Created' : bigint } |
   { 'Expired' : bigint };
+export interface Tally {
+  'no' : bigint,
+  'yes' : bigint,
+  'total' : bigint,
+  'timestamp_seconds' : bigint,
+}
 export type Threshold = {
     'Percent' : { 'percent' : bigint, 'quorum' : [] | [bigint] }
   } |

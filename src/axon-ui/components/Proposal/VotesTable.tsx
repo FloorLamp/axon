@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { useState } from "react";
-import { AxonProposal, Ballot } from "../../declarations/Axon/Axon.did";
+import { AxonProposal, Ballot__1 } from "../../declarations/Axon/Axon.did";
 import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { formatNumber, formatPercent, pluralize } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -8,7 +8,7 @@ import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 function BallotsList({
   ballots,
 }: {
-  ballots: (Ballot & { percent: string })[];
+  ballots: (Ballot__1 & { percent: string })[];
 }) {
   return ballots.length ? (
     <>

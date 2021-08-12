@@ -40,7 +40,7 @@ module {
     lastProposalId: Nat;
   };
 
-  public type AxonEntries = {
+  public type AxonEntries_v2 = {
     id: Nat;
     proxy: Proxy;
     name: Text;
@@ -49,8 +49,9 @@ module {
     ledgerEntries: [LedgerEntry];
     policy: Policy;
     neurons: ?GT.ListNeuronsResponse;
-    allProposals: [AxonProposal];
-    activeProposals: [AxonProposal];
+    totalStake: Nat;
+    allProposals: [AxonProposal_v2];
+    activeProposals: [AxonProposal_v2];
     lastProposalId: Nat;
   };
 
@@ -183,13 +184,7 @@ module {
     status: [Status];
     policy: Policy;
   };
-
-  public type PartialAxonProposal = {
-    totalVotes: ?Votes;
-    proposal: ?ProposalType;
-    status: ?Status;
-    policy: ?Policy;
-  };
+  public type AxonProposal_v2 = AxonProposal;
 
   public type AxonCommand = (AxonCommandRequest, ?AxonCommandResponse);
   public type NeuronCommand = (NeuronCommandRequest, ?[NeuronCommandResponse]);
@@ -203,7 +198,12 @@ module {
     neuronIds: ?[Nat64];
     command: GT.Command;
   };
-  public type NeuronCommandResponse = (Nat64, Result<GT.ManageNeuronResponse>);
+
+  public type ManageNeuronResponseOrProposal = {
+    #ManageNeuronResponse: Result<GT.ManageNeuronResponse>;
+    #ProposalInfo: Result<?GT.ProposalInfo>;
+  };
+  public type NeuronCommandResponse = (Nat64, [ManageNeuronResponseOrProposal]);
 
   public type Result<T> = Result.Result<T, Error>;
   public type ListNeuronsResult = Result<GT.ListNeuronsResponse>;

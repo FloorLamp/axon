@@ -35,6 +35,13 @@ type Threshold =
               quorum: opt nat;
             };
  };
+type Tally = 
+ record {
+   no: nat64;
+   timestamp_seconds: nat64;
+   total: nat64;
+   yes: nat64;
+ };
 type Status = 
  variant {
    Accepted: int;
@@ -69,15 +76,20 @@ type RewardMode =
    RewardToAccount: RewardToAccount;
    RewardToNeuron: RewardToNeuron;
  };
+type Result_4 = 
+ variant {
+   err: Error;
+   ok: AxonPublic;
+ };
 type Result_3 = 
  variant {
    err: Error;
-   ok: Axon;
+   ok: AxonProposal;
  };
 type Result_2 = 
  variant {
    err: Error;
-   ok: AxonProposal;
+   ok: opt ProposalInfo;
  };
 type Result_1 = 
  variant {
@@ -109,6 +121,27 @@ type ProposalResult =
  variant {
    err: Error;
    ok: vec AxonProposal;
+ };
+type ProposalInfo = 
+ record {
+   ballots: vec record {
+                  nat64;
+                  Ballot;
+                };
+   decided_timestamp_seconds: nat64;
+   executed_timestamp_seconds: nat64;
+   failed_timestamp_seconds: nat64;
+   failure_reason: opt GovernanceError;
+   id: opt NeuronId;
+   latest_tally: opt Tally;
+   proposal: opt Proposal;
+   proposal_timestamp_seconds: nat64;
+   proposer: opt NeuronId;
+   reject_cost_e8s: nat64;
+   reward_event_round: nat64;
+   reward_status: int32;
+   status: int32;
+   topic: int32;
  };
 type Proposal = 
  record {
@@ -167,7 +200,7 @@ type NeuronId = record {id: nat64;};
 type NeuronCommandResponse = 
  record {
    nat64;
-   Result_1;
+   vec ManageNeuronResponseOrProposal;
  };
 type NeuronCommandRequest = 
  record {
@@ -212,6 +245,11 @@ type NetworkEconomics =
    transaction_fee_e8s: nat64;
  };
 type Motion = record {motion_text: text;};
+type ManageNeuronResponseOrProposal = 
+ variant {
+   ManageNeuronResponse: Result_1;
+   ProposalInfo: Result_2;
+ };
 type ManageNeuronResponse = record {command: opt Command_1;};
 type ManageNeuron = 
  record {
@@ -349,6 +387,12 @@ type CanisterStatusResult =
              stopping;
            };
  };
+type Ballot__1 = 
+ record {
+   "principal": principal;
+   vote: opt Vote;
+   votingPower: nat;
+ };
 type BallotInfo = 
  record {
    proposal_id: opt NeuronId;
@@ -356,35 +400,48 @@ type BallotInfo =
  };
 type Ballot = 
  record {
-   "principal": principal;
-   vote: opt Vote;
-   votingPower: nat;
+   vote: int32;
+   voting_power: nat64;
  };
 type AxonService = 
  service {
-   axonById: (nat) -> (Axon) query;
+   axonById: (nat) -> (AxonPublic) query;
    axonStatusById: (nat) -> (CanisterStatusResult);
    balanceOf: (nat, opt principal) -> (nat) query;
-   cancel: (nat, nat) -> (Result_2);
+   cancel: (nat, nat) -> (Result_3);
    cleanup: (nat) -> (Result);
    count: () -> (nat) query;
-   create: (Initialization) -> (Result_3);
-   execute: (nat, nat) -> (Result_2);
+   create: (Initialization) -> (Result_4);
+   execute: (nat, nat) -> (Result_3);
    getActiveProposals: (nat) -> (ProposalResult) query;
    getAllProposals: (nat, opt nat) -> (ProposalResult) query;
    getNeuronIds: (nat) -> (vec nat64) query;
    getNeurons: (nat) -> (ListNeuronsResult) query;
-   getProposalById: (nat, nat) -> (Result_2) query;
+   getProposalById: (nat, nat) -> (Result_3) query;
    ledger: (nat) -> (vec LedgerEntry) query;
-   propose: (NewProposal) -> (Result_2);
+   myAxons: () -> (vec AxonPublic) query;
+   propose: (NewProposal) -> (Result_3);
    sync: (nat) -> (ListNeuronsResult);
+   topAxons: () -> (vec AxonPublic) query;
    transfer: (nat, principal, nat) -> (Result);
    vote: (VoteRequest) -> (Result);
    wallet_receive: () -> (nat);
  };
+type AxonPublic = 
+ record {
+   balance: nat;
+   id: nat;
+   name: text;
+   policy: Policy;
+   proxy: Proxy;
+   supply: nat;
+   tokenHolders: nat;
+   totalStake: nat;
+   visibility: Visibility;
+ };
 type AxonProposal = 
  record {
-   ballots: vec Ballot;
+   ballots: vec Ballot__1;
    creator: principal;
    id: nat;
    policy: Policy;
@@ -436,16 +493,6 @@ type AxonCommand =
  record {
    AxonCommandRequest;
    opt AxonCommandResponse;
- };
-type Axon = 
- record {
-   balance: nat;
-   id: nat;
-   name: text;
-   policy: Policy;
-   proxy: Proxy;
-   supply: nat;
-   visibility: Visibility;
  };
 type ApproveGenesisKyc = record {principals: vec principal;};
 type Amount = record {e8s: nat64;};

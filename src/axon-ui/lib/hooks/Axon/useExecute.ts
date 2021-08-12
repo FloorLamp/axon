@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "react-query";
 import { useAxon } from "../../../components/Store/Store";
-import { Result_2 } from "../../../declarations/Axon/Axon.did";
+import { Result_3 } from "../../../declarations/Axon/Axon.did";
 import { errorToString } from "../../utils";
 import useAxonId from "../useAxonId";
 
@@ -11,7 +11,7 @@ export default function useExecute(proposalId: bigint) {
 
   return useMutation(
     async () => {
-      let result: Result_2;
+      let result: Result_3;
       try {
         result = await axon.execute(BigInt(axonId), proposalId);
       } catch (error) {

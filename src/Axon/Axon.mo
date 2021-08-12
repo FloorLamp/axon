@@ -25,13 +25,14 @@ import A "./AxonHelpers";
 shared actor class AxonService() = this {
   // ---- State
 
-  stable var axonEntries: [T.AxonEntries] = [];
+  stable var axonEntries_v2: [T.AxonEntries_v2] = [];
   stable var lastAxonId: Nat = 0;
   var axons: [var T.AxonFull] = [var];
 
   // ---- Constants
 
   let ic = actor "aaaaa-aa" : IC.Self;
+  let Governance = actor "rrkah-fqaaa-aaaaa-aaaaq-cai" : GT.Service;
 
   // Default voting period for active proposals, 1 day
   let DEFAULT_DURATION_SEC = 24 * 60 * 60;
@@ -383,7 +384,7 @@ shared actor class AxonService() = this {
 
     if (Result.isOk(result)) {
       let updatedProposal = Option.unwrap(proposal);
-      Debug.print("updatedProposal " # debug_show(updatedProposal));
+      // Debug.print("updatedProposal " # debug_show(updatedProposal));
 
       let proposals = switch (A.currentStatus(updatedProposal.status)) {
         // Remove from active list if rejected
@@ -607,7 +608,7 @@ shared actor class AxonService() = this {
 
   system func preupgrade() {
     // Persist ledger hashmap entries
-    axonEntries := Array.map<T.AxonFull, T.AxonEntries>(Array.freeze(axons), func(axon) {
+    axonEntries_v2 := Array.map<T.AxonFull, T.AxonEntries_v2>(Array.freeze(axons), func(axon) {
       {
         id = axon.id;
         proxy = axon.proxy;
@@ -617,6 +618,7 @@ shared actor class AxonService() = this {
         ledgerEntries = Iter.toArray(axon.ledger.entries());
         policy = axon.policy;
         neurons = axon.neurons;
+        totalStake = axon.totalStake;
         allProposals = axon.allProposals;
         activeProposals = axon.activeProposals;
         lastProposalId = axon.lastProposalId;
@@ -626,7 +628,7 @@ shared actor class AxonService() = this {
 
   system func postupgrade() {
     // Restore ledger hashmap from entries
-    axons := Array.thaw(Array.map<T.AxonEntries, T.AxonFull>(axonEntries, func(axon) {
+    axons := Array.thaw(Array.map<T.AxonEntries_v2, T.AxonFull>(axonEntries_v2, func(axon) {
       // Remove 0-balance entries
       let filteredEntries = Array.filter<T.LedgerEntry>(axon.ledgerEntries, func((_, balance)) { balance > 0 });
       {
@@ -634,26 +636,17 @@ shared actor class AxonService() = this {
         proxy = axon.proxy;
         name = axon.name;
         visibility = axon.visibility;
-        // supply = Array.foldLeft<(Principal,Nat), Nat>(axon.ledgerEntries, 0, func(sum, c) { sum + c.1 });
         supply = axon.supply;
         ledger = HashMap.fromIter<Principal, Nat>(filteredEntries.vals(), filteredEntries.size(), Principal.equal, Principal.hash);
         policy = axon.policy;
         neurons = axon.neurons;
-        // totalStake = axon.totalStake;
-        totalStake = switch (axon.neurons) {
-          case (?{full_neurons}) {
-            Array.foldLeft<GT.Neuron, Nat>(full_neurons, 0, func(sum, c) {
-              sum + Nat64.toNat(c.cached_neuron_stake_e8s)
-            });
-          };
-          case _ { 0 };
-        };
+        totalStake = axon.totalStake;
         allProposals = axon.allProposals;
         activeProposals = axon.activeProposals;
         lastProposalId = axon.lastProposalId;
       }
     }));
-    axonEntries := [];
+    axonEntries_v2 := [];
   };
 
 
@@ -697,13 +690,28 @@ shared actor class AxonService() = this {
         let proposalResponses = Buffer.Buffer<T.NeuronCommandResponse>(neuronIds.size());
         let specifiedNeuronIds = Option.get(command.neuronIds, neuronIds);
         for (id in specifiedNeuronIds.vals()) {
+          let neuronResponses = Buffer.Buffer<T.ManageNeuronResponseOrProposal>(1);
           try {
             let response = await axon.proxy.manage_neuron({id = ?{id = id}; command = ?command.command});
-            proposalResponses.add((id, #ok(response)));
+            neuronResponses.add(#ManageNeuronResponse(#ok(response)));
           } catch (error) {
             // TODO: Command failed to deliver, retry if possible?
-            proposalResponses.add((id, #err(makeError(error))));
+            neuronResponses.add(#ManageNeuronResponse(#err(makeError(error))));
           };
+
+          // Save proposal info if MakeProposal command
+          switch (neuronResponses.get(0)) {
+            case (#ManageNeuronResponse(#ok({command = ?#MakeProposal({ proposal_id = ?({id}) })}))) {
+              try {
+                let proposalInfo = await Governance.get_proposal_info(id);
+                neuronResponses.add(#ProposalInfo(#ok(proposalInfo)));
+              } catch (error) {
+                // Failed to fetch proposal, do nothing?
+              };
+            };
+            case _ {}
+          };
+          proposalResponses.add((id, neuronResponses.toArray()));
         };
         #NeuronCommand((command, ?proposalResponses.toArray()))
       };
