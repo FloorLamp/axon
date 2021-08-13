@@ -35,8 +35,10 @@ export default function DelegateNeuronForm() {
         </p>
         <ol className="list-decimal pl-6 flex flex-col gap-2">
           <li className="pl-2">
-            Create a new neuron using a Principal that can be kept "hot". Only
-            the minimum ICP stake is required.
+            <p className="leading-tight">
+              Create a new neuron using a Principal that can be kept "hot". Only
+              the minimum ICP stake is required.
+            </p>
             <DfxCreateNeuronForm />
           </li>
           <li className="pl-2">

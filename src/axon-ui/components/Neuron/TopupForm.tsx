@@ -1,5 +1,5 @@
 import { Principal } from "@dfinity/principal";
-import React from "react";
+import React, { useState } from "react";
 import useRefresh from "../../lib/hooks/Governance/useRefresh";
 import { useFindMemo } from "../../lib/hooks/Ledger/useFindMemo";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
@@ -21,6 +21,9 @@ export default function TopupForm({
     error: refreshError,
   } = useRefresh({ account, controller });
   const { error: memoError, isSuccess: hasMemo } = useFindMemo(account);
+  const [amount, setAmount] = useState("");
+  const [transferError, setTransferError] = useState("");
+  const [isTransferring, setIsTransferring] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -29,23 +32,67 @@ export default function TopupForm({
     });
   };
 
+  const handlePlugTransfer = async () => {
+    setTransferError("");
+    try {
+      setIsTransferring(true);
+      const result = await window.ic.plug.requestTransfer({
+        to: account,
+        amount: Number(amount) * 1e8,
+      });
+      if ("height" in result) {
+        mutate(null, {
+          onSuccess: closeModal,
+        });
+      }
+    } catch (error) {
+      setTransferError(error.message);
+    }
+    setIsTransferring(false);
+  };
+
   return (
     <div className="flex flex-col divide-gray-300 divide-y">
       <div className="flex flex-col gap-2 py-4">
-        <label className="hidden">
-          Top Up Neuron
-          <input
-            type="number"
-            placeholder="Amount"
-            className="w-full mt-1"
-            disabled
-          />
-        </label>
         <label>Send ICP to:</label>
 
         <strong className="leading-tight">
           <IdentifierLabelWithButtons type="Account" id={account} />
         </strong>
+
+        {window.ic?.plug?.agent && (
+          <>
+            <label className="block">
+              Amount to Top Up
+              <div className="mt-1 xs:flex gap-2">
+                <input
+                  type="number"
+                  placeholder="Amount"
+                  className="flex-1"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  min={0}
+                  maxLength={20}
+                />
+                <div className="flex-1">
+                  <SpinnerButton
+                    className="p-3 w-full"
+                    activeClassName="btn-cta cursor-pointer"
+                    disabledClassName="btn-cta-disabled"
+                    onClick={handlePlugTransfer}
+                    isLoading={isTransferring}
+                    isDisabled={!amount}
+                  >
+                    Transfer with Plug
+                  </SpinnerButton>
+                </div>
+              </div>
+            </label>
+
+            {transferError && <ErrorAlert>{transferError}</ErrorAlert>}
+          </>
+        )}
+
         <p className="leading-tight">
           Then, click the button to refresh the neuron.
         </p>
