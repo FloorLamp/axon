@@ -31,7 +31,6 @@ export default function Neurons() {
     isSuccess,
   } = useNeurons();
   const sync = useSync();
-  console.log(neurons);
 
   const handleRefresh = () => {
     sync.mutate();
@@ -89,8 +88,8 @@ export default function Neurons() {
             <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
           </>
         )}
-        {neurons && (
-          <span>
+        {neurons && neurons.timestamp > 0 && (
+          <span className="text-xs text-gray-500">
             Updated {dateTimeFromNanos(neurons.timestamp).toRelative()}
           </span>
         )}

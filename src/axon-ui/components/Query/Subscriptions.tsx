@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "react-query";
 import { AxonProposal } from "../../declarations/Axon/Axon.did";
 import { getStatus } from "../../lib/axonProposal";
+import { ONE_HOUR_MS } from "../../lib/constants";
 import { dateTimeFromNanos } from "../../lib/datetime";
 import { useActiveProposals } from "../../lib/hooks/Axon/useActiveProposals";
 import { useAllProposals } from "../../lib/hooks/Axon/useAllProposals";
 import useCleanup from "../../lib/hooks/Axon/useCleanup";
+import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import useSync from "../../lib/hooks/Axon/useSync";
 import useAxonId from "../../lib/hooks/useAxonId";
 import { useGlobalContext } from "../Store/Store";
@@ -24,6 +26,17 @@ export const Subscriptions = () => {
 
   const sync = useSync();
   const cleanup = useCleanup();
+
+  const neurons = useNeurons();
+  useEffect(() => {
+    if (neurons.data && !sync.isLoading) {
+      const delta = dateTimeFromNanos(neurons.data.timestamp).diffNow();
+      if (Math.abs(delta.toMillis()) > ONE_HOUR_MS) {
+        console.log("neurons stale, re-syncing...");
+        sync.mutate();
+      }
+    }
+  }, [neurons.data]);
 
   // If any proposals are executing, poll for updates
   const [isExecuting, setIsExecuting] = useState(false);
