@@ -4,6 +4,10 @@
       "main": "src/Axon/Axon.mo",
       "type": "motoko"
     },
+    "staging": {
+      "main": "src/Axon/Axon.mo",
+      "type": "motoko"
+    },
     "frontend": {
       "dependencies": ["Axon"],
       "frontend": {

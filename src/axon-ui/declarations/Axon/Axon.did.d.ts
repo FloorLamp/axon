@@ -69,12 +69,12 @@ export interface AxonService {
       ProposalResult
     >,
   'getNeuronIds' : (arg_0: bigint) => Promise<Array<bigint>>,
-  'getNeurons' : (arg_0: bigint) => Promise<ListNeuronsResult>,
+  'getNeurons' : (arg_0: bigint) => Promise<NeuronsResult>,
   'getProposalById' : (arg_0: bigint, arg_1: bigint) => Promise<Result_3>,
   'ledger' : (arg_0: bigint) => Promise<Array<LedgerEntry>>,
   'myAxons' : () => Promise<Array<AxonPublic>>,
   'propose' : (arg_0: NewProposal) => Promise<Result_3>,
-  'sync' : (arg_0: bigint) => Promise<ListNeuronsResult>,
+  'sync' : (arg_0: bigint) => Promise<NeuronsResult>,
   'topAxons' : () => Promise<Array<AxonPublic>>,
   'transfer' : (arg_0: bigint, arg_1: Principal, arg_2: bigint) => Promise<
       Result
@@ -174,8 +174,6 @@ export interface ListNeuronsResponse {
   'neuron_infos' : Array<[bigint, NeuronInfo]>,
   'full_neurons' : Array<Neuron>,
 }
-export type ListNeuronsResult = { 'ok' : ListNeuronsResponse } |
-  { 'err' : Error };
 export interface MakeProposalResponse { 'proposal_id' : [] | [NeuronId] }
 export interface ManageNeuron {
   'id' : [] | [NeuronId],
@@ -243,6 +241,12 @@ export interface NeuronStakeTransfer {
   'transfer_timestamp' : bigint,
   'block_height' : bigint,
 }
+export interface Neurons {
+  'response' : ListNeuronsResponse,
+  'timestamp' : bigint,
+}
+export type NeuronsResult = { 'ok' : Neurons } |
+  { 'err' : Error };
 export interface NewProposal {
   'axonId' : bigint,
   'timeStart' : [] | [bigint],

@@ -30,11 +30,11 @@ export const useManagedNeurons = (): ManagedNeurons => {
   const { data: neurons } = useNeurons();
   const { data: neuronIds } = useNeuronIds();
 
-  if (!neuronIds?.length || !neurons?.full_neurons.length) {
+  if (!neuronIds?.length || !neurons?.response.full_neurons.length) {
     return {};
   }
 
-  const entries = neurons.full_neurons
+  const entries = neurons.response.full_neurons
     .map((n): [string, string[]] => {
       const manageNeuronTopic = n.followees.find(([topic, _id]) => topic === 1);
       let managedBy = [];

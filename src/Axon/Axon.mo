@@ -25,7 +25,8 @@ import A "./AxonHelpers";
 shared actor class AxonService() = this {
   // ---- State
 
-  stable var axonEntries_v2: [T.AxonEntries_v2] = [];
+  stable var axonEntries_v2: [T.AxonEntries_pre] = [];
+  stable var axonEntries_post: [T.AxonEntries] = [];
   stable var lastAxonId: Nat = 0;
   var axons: [var T.AxonFull] = [var];
 
@@ -53,7 +54,7 @@ shared actor class AxonService() = this {
   public query func topAxons() : async [T.AxonPublic] {
     let filtered = Array.mapFilter<T.AxonFull, T.AxonPublic>(Array.freeze(axons), func(axon) {
       switch (axon.visibility, axon.neurons) {
-        case (#Public, ?{full_neurons}) {
+        case (#Public, ?{response={full_neurons}}) {
           ?getAxonPublic(axon)
         };
         case _ { null }
@@ -107,7 +108,7 @@ shared actor class AxonService() = this {
   };
 
   // Get all full neurons. If private, only owners can call
-  public query({ caller }) func getNeurons(id: Nat) : async T.ListNeuronsResult {
+  public query({ caller }) func getNeurons(id: Nat) : async T.NeuronsResult {
     let { visibility; ledger; neurons } = axons[id];
     if (visibility == #Private and not isAuthed(caller, ledger)) {
       return #err(#Unauthorized)
@@ -513,13 +514,17 @@ shared actor class AxonService() = this {
   };
 
   // Call list_neurons() and save the list of neurons that this axon's proxy controls
-  public shared({ caller }) func sync(id: Nat) : async T.ListNeuronsResult {
+  public shared({ caller }) func sync(id: Nat) : async T.NeuronsResult {
     let axon = axons[id];
     if (axon.visibility == #Private and not isAuthed(caller, axon.ledger)) {
       return #err(#Unauthorized)
     };
 
     let response = await axon.proxy.list_neurons();
+    let neurons = {
+      response = response;
+      timestamp = Time.now();
+    };
     axons[id] := {
       id = axon.id;
       proxy = axon.proxy;
@@ -528,7 +533,7 @@ shared actor class AxonService() = this {
       supply = axon.supply;
       ledger = axon.ledger;
       policy = axon.policy;
-      neurons = ?response;
+      neurons = ?neurons;
       totalStake = Array.foldLeft<GT.Neuron, Nat>(response.full_neurons, 0, func(sum, c) {
         sum + Nat64.toNat(c.cached_neuron_stake_e8s)
       });
@@ -540,7 +545,7 @@ shared actor class AxonService() = this {
     // Since this will be called from the client periodically, call cleanup
     ignore cleanup(axon.id);
 
-    #ok(response)
+    #ok(neurons)
   };
 
   // Update proposal statuses and move from active to all if needed. Called by sync
@@ -608,7 +613,7 @@ shared actor class AxonService() = this {
 
   system func preupgrade() {
     // Persist ledger hashmap entries
-    axonEntries_v2 := Array.map<T.AxonFull, T.AxonEntries_v2>(Array.freeze(axons), func(axon) {
+    axonEntries_post := Array.map<T.AxonFull, T.AxonEntries>(Array.freeze(axons), func(axon) {
       {
         id = axon.id;
         proxy = axon.proxy;
@@ -628,7 +633,7 @@ shared actor class AxonService() = this {
 
   system func postupgrade() {
     // Restore ledger hashmap from entries
-    axons := Array.thaw(Array.map<T.AxonEntries_v2, T.AxonFull>(axonEntries_v2, func(axon) {
+    axons := Array.thaw(Array.map<T.AxonEntries_pre, T.AxonFull>(axonEntries_v2, func(axon) {
       // Remove 0-balance entries
       let filteredEntries = Array.filter<T.LedgerEntry>(axon.ledgerEntries, func((_, balance)) { balance > 0 });
       {
@@ -639,7 +644,15 @@ shared actor class AxonService() = this {
         supply = axon.supply;
         ledger = HashMap.fromIter<Principal, Nat>(filteredEntries.vals(), filteredEntries.size(), Principal.equal, Principal.hash);
         policy = axon.policy;
-        neurons = axon.neurons;
+        neurons = switch (axon.neurons) {
+          case (?response) {
+            ?{
+              response = response;
+              timestamp = 0;
+            };
+          };
+          case _ null;
+        };
         totalStake = axon.totalStake;
         allProposals = axon.allProposals;
         activeProposals = axon.activeProposals;
@@ -950,8 +963,8 @@ shared actor class AxonService() = this {
   // Return neuron IDs from stored neuron_infos
   func neuronIdsFromInfos(id: Nat) : [Nat64] {
     switch (axons[id].neurons) {
-      case (?data) {
-        Array.map<(Nat64, GT.NeuronInfo), Nat64>(data.neuron_infos, func(i) { i.0 })
+      case (?{response={neuron_infos}}) {
+        Array.map<(Nat64, GT.NeuronInfo), Nat64>(neuron_infos, func(i) { i.0 })
       };
       case _ { [] }
     }

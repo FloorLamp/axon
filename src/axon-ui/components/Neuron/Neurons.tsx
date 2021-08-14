@@ -2,6 +2,7 @@ import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { BsInboxFill } from "react-icons/bs";
 import { useIsMutating } from "react-query";
+import { dateTimeFromNanos } from "../../lib/datetime";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
@@ -30,6 +31,7 @@ export default function Neurons() {
     isSuccess,
   } = useNeurons();
   const sync = useSync();
+  console.log(neurons);
 
   const handleRefresh = () => {
     sync.mutate();
@@ -70,27 +72,34 @@ export default function Neurons() {
           </ResponseError>
         </div>
       )}
-      {isProposer && (
-        <div className="flex gap-3 items-center px-4 pb-2">
-          {neuronIds?.length > 0 && (
-            <input
-              type="checkbox"
-              className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
-              onChange={handleSelectAll}
-              checked={
-                neuronIds?.length > 0 &&
-                selectedNeuronIds.length === neuronIds.length
-              }
-            />
-          )}
-          <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
-        </div>
-      )}
+      <div className="flex gap-3 items-center px-4 pb-2">
+        {isProposer && (
+          <>
+            {neuronIds?.length > 0 && (
+              <input
+                type="checkbox"
+                className="mr-1 cursor-pointer hover:ring-2 hover:ring-opacity-50 hover:ring-indigo-500 hover:border-indigo-500"
+                onChange={handleSelectAll}
+                checked={
+                  neuronIds?.length > 0 &&
+                  selectedNeuronIds.length === neuronIds.length
+                }
+              />
+            )}
+            <ManageNeuronModal defaultNeuronIds={selectedNeuronIds} />
+          </>
+        )}
+        {neurons && (
+          <span>
+            Updated {dateTimeFromNanos(neurons.timestamp).toRelative()}
+          </span>
+        )}
+      </div>
       {neuronIds?.length > 0 ? (
         <ul className="divide-y divide-gray-300">
           {neuronIds.map((neuronId) => {
             const id = neuronId.toString();
-            const neuron = neurons?.full_neurons.find(
+            const neuron = neurons?.response.full_neurons.find(
               (fn) => fn.id[0].id === neuronId
             );
 

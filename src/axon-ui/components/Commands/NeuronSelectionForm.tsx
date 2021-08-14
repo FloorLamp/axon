@@ -48,7 +48,7 @@ export default function NeuronSelectionForm({
 
   const showNonControllerWarning =
     controlType === "Direct" &&
-    !neurons?.full_neurons
+    !neurons?.response.full_neurons
       .filter(
         (neuron) =>
           neuronIds.includes(neuron.id[0].id.toString()) || !neuronIds.length

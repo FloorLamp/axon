@@ -12,6 +12,11 @@ module {
     manage_neuron : shared GT.ManageNeuron -> async GT.ManageNeuronResponse;
   };
 
+  public type Neurons = {
+    response: GT.ListNeuronsResponse;
+    timestamp: Int;
+  };
+
   // Publicly exposed Axon that includes treasury balance, total neuron stake, and token holders
   public type AxonPublic = {
     id: Nat;
@@ -33,14 +38,29 @@ module {
     supply: Nat;
     ledger: Ledger;
     policy: Policy;
-    neurons: ?GT.ListNeuronsResponse;
+    neurons: ?Neurons;
     totalStake: Nat;
     allProposals: [AxonProposal];
     activeProposals: [AxonProposal];
     lastProposalId: Nat;
   };
 
-  public type AxonEntries_v2 = {
+  public type AxonEntries = {
+    id: Nat;
+    proxy: Proxy;
+    name: Text;
+    visibility: Visibility;
+    supply: Nat;
+    ledgerEntries: [LedgerEntry];
+    policy: Policy;
+    neurons: ?Neurons;
+    totalStake: Nat;
+    allProposals: [AxonProposal];
+    activeProposals: [AxonProposal];
+    lastProposalId: Nat;
+  };
+
+  public type AxonEntries_pre = {
     id: Nat;
     proxy: Proxy;
     name: Text;
@@ -50,8 +70,8 @@ module {
     policy: Policy;
     neurons: ?GT.ListNeuronsResponse;
     totalStake: Nat;
-    allProposals: [AxonProposal_v2];
-    activeProposals: [AxonProposal_v2];
+    allProposals: [AxonProposal];
+    activeProposals: [AxonProposal];
     lastProposalId: Nat;
   };
 
@@ -184,7 +204,6 @@ module {
     status: [Status];
     policy: Policy;
   };
-  public type AxonProposal_v2 = AxonProposal;
 
   public type AxonCommand = (AxonCommandRequest, ?AxonCommandResponse);
   public type NeuronCommand = (NeuronCommandRequest, ?[NeuronCommandResponse]);
@@ -206,7 +225,7 @@ module {
   public type NeuronCommandResponse = (Nat64, [ManageNeuronResponseOrProposal]);
 
   public type Result<T> = Result.Result<T, Error>;
-  public type ListNeuronsResult = Result<GT.ListNeuronsResponse>;
+  public type NeuronsResult = Result<Neurons>;
   public type ProposalResult = Result<[AxonProposal]>;
   public type SyncResult = Result<[Nat64]>;
 }

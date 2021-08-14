@@ -378,10 +378,11 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(AxonProposal),
     'err' : Error,
   });
-  const ListNeuronsResult = IDL.Variant({
-    'ok' : ListNeuronsResponse,
-    'err' : Error,
+  const Neurons = IDL.Record({
+    'response' : ListNeuronsResponse,
+    'timestamp' : IDL.Int,
   });
+  const NeuronsResult = IDL.Variant({ 'ok' : Neurons, 'err' : Error });
   const NewProposal = IDL.Record({
     'axonId' : IDL.Nat,
     'timeStart' : IDL.Opt(IDL.Int),
@@ -414,12 +415,12 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getNeuronIds' : IDL.Func([IDL.Nat], [IDL.Vec(IDL.Nat64)], ['query']),
-    'getNeurons' : IDL.Func([IDL.Nat], [ListNeuronsResult], ['query']),
+    'getNeurons' : IDL.Func([IDL.Nat], [NeuronsResult], ['query']),
     'getProposalById' : IDL.Func([IDL.Nat, IDL.Nat], [Result_3], ['query']),
     'ledger' : IDL.Func([IDL.Nat], [IDL.Vec(LedgerEntry)], ['query']),
     'myAxons' : IDL.Func([], [IDL.Vec(AxonPublic)], ['query']),
     'propose' : IDL.Func([NewProposal], [Result_3], []),
-    'sync' : IDL.Func([IDL.Nat], [ListNeuronsResult], []),
+    'sync' : IDL.Func([IDL.Nat], [NeuronsResult], []),
     'topAxons' : IDL.Func([], [IDL.Vec(AxonPublic)], ['query']),
     'transfer' : IDL.Func([IDL.Nat, IDL.Principal, IDL.Nat], [Result], []),
     'vote' : IDL.Func([VoteRequest], [Result], []),

@@ -176,6 +176,16 @@ type NewProposal =
    proposal: ProposalType;
    timeStart: opt int;
  };
+type NeuronsResult = 
+ variant {
+   err: Error;
+   ok: Neurons;
+ };
+type Neurons = 
+ record {
+   response: ListNeuronsResponse;
+   timestamp: int;
+ };
 type NeuronStakeTransfer = 
  record {
    block_height: nat64;
@@ -257,11 +267,6 @@ type ManageNeuron =
    id: opt NeuronId;
  };
 type MakeProposalResponse = record {proposal_id: opt NeuronId;};
-type ListNeuronsResult = 
- variant {
-   err: Error;
-   ok: ListNeuronsResponse;
- };
 type ListNeuronsResponse = 
  record {
    full_neurons: vec Neuron;
@@ -416,12 +421,12 @@ type AxonService =
    getActiveProposals: (nat) -> (ProposalResult) query;
    getAllProposals: (nat, opt nat) -> (ProposalResult) query;
    getNeuronIds: (nat) -> (vec nat64) query;
-   getNeurons: (nat) -> (ListNeuronsResult) query;
+   getNeurons: (nat) -> (NeuronsResult) query;
    getProposalById: (nat, nat) -> (Result_3) query;
    ledger: (nat) -> (vec LedgerEntry) query;
    myAxons: () -> (vec AxonPublic) query;
    propose: (NewProposal) -> (Result_3);
-   sync: (nat) -> (ListNeuronsResult);
+   sync: (nat) -> (NeuronsResult);
    topAxons: () -> (vec AxonPublic) query;
    transfer: (nat, principal, nat) -> (Result);
    vote: (VoteRequest) -> (Result);

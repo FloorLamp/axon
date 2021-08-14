@@ -25,7 +25,7 @@ const governanceCanister = Principal.fromText(governanceCanisterId);
 export default function NeuronDetails({ neuronId }: { neuronId: string }) {
   const isMember = useIsMember();
   const neurons = useNeurons();
-  const neuron = neurons.data?.full_neurons.find(
+  const neuron = neurons.data?.response.full_neurons.find(
     (fn) => fn.id[0].id.toString() === neuronId
   );
   const managedNeurons = useManagedNeurons();
