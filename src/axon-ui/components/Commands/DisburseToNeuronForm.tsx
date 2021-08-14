@@ -61,7 +61,7 @@ export function DisburseToNeuronForm({
         DisburseToNeuron: {
           dissolve_delay_seconds: BigInt(dissolveDelay),
           kyc_verified: kyc,
-          amount_e8s: BigInt(amount) * BigInt(1e8),
+          amount_e8s: BigInt(Number(amount) * 1e8),
           new_controller,
           nonce: nonce_bi,
         },

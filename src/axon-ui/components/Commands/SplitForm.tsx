@@ -14,16 +14,17 @@ export function SplitForm({
   const [amount, setAmount] = useState(
     defaults ? (Number(defaults.amount_e8s) / 1e8).toString() : ""
   );
-  const [error, setError] = useState();
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    setError("");
     if (!amount) return makeCommand(null);
 
     let command: Command;
     try {
       command = {
         Split: {
-          amount_e8s: BigInt(amount) * BigInt(1e8),
+          amount_e8s: BigInt(Number(amount) * 1e8),
         },
       };
     } catch (error) {
@@ -44,7 +45,7 @@ export function SplitForm({
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           min={0}
-          max={stake !== undefined ? Number(stake / BigInt(1e8)) : undefined}
+          max={stake !== undefined ? Number(stake) / 1e8 : undefined}
           required
         />
       </label>

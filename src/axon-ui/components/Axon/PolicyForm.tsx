@@ -111,6 +111,8 @@ export function PolicyForm({
   const [quorum, setQuorum] = useState(defaultQuorum);
 
   useEffect(() => {
+    setInputError("");
+
     let proposersValue: Policy["proposers"];
     if (proposers === "Closed") {
       if (!users.length) {
@@ -134,7 +136,9 @@ export function PolicyForm({
     let policy: Policy;
     try {
       policy = {
-        proposeThreshold: BigInt(proposeThreshold),
+        proposeThreshold: proposeThreshold
+          ? BigInt(proposeThreshold)
+          : BigInt(0),
         proposers: proposersValue,
         acceptanceThreshold:
           threshold === "Absolute"
@@ -144,7 +148,7 @@ export function PolicyForm({
             : {
                 Percent: {
                   percent: percentToBigInt(acceptanceThreshold),
-                  quorum: quorum ? [BigInt((Number(quorum) / 100) * 1e8)] : [],
+                  quorum: quorum ? [BigInt(Number(quorum) * 1e6)] : [],
                 },
               },
       };
@@ -228,7 +232,7 @@ export function PolicyForm({
           <span className="flex items-center">
             Proposer Balance Requirement
             <span
-              aria-label="Minimum token balance required to create a proposal"
+              aria-label="Minimum token balance required to create a proposal. Proposer must have nonzero token balance regardless of this minimum"
               data-balloon-pos="right"
               data-balloon-length="large"
             >
@@ -249,7 +253,6 @@ export function PolicyForm({
           onChange={(e) => setProposeThreshold(e.target.value)}
           min={0}
           max={defaultMaxSupply ? Number(defaultMaxSupply) : undefined}
-          required
         />
       </label>
 
