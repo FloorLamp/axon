@@ -13,4 +13,12 @@ module.exports = {
   env: {
     AXON_CANISTER_ID,
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:slug*",
+        destination: "https://api.axon.ooo/api/:slug*",
+      },
+    ];
+  },
 };

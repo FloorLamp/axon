@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "export": "next export",
-    "copy:types": "rsync -avr ../../.dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/** --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --exclude='index.js' --delete declarations"
+    "copy:types": "rsync -avr ../../.dfx/$(echo ${DFX_NETWORK:-'**'})/canisters/Axon --exclude='assets/' --exclude='idl/' --exclude='*.wasm' --exclude='index.js' --delete declarations"
   },
   "dependencies": {
     "@dfinity/agent": "0.9.2",
