@@ -23,6 +23,7 @@ export default function Proposals() {
 
   const { data, error, isFetching, isSuccess } =
     type === "Active" ? activeProposalsQuery : allProposalsQuery;
+  const isUnauthorized = error === "Unauthorized";
 
   const handleRefresh = () => {
     activeProposalsQuery.refetch();
@@ -54,14 +55,16 @@ export default function Proposals() {
             title="Refresh proposals"
           />
         </div>
-        <div className="justify-self-center">
-          <NavButtons
-            values={ProposalTypes}
-            selected={type}
-            onChange={(value) => setType(value)}
-            renderValue={renderTabValue}
-          />
-        </div>
+        {!isUnauthorized && (
+          <div className="justify-self-center">
+            <NavButtons
+              values={ProposalTypes}
+              selected={type}
+              onChange={(value) => setType(value)}
+              renderValue={renderTabValue}
+            />
+          </div>
+        )}
       </div>
       {error && (
         <div className="px-4">

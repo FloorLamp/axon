@@ -15,7 +15,7 @@ export default function TokenSummary() {
   const axonId = useAxonId();
   const { data: info } = useAxonById();
   const { data: ledger, error, isFetching, refetch, isSuccess } = useLedger();
-  const topHolders = ledger?.slice(0, 5);
+  const topHolders = ledger?.slice(0, 5).filter(([_, bal]) => bal > 0);
 
   return (
     <Panel className="flex-1 p-4">

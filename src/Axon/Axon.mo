@@ -100,7 +100,8 @@ shared actor class AxonService() = this {
     Array.mapFilter<T.AxonFull, T.AxonPublic>(Array.freeze(axons), func(axon) {
       switch (axon.ledger.get(caller)) {
         case (?balance) {
-          ?getAxonPublic(axon)
+          if (balance > 0) { ?getAxonPublic(axon) }
+          else { null }
         };
         case _ { null }
       }

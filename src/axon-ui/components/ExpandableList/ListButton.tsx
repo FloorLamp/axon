@@ -15,7 +15,7 @@ export function ListButton({
 }) {
   return (
     <div
-      onClick={onClick}
+      onClick={!disabled ? onClick : undefined}
       className={classNames(
         "group flex items-center px-4 py-2 transition-colors duration-75",
         {

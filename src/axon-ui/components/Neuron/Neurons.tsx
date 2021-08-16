@@ -105,6 +105,7 @@ export default function Neurons() {
             return (
               <li key={id}>
                 <ListButton
+                  disabled={!neuron}
                   onClick={() =>
                     router.push(`/axon/${axonId}/neuron/${id.toString()}`)
                   }
