@@ -79,7 +79,7 @@ export default function MakeProposalForm({
         <div>
           <label>Action</label>
           <select
-            className="w-full mt-1"
+            className="react-select w-full mt-1"
             onChange={(e) => setActionKey(e.target.value as ActionKey)}
             value={actionKey}
           >

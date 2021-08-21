@@ -6,7 +6,7 @@ export default function useNeuronOptions() {
   const { data } = useNeuronIds();
   const { neuronName } = useNames();
 
-  const myNeurons = data.map(String);
+  const myNeurons = data.map(String).filter((id) => !(id in DEFAULT_NEURONS));
 
   return Object.keys(DEFAULT_NEURONS)
     .concat(myNeurons)

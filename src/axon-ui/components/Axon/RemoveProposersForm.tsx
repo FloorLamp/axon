@@ -59,6 +59,7 @@ export function RemoveProposersForm({
         <label className="block">
           <span>Proposers</span>
           <Select
+            className="react-select"
             isMulti={true}
             onChange={(values) => setUsers(values.map(({ value }) => value))}
             options={membersOptions}

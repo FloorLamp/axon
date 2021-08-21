@@ -54,6 +54,7 @@ export default function ManageNeuronForm({
       <label className="block">
         Neuron ID
         <CreatableSelect
+          className="react-select"
           onChange={({ value }) => setNeuronId(value)}
           options={neuronOptions}
           defaultValue={

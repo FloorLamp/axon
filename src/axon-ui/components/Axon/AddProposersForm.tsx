@@ -47,6 +47,7 @@ export function AddProposersForm({
       <label className="block">
         <span>Proposers</span>
         <CreatableSelect
+          className="react-select"
           isMulti={true}
           onChange={(values) => setUsers(values.map(({ value }) => value))}
           defaultValue={defaults?.map((p) => ({

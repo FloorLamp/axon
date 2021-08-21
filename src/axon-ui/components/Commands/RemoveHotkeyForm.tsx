@@ -59,6 +59,7 @@ export function RemoveHotkeyForm({
       <div>
         <label>Hot Key</label>
         <CreatableSelect
+          className="react-select"
           onChange={({ value }) => setHotKey(value)}
           options={hotkeyOptions}
           defaultValue={

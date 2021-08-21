@@ -231,7 +231,7 @@ export default function CommandForm({
       <div>
         <label>Command</label>
         <Select
-          className="w-full mt-1"
+          className="react-select w-full mt-1"
           onChange={({ value }) => setCommandKey(value as CommandKey)}
           options={commands}
           defaultValue={commands.find(({ value }) => value === commandKey)}

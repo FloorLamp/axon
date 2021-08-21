@@ -215,6 +215,7 @@ export function PolicyForm({
       {proposers === "Closed" && (
         <label className="block">
           <CreatableSelect
+            className="react-select"
             placeholder="Select proposers..."
             isMulti={true}
             onChange={(values) => setUsers(values.map(({ value }) => value))}

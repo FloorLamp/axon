@@ -48,7 +48,7 @@ export default function FollowForm({
       <div>
         <label>Topic</label>
         <select
-          className="w-full mt-1"
+          className="react-select w-full mt-1"
           onChange={(e) => setTopic(e.target.value as unknown as Topic)}
           value={topic}
         >
@@ -63,6 +63,7 @@ export default function FollowForm({
       <div>
         <label>Neuron</label>
         <CreatableSelect
+          className="react-select"
           isMulti
           onChange={handleChangeNeurons}
           options={neuronOptions}
