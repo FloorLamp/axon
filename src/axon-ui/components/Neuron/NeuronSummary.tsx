@@ -1,7 +1,7 @@
 import React from "react";
-import { Neuron } from "../../declarations/Axon/Axon.did";
-import { useControllerType } from "../../lib/hooks/Axon/useControllerType";
+import { BsExclamationCircleFill } from "react-icons/bs";
 import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
+import { NeuronWithRelationships } from "../../lib/hooks/Axon/useNeuronRelationships";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
 import ControllerTypeLabel from "../Labels/ControllerTypeLabel";
@@ -14,12 +14,11 @@ export default function NeuronSummary({
   isSelected,
 }: {
   id: string;
-  neuron: Neuron | null;
+  neuron: NeuronWithRelationships | null;
   onSelect?: (id: string) => void;
   isSelected?: boolean;
 }) {
   const isProposer = useIsProposer();
-  const controllerType = useControllerType(neuron);
 
   return (
     <div className="flex items-center">
@@ -34,7 +33,7 @@ export default function NeuronSummary({
       )}
       <div className="flex-1 flex flex-col md:flex-row">
         <div className="flex-1 md:flex-none md:w-80 xs:flex gap-2 items-center">
-          {controllerType && <ControllerTypeLabel type={controllerType} />}
+          {neuron._type && <ControllerTypeLabel type={neuron._type} />}
           <IdentifierLabelWithButtons type="Neuron" id={id} />
         </div>
         <div className="flex-1 flex flex-col sm:flex-row sm:items-center">
@@ -43,6 +42,11 @@ export default function NeuronSummary({
               <DissolveStateLabel dissolveState={neuron.dissolve_state[0]} />
               <div className="flex-1 sm:pr-8 sm:text-right">
                 <BalanceLabel value={neuron.cached_neuron_stake_e8s} />
+                {neuron.maturity_e8s_equivalent > BigInt(1e8) && (
+                  <span data-balloon-pos="left" aria-label="Can spawn">
+                    <BsExclamationCircleFill className="ml-1 inline-block text-green-400" />
+                  </span>
+                )}
               </div>
             </>
           )}

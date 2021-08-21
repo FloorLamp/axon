@@ -205,7 +205,7 @@ shared actor class AxonService() = this {
     // TODO: Axon creation costs
 
     let supply = Array.foldLeft<(Principal,Nat), Nat>(init.ledgerEntries, 0, func(sum, c) { sum + c.1 });
-    Cycles.add(1_500_000_000_000);
+    Cycles.add(1_000_000_000_000);
     let axon: T.AxonFull = {
       id = lastAxonId;
       proxy = await Proxy.Proxy(Principal.fromActor(this));

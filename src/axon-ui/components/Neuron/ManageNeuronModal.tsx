@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
+import { useIsMember } from "../../lib/hooks/Axon/useIsMember";
 import Modal from "../Layout/Modal";
 import NeuronActionsMenu from "./NeuronActionsMenu";
 
@@ -12,12 +12,12 @@ export default function ManageNeuronModal({
   buttonClassName?: string;
   buttonText?: string;
 }) {
-  const isOwner = useIsProposer();
+  const isMember = useIsMember();
   const [isOpen, setIsOpen] = useState(false);
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
-  if (!isOwner) {
+  if (!isMember) {
     return null;
   }
 

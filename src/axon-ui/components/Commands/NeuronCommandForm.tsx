@@ -6,9 +6,9 @@ import {
   ProposalType,
 } from "../../declarations/Axon/Axon.did";
 import {
-  ManagedNeurons,
-  useManagedNeurons,
-} from "../../lib/hooks/Axon/useControllerType";
+  NeuronWithRelationships,
+  useNeuronRelationships,
+} from "../../lib/hooks/Axon/useNeuronRelationships";
 import CommandForm from "./CommandForm";
 import NeuronSelectionForm, {
   ControlType,
@@ -18,11 +18,11 @@ import NeuronSelectionForm, {
 const parseDelegated = ({
   defaultNeuronIds,
   defaultCommand,
-  managedNeurons,
+  neurons,
 }: {
   defaultNeuronIds?: string[];
   defaultCommand?: NeuronCommandRequest;
-  managedNeurons: ManagedNeurons;
+  neurons: NeuronWithRelationships[];
 }) => {
   let targetNeuronIds =
     defaultCommand?.neuronIds.map(String) ?? defaultNeuronIds ?? [];
@@ -45,7 +45,9 @@ const parseDelegated = ({
 
   return {
     targetNeuronIds,
-    isDelegated: managed ? !!managedNeurons[managed] : false,
+    isDelegated: managed
+      ? neurons.find(({ _id }) => _id === managed)._managedBy?.length > 0
+      : false,
     parsedCommand,
   };
 };
@@ -59,11 +61,12 @@ export default function NeuronCommandForm({
   defaultNeuronIds?: string[];
   defaultCommand?: NeuronCommandRequest;
 }) {
-  const managedNeurons = useManagedNeurons();
+  const neurons = useNeuronRelationships();
+
   const { targetNeuronIds, isDelegated, parsedCommand } = parseDelegated({
     defaultNeuronIds,
     defaultCommand,
-    managedNeurons,
+    neurons,
   });
 
   const [neuronIds, setNeuronIds] = useState(targetNeuronIds);
@@ -74,15 +77,20 @@ export default function NeuronCommandForm({
   const [command, setCommand] = useState(parsedCommand);
 
   useEffect(() => {
+    let proposal = null;
+
     if (command) {
       let neuronCommand: NeuronCommand;
       if (controlType === "Delegated") {
-        const manager =
+        const neuron =
           neuronIds?.length === 1
-            ? managedNeurons[neuronIds[0]]
-              ? managedNeurons[neuronIds[0]][0]
-              : null
+            ? neurons.find(({ _id }) => _id === neuronIds[0])
             : null;
+        const manager = neuron
+          ? neuron._managedBy
+            ? neuron._managedBy[0]
+            : null
+          : null;
 
         if (manager) {
           neuronCommand = [
@@ -105,8 +113,6 @@ export default function NeuronCommandForm({
             },
             [],
           ];
-        } else {
-          return setProposal(null);
         }
       } else {
         neuronCommand = [
@@ -118,12 +124,12 @@ export default function NeuronCommandForm({
         ];
       }
 
-      setProposal({
+      proposal = {
         NeuronCommand: neuronCommand,
-      });
-    } else {
-      setProposal(null);
+      };
     }
+
+    setProposal(proposal);
   }, [command, controlType, neuronIds]);
 
   return (
@@ -134,7 +140,6 @@ export default function NeuronCommandForm({
           setNeuronIds={setNeuronIds}
           controlType={controlType}
           setControlType={setControlType}
-          managedNeurons={managedNeurons}
         />
       </div>
       <div className="flex-1 py-4 sm:pl-4">

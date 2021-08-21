@@ -1,9 +1,8 @@
 import classNames from "classnames";
 import React, { useEffect } from "react";
 import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
-import { ManagedNeurons } from "../../lib/hooks/Axon/useControllerType";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
-import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
+import { useNeuronRelationships } from "../../lib/hooks/Axon/useNeuronRelationships";
 import { pluralize, principalIsEqual } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import WarningAlert from "../Labels/WarningAlert";
@@ -16,16 +15,14 @@ export default function NeuronSelectionForm({
   setNeuronIds,
   controlType,
   setControlType,
-  managedNeurons,
 }: {
   neuronIds: string[];
   setNeuronIds: (arg: string[]) => void;
   controlType: ControlType;
   setControlType: (arg: ControlType) => void;
-  managedNeurons: ManagedNeurons;
 }) {
   const { data: info } = useAxonById();
-  const { data: neurons } = useNeurons();
+  const allNeurons = useNeuronRelationships();
   const { data: allNeuronIds, isSuccess } = useNeuronIds();
 
   const set = new Set(neuronIds);
@@ -40,20 +37,25 @@ export default function NeuronSelectionForm({
 
   useEffect(() => {
     if (controlType === "Delegated") {
-      if (!(neuronIds.length === 1 && managedNeurons[neuronIds[0]])) {
+      if (
+        neuronIds.length === 1 &&
+        allNeurons.find(({ _id }) => _id === neuronIds[0])._managedBy
+          ?.length === 0
+      ) {
         setNeuronIds([]);
       }
     }
   }, [controlType]);
 
+  const selectedNeurons = allNeurons.filter(({ _id }) =>
+    neuronIds.includes(_id)
+  );
+
   const showNonControllerWarning =
     controlType === "Direct" &&
-    !neurons?.response.full_neurons
-      .filter(
-        (neuron) =>
-          neuronIds.includes(neuron.id[0].id.toString()) || !neuronIds.length
-      )
-      .every((neuron) => principalIsEqual(info.proxy, neuron.controller[0]));
+    !selectedNeurons.every((neuron) =>
+      principalIsEqual(info.proxy, neuron.controller[0])
+    );
 
   const handleSelectAll = (e) => {
     setNeuronIds(
@@ -103,60 +105,64 @@ export default function NeuronSelectionForm({
             )}
           </div>
         )}
-        <ul className="flex flex-col gap-0.5 py-2">
+        <ul
+          className="flex flex-col gap-0.5 py-2 overflow-y-auto"
+          style={{ maxHeight: "20rem" }}
+        >
           {controlType === "Direct"
-            ? allNeuronIds.map((neuronId) => {
-                const id = neuronId.toString();
+            ? allNeurons.map(({ _id }) => {
                 return (
-                  <li key={id}>
+                  <li key={_id}>
                     <label className="inline-flex items-center cursor-pointer">
                       <input
                         type="checkbox"
                         className="mr-2"
-                        onChange={(e) => toggle(id)}
-                        checked={set.has(id)}
+                        onChange={(e) => toggle(_id)}
+                        checked={set.has(_id)}
                       />
                       <IdentifierLabelWithButtons
                         type="Neuron"
-                        id={id}
+                        id={_id}
                         showButtons={false}
                       />
                     </label>
                   </li>
                 );
               })
-            : Object.entries(managedNeurons).map(([target, managers]) => {
-                return (
-                  <li key={target}>
-                    <label
-                      className={classNames(
-                        "flex py-1 px-2 rounded-md border border-transparent cursor-pointer",
-                        {
-                          "bg-indigo-100 border-indigo-400": set.has(target),
-                        }
-                      )}
-                    >
-                      <div className="w-6">
-                        <input
-                          type="radio"
-                          onChange={(e) => setNeuronIds([target])}
-                          checked={set.has(target)}
-                        />
-                      </div>
-                      <div>
-                        <IdentifierLabelWithButtons
-                          type="Neuron"
-                          id={target}
-                          showButtons={false}
-                        />
-                        <p className="text-xs">
-                          Managed by {managers.join(", ")}
-                        </p>
-                      </div>
-                    </label>
-                  </li>
-                );
-              })}
+            : allNeurons
+                .filter(({ _managedBy }) => _managedBy.length > 0)
+                .map(({ _id, _managedBy }) => {
+                  return (
+                    <li key={_id}>
+                      <label
+                        className={classNames(
+                          "flex py-1 px-2 rounded-md border border-transparent cursor-pointer",
+                          {
+                            "bg-indigo-100 border-indigo-400": set.has(_id),
+                          }
+                        )}
+                      >
+                        <div className="w-6">
+                          <input
+                            type="radio"
+                            onChange={(e) => setNeuronIds([_id])}
+                            checked={set.has(_id)}
+                          />
+                        </div>
+                        <div>
+                          <IdentifierLabelWithButtons
+                            type="Neuron"
+                            id={_id}
+                            showButtons={false}
+                          />
+                          <p className="text-xs">
+                            Managed by {_managedBy.join(", ")}
+                          </p>
+                        </div>
+                      </label>
+                    </li>
+                  );
+                })}
         </ul>
       </div>
       {showNonControllerWarning && (

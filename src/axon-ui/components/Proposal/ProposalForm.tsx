@@ -1,6 +1,8 @@
+import classNames from "classnames";
 import { useRouter } from "next/dist/client/router";
 import React, { useState } from "react";
 import { ProposalType } from "../../declarations/Axon/Axon.did";
+import { useIsProposer } from "../../lib/hooks/Axon/useIsProposer";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import usePropose from "../../lib/hooks/Axon/usePropose";
 import useAxonId from "../../lib/hooks/useAxonId";
@@ -23,8 +25,9 @@ export default function ProposalForm({
   defaultNeuronIds?: string[];
 }) {
   const router = useRouter();
+  const isOwner = useIsProposer();
   const axonId = useAxonId();
-  const { data } = useNeuronIds();
+  const { data: neuronIds } = useNeuronIds();
   const [options, setOptions] = useState<ProposalOptions>({});
   const [proposal, setProposal] = useState<ProposalType>(null);
 
@@ -33,7 +36,7 @@ export default function ProposalForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (proposal) {
+    if (isOwner && proposal) {
       mutate(proposal, {
         onSuccess: (data) => {
           closeModal();
@@ -44,7 +47,9 @@ export default function ProposalForm({
   }
 
   const isDisabled =
-    !proposal || (proposalType === "NeuronCommand" && !data?.length);
+    !isOwner ||
+    !proposal ||
+    (proposalType === "NeuronCommand" && !neuronIds?.length);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -74,15 +79,20 @@ export default function ProposalForm({
         <ProposalOptionsForm onChangeOptions={setOptions} />
 
         <div className="flex flex-col gap-2 py-4">
-          <SpinnerButton
-            className="w-20 p-2"
-            activeClassName="btn-cta"
-            disabledClassName="btn-cta-disabled"
-            isLoading={isLoading}
-            isDisabled={isDisabled}
-          >
-            Submit
-          </SpinnerButton>
+          <div className="">
+            <SpinnerButton
+              className={classNames("p-2", {
+                "w-20": isOwner,
+                "px-3": !isOwner,
+              })}
+              activeClassName="btn-cta"
+              disabledClassName="btn-cta-disabled"
+              isLoading={isLoading}
+              isDisabled={isDisabled}
+            >
+              {isOwner ? "Submit" : "Not eligible to propose"}
+            </SpinnerButton>
+          </div>
 
           {isError && <ErrorAlert>{error}</ErrorAlert>}
         </div>

@@ -1,5 +1,6 @@
 import { HttpAgent, Identity } from "@dfinity/agent";
 import { AuthClient } from "@dfinity/auth-client";
+import { Ed25519KeyIdentity } from "@dfinity/identity";
 import PlugConnect from "@psychedelic/plug-connect";
 // import { StoicIdentity } from "ic-stoic-identity";
 import React, { useEffect, useState } from "react";
@@ -8,7 +9,6 @@ import { HOST, IDENTITY_PROVIDER } from "../../lib/canisters";
 import { ONE_WEEK_NS } from "../../lib/constants";
 import Modal from "../Layout/Modal";
 import { useGlobalContext, useSetAgent } from "../Store/Store";
-
 declare global {
   interface Window {
     ic: {
@@ -88,7 +88,22 @@ export default function LoginButton() {
   // Auth on refresh
   useEffect(() => {
     (async () => {
-      if (await window?.ic?.plug?.isConnected()) {
+      if (process.env.NEXT_PUBLIC_IDENTITY_OVERRIDE_SECRET_KEY) {
+        // direct ed25519 pk identity
+        const identity = Ed25519KeyIdentity.fromSecretKey(
+          Buffer.from(
+            process.env.NEXT_PUBLIC_IDENTITY_OVERRIDE_SECRET_KEY,
+            "hex"
+          )
+        );
+        setAgent({
+          agent: new HttpAgent({
+            identity,
+            host: HOST,
+          }),
+          isAuthed: true,
+        });
+      } else if (await window?.ic?.plug?.isConnected()) {
         // const connected = await window?.ic?.plug?.isConnected();
         // if (!connected) await window.ic.plug.requestConnect({ whitelist, host });
         if (!window.ic.plug.agent) {

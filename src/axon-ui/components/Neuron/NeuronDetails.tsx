@@ -4,18 +4,17 @@ import React, { Fragment } from "react";
 import { canisterId as governanceCanisterId } from "../../declarations/Governance";
 import { subaccountToAccount } from "../../lib/account";
 import { Topic } from "../../lib/governance";
-import {
-  useControllerType,
-  useManagedNeurons,
-} from "../../lib/hooks/Axon/useControllerType";
 import { useIsMember } from "../../lib/hooks/Axon/useIsMember";
-import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
+import { useNeuronRelationships } from "../../lib/hooks/Axon/useNeuronRelationships";
+import useAxonId from "../../lib/hooks/useAxonId";
 import { calculateVotingPower } from "../../lib/neurons";
 import { formatNumber } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import Panel from "../Containers/Panel";
 import BalanceLabel from "../Labels/BalanceLabel";
+import ControllerTypeLabel from "../Labels/ControllerTypeLabel";
 import { DissolveStateLabel } from "../Labels/DissolveStateLabel";
+import { renderNeuronIdLink } from "../Labels/NeuronIdLink";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import RemoveHotkeyModal from "./RemoveHotkeyModal";
 import TopupNeuronModal from "./TopupNeuronModal";
@@ -23,23 +22,18 @@ import TopupNeuronModal from "./TopupNeuronModal";
 const governanceCanister = Principal.fromText(governanceCanisterId);
 
 export default function NeuronDetails({ neuronId }: { neuronId: string }) {
+  const axonId = useAxonId();
   const isMember = useIsMember();
-  const neurons = useNeurons();
-  const neuron = neurons.data?.response.full_neurons.find(
-    (fn) => fn.id[0].id.toString() === neuronId
-  );
-  const managedNeurons = useManagedNeurons();
-  const managerOfNeurons = Object.entries(managedNeurons)
-    .filter(([k, v]) => v.includes(neuronId))
-    .map(([k]) => k);
+  const neurons = useNeuronRelationships();
+  const neuron = neurons.find((fn) => fn.id[0].id.toString() === neuronId);
 
-  const controllerType = useControllerType(neuron);
   const controller = neuron?.controller[0];
   const account = neuron
     ? subaccountToAccount(governanceCanister, neuron.account)
     : null;
 
   const votingPower = neuron ? calculateVotingPower(neuron) / 1e8 : null;
+  const isSpawnable = neuron?.maturity_e8s_equivalent > BigInt(1e8);
 
   return (
     <div className="flex flex-col gap-4 xs:gap-8">
@@ -58,6 +52,11 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
 
         <Panel className="flex-1 p-4">
           <label className="text-gray-500 uppercase text-sm">Maturity</label>
+          {isSpawnable && (
+            <label className="ml-2 bg-green-300 text-green-700 px-2 py-0.5 rounded uppercase text-xs">
+              Spawnable
+            </label>
+          )}
           <h2 className="text-2xl font-bold">
             {neuron && <BalanceLabel value={neuron.maturity_e8s_equivalent} />}
           </h2>
@@ -79,28 +78,52 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
       </div>
 
       <Panel className="px-6 flex flex-col divide-y divide-gray-200 py-4">
-        {managedNeurons[neuronId] && (
+        <div className="md:flex leading-tight py-2">
+          <div className="w-32 font-bold">Type</div>
+          <div>{neuron && <ControllerTypeLabel type={neuron._type} />}</div>
+        </div>
+        {neuron?._managedBy.length > 0 && (
           <div className="md:flex leading-tight py-2">
-            <div className="w-32 font-bold">Managed By</div>
+            <div className="w-32 font-bold">
+              Managed By ({neuron._managedBy.length})
+            </div>
             <div>
               <ul>
-                {managedNeurons[neuronId].map((nid) => (
+                {neuron._managedBy.map((nid) => (
                   <li key={nid}>
-                    <IdentifierLabelWithButtons type="Neuron" id={nid} />
+                    {nid === neuronId ? (
+                      "This Neuron"
+                    ) : (
+                      <IdentifierLabelWithButtons
+                        type="Neuron"
+                        id={nid}
+                        render={renderNeuronIdLink(axonId)}
+                      />
+                    )}
                   </li>
                 ))}
               </ul>
             </div>
           </div>
         )}
-        {managerOfNeurons.length > 0 && (
+        {neuron?._managerOf.length > 0 && (
           <div className="md:flex leading-tight py-2">
-            <div className="w-32 font-bold">Manager Of</div>
-            <div>
-              <ul>
-                {managerOfNeurons.map((id) => (
+            <div className="w-32 font-bold">
+              Manager Of ({neuron._managerOf.length})
+            </div>
+            <div className="flex-1">
+              <ul className="overflow-y-auto" style={{ maxHeight: "20rem" }}>
+                {neuron._managerOf.map((id) => (
                   <li key={id}>
-                    <IdentifierLabelWithButtons type="Neuron" id={id} />
+                    {id === neuronId ? (
+                      "This Neuron"
+                    ) : (
+                      <IdentifierLabelWithButtons
+                        type="Neuron"
+                        id={id}
+                        render={renderNeuronIdLink(axonId)}
+                      />
+                    )}
                   </li>
                 ))}
               </ul>
@@ -199,7 +222,7 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
           <div className="w-32 font-bold">Actions</div>
           <div className="flex gap-2">
             <TopupNeuronModal account={account} controller={controller} />
-            {isMember && controllerType === "Hot Key" && (
+            {isMember && neuron?._type === "Hot Key" && (
               <RemoveHotkeyModal neuronId={neuronId} />
             )}
           </div>

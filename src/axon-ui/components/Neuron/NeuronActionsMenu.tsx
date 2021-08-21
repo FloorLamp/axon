@@ -16,7 +16,11 @@ export default function NeuronActionsMenu({
 }) {
   const { data } = useNeuronIds();
   const [action, setAction] = useState<typeof ACTIONS[number]>(
-    data && !data.length ? ACTIONS[1] : ACTIONS[0]
+    defaultNeuronIds?.length > 0
+      ? ACTIONS[0]
+      : data && !data.length
+      ? ACTIONS[1]
+      : ACTIONS[0]
   );
   return (
     <div>

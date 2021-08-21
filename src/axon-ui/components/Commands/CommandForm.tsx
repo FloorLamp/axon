@@ -59,6 +59,7 @@ export default function CommandForm({
 
   const [operation, setOperation] = useState<Operation>(null);
   useEffect(() => {
+    let command = null;
     if (
       commandKey === "IncreaseDissolveDelay" ||
       commandKey === "SetDissolveTimestamp" ||
@@ -66,20 +67,19 @@ export default function CommandForm({
       commandKey === "RemoveHotKey"
     ) {
       if (operation) {
-        setCommand({
+        command = {
           Configure: { operation: [operation] },
-        });
-      } else {
-        setCommand(null);
+        };
       }
     } else if (
       commandKey === "StartDissolving" ||
       commandKey === "StopDissolving"
     ) {
-      setCommand({
+      command = {
         Configure: { operation: [{ [commandKey]: null } as Operation] },
-      });
+      };
     }
+    setCommand(command);
   }, [commandKey, operation]);
 
   const renderForm = () => {

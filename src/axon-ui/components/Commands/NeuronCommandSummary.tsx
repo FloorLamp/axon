@@ -24,10 +24,12 @@ import {
 import { accountIdentifierToString } from "../../lib/account";
 import { formatDuration, secondsToDuration } from "../../lib/datetime";
 import { Topic, Vote } from "../../lib/governance";
+import useAxonId from "../../lib/hooks/useAxonId";
 import { ActionKey, CommandKey, OperationKey } from "../../lib/types";
 import { stringify } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import BalanceLabel from "../Labels/BalanceLabel";
+import { renderNeuronIdLink } from "../Labels/NeuronIdLink";
 import { TimestampLabel } from "../Labels/TimestampLabel";
 import { DataRow, DataTable } from "../Proposal/DataTable";
 
@@ -45,6 +47,8 @@ export default function NeuronCommandSummary({
 }
 
 function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
+  const axonId = useAxonId();
+
   return (
     <div>
       <strong>Neurons</strong>
@@ -53,7 +57,11 @@ function NeuronIds({ neuronIds: [ids] }: { neuronIds: [] | [bigint[]] }) {
           <ul>
             {ids.map((id) => (
               <li key={id.toString()}>
-                <IdentifierLabelWithButtons type="Neuron" id={id} />
+                <IdentifierLabelWithButtons
+                  type="Neuron"
+                  id={id}
+                  render={renderNeuronIdLink(axonId)}
+                />
               </li>
             ))}
           </ul>
@@ -281,6 +289,7 @@ function CommandSummary({ command }: { command: Command }) {
 
 const ActionSummary = ({ action }: { action: Action }) => {
   const key = Object.keys(action)[0] as ActionKey;
+  const axonId = useAxonId();
 
   switch (key) {
     case "ManageNeuron":
@@ -292,7 +301,13 @@ const ActionSummary = ({ action }: { action: Action }) => {
         <div>
           <div className="xs:flex items-center">
             <DataRow labelClassName="w-32" label="Manage Neuron">
-              {id && <IdentifierLabelWithButtons id={id} type="Neuron" />}
+              {id && (
+                <IdentifierLabelWithButtons
+                  id={id}
+                  type="Neuron"
+                  render={renderNeuronIdLink(axonId)}
+                />
+              )}
             </DataRow>
           </div>
           <div>

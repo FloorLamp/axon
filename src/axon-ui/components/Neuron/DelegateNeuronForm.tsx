@@ -3,16 +3,19 @@ import React, { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
 import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
+import { useNeuronRelationships } from "../../lib/hooks/Axon/useNeuronRelationships";
 import CodeBlockWithCopy from "../Inputs/CodeBlockWithCopy";
 import { DfxCreateNeuronForm } from "./DfxCreateNeuronForm";
 import SyncForm from "./SyncForm";
 
 export default function DelegateNeuronForm() {
   const { data } = useAxonById();
-  const { data: neuronIds, isSuccess } = useNeuronIds();
-  const hasNeurons = isSuccess && neuronIds.length > 0;
-  const ids = neuronIds
-    .map((id) => `record{id=${id.toString()}:nat64}`)
+  const { isSuccess } = useNeuronIds();
+  const neurons = useNeuronRelationships();
+  const managers = neurons.filter(({ _managerOf }) => _managerOf.length > 0);
+  const hasNeurons = isSuccess && neurons.length > 0;
+  const ids = (managers.length > 0 ? managers : neurons)
+    .map(({ _id }) => `record{id=${_id}:nat64}`)
     .join("; ");
   const [neuronId, setNeuronId] = useState("");
   const dfxFollowCommand = `dfx canister --network=ic --no-wallet call rrkah-fqaaa-aaaaa-aaaaq-cai manage_neuron "(record {id=opt (record {id=${
@@ -63,12 +66,11 @@ export default function DelegateNeuronForm() {
             {hasNeurons && (
               <label className="block">
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Neuron ID"
                   className="w-full mt-1"
                   value={neuronId}
                   onChange={(e) => setNeuronId(e.target.value)}
-                  min={0}
                   required
                 />
               </label>

@@ -10,7 +10,8 @@ export default function ControllerTypeLabel({
   return (
     <label
       className={classNames("w-20 flex justify-center py-0.5 rounded text-xs", {
-        "bg-yellow-200 text-yellow-700": type === "Hot Key",
+        "bg-yellow-200 text-yellow-700":
+          type === "Hot Key" || type === "Manager",
         "bg-green-300 text-green-700": type === "Controller",
         "bg-blue-300 text-blue-700": type === "Delegated",
       })}
@@ -19,6 +20,8 @@ export default function ControllerTypeLabel({
       aria-label={
         type === "Hot Key"
           ? "Axon is Hot Key: Only Vote/Follow/Propose commands can be executed"
+          : type === "Manager"
+          ? "Neuron is Manager: Issue any command to its delegated neurons"
           : type === "Delegated"
           ? "Neuron is Delegated: All neuron commands can be executed"
           : "Axon is Controller: All neuron commands can be executed"

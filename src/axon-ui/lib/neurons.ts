@@ -3,7 +3,12 @@ import { DissolveState, Neuron } from "../declarations/Axon/Axon.did";
 import { formatDuration, secondsToDuration } from "./datetime";
 import { NeuronState } from "./governance";
 
-export type ControllerType = "Hot Key" | "Controller" | "Delegated" | null;
+export type ControllerType =
+  | "Hot Key"
+  | "Controller"
+  | "Delegated"
+  | "Manager"
+  | null;
 
 export const parseDissolveState = (dissolveState: DissolveState) => {
   let state: keyof typeof NeuronState, duration: Duration, seconds: number;
