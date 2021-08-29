@@ -86,7 +86,7 @@ export default function NeuronSelectionForm({
           </button>
         ))}
       </div>
-      <div className="divide-y divide-gray-300">
+      <div className="flex-1 divide-y divide-gray-300">
         {controlType === "Direct" && (
           <div className="flex items-center py-2">
             <input
@@ -172,6 +172,13 @@ export default function NeuronSelectionForm({
             For those neurons, Axon is only able to issue{" "}
             <strong>Follow, Vote</strong>, and <strong>Make Proposal</strong>{" "}
             commands.
+          </p>
+        </WarningAlert>
+      )}
+      {controlType === "Delegated" && (
+        <WarningAlert>
+          <p className="leading-tight text-sm p-1">
+            The NNS charges <strong>0.01 ICP</strong> for a delegated command.
           </p>
         </WarningAlert>
       )}

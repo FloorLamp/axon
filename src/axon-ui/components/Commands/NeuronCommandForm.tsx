@@ -134,7 +134,7 @@ export default function NeuronCommandForm({
 
   return (
     <div className="flex flex-col divide-y sm:flex-row sm:divide-y-0 sm:divide-x divide-gray-300">
-      <div className="flex-1 py-4 sm:pr-4">
+      <div className="flex-1 py-4 sm:pr-4 flex flex-col">
         <NeuronSelectionForm
           neuronIds={neuronIds}
           setNeuronIds={setNeuronIds}

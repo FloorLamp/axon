@@ -41,7 +41,11 @@ export default function NeuronSummary({
             <>
               <DissolveStateLabel dissolveState={neuron.dissolve_state[0]} />
               <div className="flex-1 sm:pr-8 sm:text-right">
-                <BalanceLabel value={neuron.cached_neuron_stake_e8s} />
+                <BalanceLabel
+                  value={
+                    neuron.cached_neuron_stake_e8s - neuron.neuron_fees_e8s
+                  }
+                />
                 {neuron.maturity_e8s_equivalent > BigInt(1e8) && (
                   <span data-balloon-pos="left" aria-label="Can spawn">
                     <BsExclamationCircleFill className="ml-1 inline-block text-green-400" />

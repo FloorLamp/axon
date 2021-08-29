@@ -46,7 +46,11 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
         <Panel className="flex-1 p-4">
           <label className="text-gray-500 uppercase text-sm">Stake</label>
           <h2 className="text-2xl font-bold">
-            {neuron && <BalanceLabel value={neuron.cached_neuron_stake_e8s} />}
+            {neuron && (
+              <BalanceLabel
+                value={neuron.cached_neuron_stake_e8s - neuron.neuron_fees_e8s}
+              />
+            )}
           </h2>
         </Panel>
 
