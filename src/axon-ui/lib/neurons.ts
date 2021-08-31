@@ -53,21 +53,24 @@ export const parseDissolveState = (dissolveState: DissolveState) => {
 
 export const calculateVotingPower = (neuron: Neuron) => {
   const { seconds } = parseDissolveState(neuron.dissolve_state[0]);
+
   if (seconds < 180 * 24 * 60 * 60) {
     return 0;
   } else {
     const delayMultiplier = 1 + Math.min(seconds, 252460800) / 252460800;
-    const ageMultiplier =
-      neuron.aging_since_timestamp_seconds < BigInt("2000000000")
-        ? 1 +
-          Math.min(
-            DateTime.fromSeconds(Number(neuron.aging_since_timestamp_seconds))
-              .diffNow()
-              .toMillis() / 1000,
-            126230400
-          ) /
-            126230400
-        : 1;
+
+    let ageMultiplier = 1;
+    if (neuron.aging_since_timestamp_seconds < BigInt("2000000000")) {
+      const ageSeconds =
+        Math.abs(
+          DateTime.fromSeconds(Number(neuron.aging_since_timestamp_seconds))
+            .diffNow()
+            .toMillis()
+        ) / 1000;
+
+      ageMultiplier = (1.25 * Math.min(ageSeconds, 31557600)) / 31557600;
+    }
+
     return (
       Number(neuron.cached_neuron_stake_e8s) * delayMultiplier * ageMultiplier
     );
