@@ -11,6 +11,8 @@ export default function useCleanup() {
   return useMutation(
     ["cleanup", axonId],
     async () => {
+      console.log("cleanup...");
+
       const result = await tryCall(() => axon.cleanup(BigInt(axonId)));
       if ("ok" in result) {
         return result.ok;

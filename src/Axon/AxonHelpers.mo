@@ -53,6 +53,13 @@ module {
         }
       };
       case (#Active(_)) {};
+      case (#ExecutionStarted(ts)) {
+        // If we fail to receive a response after 4 hours, set status to timed out
+        let EXECUTION_TIMEOUT = 4 * 60 * 60 * 1_000_000; // 4 hours
+        if (now > ts + EXECUTION_TIMEOUT) {
+          return withNewStatus(proposal, #ExecutionTimedOut(now))
+        }
+      };
       case _ {
         return proposal;
       }

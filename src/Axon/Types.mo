@@ -145,6 +145,7 @@ module {
     #Unauthorized;
     #InvalidProposal;
     #NotFound;
+    #ProposalNotFound;
     #NoNeurons;
     #CannotExecute;
     #NotProposer;
@@ -187,6 +188,7 @@ module {
     #Accepted: Int;
     #ExecutionQueued: Int;
     #ExecutionStarted: Int;
+    #ExecutionTimedOut: Int;
     #ExecutionFinished: Int;
     #Rejected: Int;
     #Expired: Int;

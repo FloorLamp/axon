@@ -88,6 +88,9 @@ export default function LoginButton() {
   // Auth on refresh
   useEffect(() => {
     (async () => {
+      const authClient = await AuthClient.create();
+      setAuthClient(authClient);
+
       if (process.env.NEXT_PUBLIC_IDENTITY_OVERRIDE_SECRET_KEY) {
         // direct ed25519 pk identity
         const identity = Ed25519KeyIdentity.fromSecretKey(
@@ -114,8 +117,6 @@ export default function LoginButton() {
         }
         handlePlugLogin();
       } else {
-        const authClient = await AuthClient.create();
-        setAuthClient(authClient);
         if (await authClient.isAuthenticated()) {
           handleAuthenticated(authClient);
         }

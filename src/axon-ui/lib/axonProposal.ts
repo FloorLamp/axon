@@ -12,6 +12,7 @@ export const getActionTime = (proposal: AxonProposal): DateTime | null => {
     status === "ExecutionQueued" ||
     status === "ExecutionStarted" ||
     status === "ExecutionFinished" ||
+    status === "ExecutionTimedOut" ||
     status === "Rejected" ||
     status === "Accepted" ||
     status === "Expired" ||

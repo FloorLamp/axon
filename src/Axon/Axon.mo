@@ -25,7 +25,7 @@ import A "./AxonHelpers";
 shared actor class AxonService() = this {
   // ---- State
 
-  stable var axonEntries_v2: [T.AxonEntries_pre] = [];
+  stable var axonEntries_pre: [T.AxonEntries_pre] = [];
   stable var axonEntries_post: [T.AxonEntries] = [];
   stable var lastAxonId: Nat = 0;
   var axons: [var T.AxonFull] = [var];
@@ -634,7 +634,7 @@ shared actor class AxonService() = this {
 
   system func postupgrade() {
     // Restore ledger hashmap from entries
-    axons := Array.thaw(Array.map<T.AxonEntries_pre, T.AxonFull>(axonEntries_v2, func(axon) {
+    axons := Array.thaw(Array.map<T.AxonEntries, T.AxonFull>(axonEntries_post, func(axon) {
       // Remove 0-balance entries
       let filteredEntries = Array.filter<T.LedgerEntry>(axon.ledgerEntries, func((_, balance)) { balance > 0 });
       {
@@ -645,22 +645,13 @@ shared actor class AxonService() = this {
         supply = axon.supply;
         ledger = HashMap.fromIter<Principal, Nat>(filteredEntries.vals(), filteredEntries.size(), Principal.equal, Principal.hash);
         policy = axon.policy;
-        neurons = switch (axon.neurons) {
-          case (?response) {
-            ?{
-              response = response;
-              timestamp = 0;
-            };
-          };
-          case _ null;
-        };
+        neurons = axon.neurons;
         totalStake = axon.totalStake;
         allProposals = axon.allProposals;
         activeProposals = axon.activeProposals;
         lastProposalId = axon.lastProposalId;
       }
     }));
-    axonEntries_v2 := [];
   };
 
 
@@ -716,12 +707,8 @@ shared actor class AxonService() = this {
           // Save proposal info if MakeProposal command
           switch (neuronResponses.get(0)) {
             case (#ManageNeuronResponse(#ok({command = ?#MakeProposal({ proposal_id = ?({id}) })}))) {
-              try {
-                let proposalInfo = await Governance.get_proposal_info(id);
-                neuronResponses.add(#ProposalInfo(#ok(proposalInfo)));
-              } catch (error) {
-                // Failed to fetch proposal, do nothing?
-              };
+              let (responseOrError, _) = await _tryGetProposal(id, 0);
+              neuronResponses.add(#ProposalInfo(responseOrError));
             };
             case _ {}
           };
@@ -947,6 +934,20 @@ shared actor class AxonService() = this {
           receiver = recipient;
         }))
       };
+    };
+  };
+
+  // Attempt to retrieve NNS proposal, tries up to 10 times
+  func _tryGetProposal(id: Nat64, tries: Nat): async (T.Result<?GT.ProposalInfo>, Nat) {
+    try {
+      let proposalInfo = await Governance.get_proposal_info(id);
+      (#ok(proposalInfo), tries);
+    } catch (error) {
+      if (tries >= 10) {
+        (#err(#ProposalNotFound), tries)
+      } else {
+        await _tryGetProposal(id, tries + 1);
+      }
     };
   };
 

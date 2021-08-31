@@ -12,6 +12,8 @@ export const statusColor = (status: StatusKey, hasExecutionError?: boolean) => {
     case "ExecutionQueued":
     case "ExecutionStarted":
       return "bg-blue-200 text-blue-700";
+    case "ExecutionTimedOut":
+      return "bg-yellow-300 text-yellow-700";
     case "ExecutionFinished":
       if (hasExecutionError) {
         return "bg-yellow-300 text-yellow-700";
@@ -34,6 +36,8 @@ const statusDisplay = (status: StatusKey, hasExecutionError?: boolean) => {
       return "Queued";
     case "ExecutionStarted":
       return "Executing";
+    case "ExecutionTimedOut":
+      return "Timed Out";
     case "ExecutionFinished": {
       if (hasExecutionError) {
         return "Executed*";

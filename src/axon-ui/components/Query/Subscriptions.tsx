@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQueryClient } from "react-query";
 import { AxonProposal } from "../../declarations/Axon/Axon.did";
-import { getStatus } from "../../lib/axonProposal";
-import { ONE_HOUR_MS } from "../../lib/constants";
+import { getActionTime, getStatus } from "../../lib/axonProposal";
+import { FOUR_HOUR_SEC, ONE_HOUR_MS } from "../../lib/constants";
 import { dateTimeFromNanos } from "../../lib/datetime";
 import { useActiveProposals } from "../../lib/hooks/Axon/useActiveProposals";
 import { useAllProposals } from "../../lib/hooks/Axon/useAllProposals";
@@ -62,9 +62,13 @@ export const Subscriptions = () => {
           (status === "Active" &&
             dateTimeFromNanos(proposal.timeEnd).diffNow().toMillis() < 0) ||
           (status === "Created" &&
-            dateTimeFromNanos(proposal.timeStart).diffNow().toMillis() < 0)
+            dateTimeFromNanos(proposal.timeStart).diffNow().toMillis() < 0) ||
+          (status === "ExecutionStarted" &&
+            getActionTime(proposal).diffNow().toMillis() <
+              -FOUR_HOUR_SEC * 1000)
         );
-      })
+      }) &&
+      !cleanup.isLoading
     ) {
       cleanup.mutate();
     }

@@ -136,6 +136,7 @@ export type Error = { 'AlreadyVoted' : null } |
   { 'Error' : { 'error_message' : string, 'error_type' : ErrorCode } } |
   { 'CannotVote' : null } |
   { 'CannotExecute' : null } |
+  { 'ProposalNotFound' : null } |
   { 'InvalidProposal' : null } |
   { 'InsufficientBalance' : null } |
   { 'NotFound' : null } |
@@ -325,7 +326,8 @@ export interface SetDissolveTimestamp { 'dissolve_timestamp_seconds' : bigint }
 export interface Spawn { 'new_controller' : [] | [Principal] }
 export interface SpawnResponse { 'created_neuron_id' : [] | [NeuronId] }
 export interface Split { 'amount_e8s' : bigint }
-export type Status = { 'Active' : bigint } |
+export type Status = { 'ExecutionTimedOut' : bigint } |
+  { 'Active' : bigint } |
   { 'Rejected' : bigint } |
   { 'ExecutionQueued' : bigint } |
   { 'Accepted' : bigint } |

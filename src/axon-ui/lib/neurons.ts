@@ -25,7 +25,6 @@ export const parseDissolveState = (dissolveState: DissolveState) => {
       duration = secondsToDuration(seconds);
     }
   } else {
-    state = "Dissolving";
     datetime = DateTime.fromSeconds(
       Number(dissolveState.WhenDissolvedTimestampSeconds)
     );
@@ -37,6 +36,11 @@ export const parseDissolveState = (dissolveState: DissolveState) => {
       "minutes",
     ]);
     seconds = duration.toMillis() / 1000;
+    if (seconds < 0) {
+      state = "Dissolved";
+    } else {
+      state = "Dissolving";
+    }
   }
   return {
     state,

@@ -19,7 +19,7 @@ export function DisburseForm({
       : ""
   );
   const [amount, setAmount] = useState(
-    defaults ? (Number(defaults.amount[0].e8s) / 1e8).toString() : ""
+    defaults?.amount[0] ? (Number(defaults.amount[0].e8s) / 1e8).toString() : ""
   );
   const [error, setError] = useState("");
 

@@ -51,6 +51,7 @@ type Status =
    ExecutionFinished: int;
    ExecutionQueued: int;
    ExecutionStarted: int;
+   ExecutionTimedOut: int;
    Expired: int;
    Rejected: int;
  };
@@ -330,6 +331,7 @@ type Error =
    NoNeurons;
    NotFound;
    NotProposer;
+   ProposalNotFound;
    Unauthorized;
  };
 type DissolveState = 

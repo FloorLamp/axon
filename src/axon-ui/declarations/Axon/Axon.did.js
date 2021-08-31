@@ -229,6 +229,7 @@ export const idlFactory = ({ IDL }) => {
     'module_hash' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
   const Status = IDL.Variant({
+    'ExecutionTimedOut' : IDL.Int,
     'Active' : IDL.Int,
     'Rejected' : IDL.Int,
     'ExecutionQueued' : IDL.Int,
@@ -294,6 +295,7 @@ export const idlFactory = ({ IDL }) => {
     }),
     'CannotVote' : IDL.Null,
     'CannotExecute' : IDL.Null,
+    'ProposalNotFound' : IDL.Null,
     'InvalidProposal' : IDL.Null,
     'InsufficientBalance' : IDL.Null,
     'NotFound' : IDL.Null,
