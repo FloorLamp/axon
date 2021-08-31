@@ -86,16 +86,16 @@ const Store = ({ children }) => {
   useEffect(() => {
     try {
       const stored = localStorage.getItem("state");
-      const value = JSON.parse(stored);
-      dispatch({ type: "LOAD_PERSISTENT_STATE", value });
+      if (stored) {
+        const value = JSON.parse(stored);
+        dispatch({ type: "LOAD_PERSISTENT_STATE", value });
+      }
     } catch (error) {
       console.log(error);
     }
   }, []);
 
   useEffect(() => {
-    console.log("state.persistent", state.persistent);
-
     if (typeof window !== "undefined") {
       window.localStorage.setItem("state", JSON.stringify(state.persistent));
     }
