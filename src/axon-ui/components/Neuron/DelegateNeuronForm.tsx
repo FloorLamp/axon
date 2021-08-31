@@ -2,15 +2,15 @@ import classNames from "classnames";
 import React, { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import { useAxonById } from "../../lib/hooks/Axon/useAxonById";
-import { useNeuronIds } from "../../lib/hooks/Axon/useNeuronIds";
 import { useNeuronRelationships } from "../../lib/hooks/Axon/useNeuronRelationships";
+import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import CodeBlockWithCopy from "../Inputs/CodeBlockWithCopy";
 import { DfxCreateNeuronForm } from "./DfxCreateNeuronForm";
 import SyncForm from "./SyncForm";
 
 export default function DelegateNeuronForm() {
   const { data } = useAxonById();
-  const { isSuccess } = useNeuronIds();
+  const { isSuccess } = useNeurons();
   const neurons = useNeuronRelationships();
   const managers = neurons.filter(({ _managerOf }) => _managerOf.length > 0);
   const hasNeurons = isSuccess && neurons.length > 0;

@@ -11,24 +11,36 @@ export type ControllerType =
   | null;
 
 export const parseDissolveState = (dissolveState: DissolveState) => {
-  let state: keyof typeof NeuronState, duration: Duration, seconds: number;
+  let state: keyof typeof NeuronState,
+    datetime: DateTime,
+    duration: Duration,
+    seconds: number;
   if ("DissolveDelaySeconds" in dissolveState) {
     seconds = Number(dissolveState.DissolveDelaySeconds);
     if (dissolveState.DissolveDelaySeconds === BigInt(0)) {
       state = "Dissolved";
     } else {
       state = "Non-Dissolving";
+      datetime = DateTime.utc().plus({ seconds });
       duration = secondsToDuration(seconds);
     }
   } else {
     state = "Dissolving";
-    duration = DateTime.fromSeconds(
+    datetime = DateTime.fromSeconds(
       Number(dissolveState.WhenDissolvedTimestampSeconds)
-    ).diffNow(["years", "months", "days", "hours", "minutes"]);
+    );
+    duration = datetime.diffNow([
+      "years",
+      "months",
+      "days",
+      "hours",
+      "minutes",
+    ]);
     seconds = duration.toMillis() / 1000;
   }
   return {
     state,
+    datetime,
     duration,
     seconds,
     dissolveDelay: duration ? formatDuration(duration) : null,

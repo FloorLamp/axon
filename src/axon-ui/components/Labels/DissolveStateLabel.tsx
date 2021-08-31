@@ -8,7 +8,7 @@ export function DissolveStateLabel({
 }: {
   dissolveState: DissolveState;
 }) {
-  let { state, dissolveDelay } = parseDissolveState(dissolveState);
+  const { state, dissolveDelay } = parseDissolveState(dissolveState);
 
   return (
     <span className="inline-flex gap-2 items-center">

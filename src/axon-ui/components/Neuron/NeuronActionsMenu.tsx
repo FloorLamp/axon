@@ -4,8 +4,14 @@ import NavButtons from "../Buttons/NavButtons";
 import ProposalForm from "../Proposal/ProposalForm";
 import AddHotKeyForm from "./AddHotKeyForm";
 import DelegateNeuronForm from "./DelegateNeuronForm";
+import SettingsForm from "./SettingsForm";
 
-const ACTIONS = ["Manage", "Add Hot Key", "Delegate Neuron"] as const;
+const ACTIONS = [
+  "Manage",
+  "Add Hot Key",
+  "Delegate Neuron",
+  "Settings",
+] as const;
 
 export default function NeuronActionsMenu({
   closeModal,
@@ -14,7 +20,7 @@ export default function NeuronActionsMenu({
   closeModal: () => void;
   defaultNeuronIds?: string[];
 }) {
-  const { data } = useNeuronIds();
+  const data = useNeuronIds();
   const [action, setAction] = useState<typeof ACTIONS[number]>(
     defaultNeuronIds?.length > 0
       ? ACTIONS[0]
@@ -37,6 +43,7 @@ export default function NeuronActionsMenu({
       )}
       {action === "Add Hot Key" && <AddHotKeyForm />}
       {action === "Delegate Neuron" && <DelegateNeuronForm />}
+      {action === "Settings" && <SettingsForm />}
     </div>
   );
 }

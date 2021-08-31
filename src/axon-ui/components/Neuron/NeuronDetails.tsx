@@ -7,7 +7,7 @@ import { Topic } from "../../lib/governance";
 import { useIsMember } from "../../lib/hooks/Axon/useIsMember";
 import { useNeuronRelationships } from "../../lib/hooks/Axon/useNeuronRelationships";
 import useAxonId from "../../lib/hooks/useAxonId";
-import { calculateVotingPower } from "../../lib/neurons";
+import { calculateVotingPower, parseDissolveState } from "../../lib/neurons";
 import { formatNumber } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import Panel from "../Containers/Panel";
@@ -34,6 +34,10 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
 
   const votingPower = neuron ? calculateVotingPower(neuron) / 1e8 : null;
   const isSpawnable = neuron?.maturity_e8s_equivalent > BigInt(1e8);
+
+  const dissolveState = neuron
+    ? parseDissolveState(neuron.dissolve_state[0])
+    : null;
 
   return (
     <div className="flex flex-col gap-4 xs:gap-8">
@@ -220,6 +224,20 @@ export default function NeuronDetails({ neuronId }: { neuronId: string }) {
             {neuron && (
               <DissolveStateLabel dissolveState={neuron.dissolve_state[0]} />
             )}
+          </div>
+        </div>
+        <div className="md:flex leading-tight py-2">
+          <div className="w-32 font-bold">Dissolve Date</div>
+          <div>
+            {neuron &&
+              (dissolveState.datetime ? (
+                <TimestampLabel
+                  dt={dissolveState.datetime}
+                  showRelative={false}
+                />
+              ) : (
+                "-"
+              ))}
           </div>
         </div>
         <div className="md:flex leading-tight py-2">

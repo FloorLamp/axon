@@ -6,6 +6,7 @@ import { useNeuronRelationships } from "../../lib/hooks/Axon/useNeuronRelationsh
 import { pluralize, principalIsEqual } from "../../lib/utils";
 import IdentifierLabelWithButtons from "../Buttons/IdentifierLabelWithButtons";
 import WarningAlert from "../Labels/WarningAlert";
+import { useHideZeroBalances } from "../Store/Store";
 
 export const ControlTypes = ["Direct", "Delegated"] as const;
 export type ControlType = typeof ControlTypes[number];
@@ -23,7 +24,14 @@ export default function NeuronSelectionForm({
 }) {
   const { data: info } = useAxonById();
   const allNeurons = useNeuronRelationships();
-  const { data: allNeuronIds, isSuccess } = useNeuronIds();
+  const allNeuronIds = useNeuronIds();
+  const [hideZeroBalances] = useHideZeroBalances();
+  const filteredNeurons = hideZeroBalances
+    ? allNeurons.filter(
+        ({ cached_neuron_stake_e8s, neuron_fees_e8s }) =>
+          cached_neuron_stake_e8s - neuron_fees_e8s > BigInt(0)
+      )
+    : allNeurons;
 
   const set = new Set(neuronIds);
 
@@ -39,7 +47,7 @@ export default function NeuronSelectionForm({
     if (controlType === "Delegated") {
       if (
         neuronIds.length === 1 &&
-        allNeurons.find(({ _id }) => _id === neuronIds[0])._managedBy
+        filteredNeurons.find(({ _id }) => _id === neuronIds[0])._managedBy
           ?.length === 0
       ) {
         setNeuronIds([]);
@@ -47,7 +55,7 @@ export default function NeuronSelectionForm({
     }
   }, [controlType]);
 
-  const selectedNeurons = allNeurons.filter(({ _id }) =>
+  const selectedNeurons = filteredNeurons.filter(({ _id }) =>
     neuronIds.includes(_id)
   );
 
@@ -63,7 +71,7 @@ export default function NeuronSelectionForm({
     );
   };
 
-  return isSuccess && !allNeuronIds.length ? (
+  return allNeuronIds.length === 0 ? (
     <p className="flex items-center justify-center h-full text-gray-500 text-sm">
       No neurons to manage.
     </p>
@@ -110,7 +118,7 @@ export default function NeuronSelectionForm({
           style={{ maxHeight: "20rem" }}
         >
           {controlType === "Direct"
-            ? allNeurons.map(({ _id }) => {
+            ? filteredNeurons.map(({ _id }) => {
                 return (
                   <li key={_id}>
                     <label className="inline-flex items-center cursor-pointer">
@@ -129,7 +137,7 @@ export default function NeuronSelectionForm({
                   </li>
                 );
               })
-            : allNeurons
+            : filteredNeurons
                 .filter(({ _managedBy }) => _managedBy.length > 0)
                 .map(({ _id, _managedBy }) => {
                   return (

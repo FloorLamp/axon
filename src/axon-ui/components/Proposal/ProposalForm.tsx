@@ -27,7 +27,7 @@ export default function ProposalForm({
   const router = useRouter();
   const isOwner = useIsProposer();
   const axonId = useAxonId();
-  const { data: neuronIds } = useNeuronIds();
+  const neuronIds = useNeuronIds();
   const [options, setOptions] = useState<ProposalOptions>({});
   const [proposal, setProposal] = useState<ProposalType>(null);
 

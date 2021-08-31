@@ -12,10 +12,12 @@ import { useNeurons } from "../../lib/hooks/Axon/useNeurons";
 import useSync from "../../lib/hooks/Axon/useSync";
 import useAxonId from "../../lib/hooks/useAxonId";
 import { ControllerType } from "../../lib/neurons";
+import { pluralize } from "../../lib/utils";
 import { RefreshButton } from "../Buttons/RefreshButton";
 import Panel from "../Containers/Panel";
 import { ListButton } from "../ExpandableList/ListButton";
 import ResponseError from "../Labels/ResponseError";
+import { useHideZeroBalances } from "../Store/Store";
 import ManageNeuronModal from "./ManageNeuronModal";
 import NeuronSummary from "./NeuronSummary";
 
@@ -31,11 +33,7 @@ export default function Neurons() {
   const isMember = useIsMember();
   const axonId = useAxonId();
   const router = useRouter();
-  const {
-    data: neuronIds,
-    isFetching: isFetchingNeuronIds,
-    error: errorNeuronIds,
-  } = useNeuronIds();
+  const neuronIds = useNeuronIds();
   const {
     data: rawNeurons,
     isFetching: isFetchingNeurons,
@@ -44,12 +42,13 @@ export default function Neurons() {
   } = useNeurons();
   const neurons = useNeuronRelationships();
   const sync = useSync();
+  const [hideZeroBalances] = useHideZeroBalances();
 
   const handleRefresh = () => {
     sync.mutate();
   };
   const isSyncing = !!useIsMutating({ mutationKey: ["sync", axonId] });
-  const isFetching = isSyncing || isFetchingNeuronIds || isFetchingNeurons;
+  const isFetching = isSyncing || isFetchingNeurons;
   const [selectedNeuronIds, setSelectedNeuronIds] = useState<string[]>([]);
   const handleToggle = (id: string) => {
     setSelectedNeuronIds(
@@ -78,12 +77,9 @@ export default function Neurons() {
           />
         </div>
       </div>
-      {(errorNeuronIds || errorNeurons) && (
+      {errorNeurons && (
         <div className="px-4">
-          <ResponseError>
-            {errorNeuronIds}
-            {errorNeurons}
-          </ResponseError>
+          <ResponseError>{errorNeurons}</ResponseError>
         </div>
       )}
       <div className="flex gap-3 items-center px-4 pb-2">
@@ -115,13 +111,24 @@ export default function Neurons() {
             if (!neurons) {
               return null;
             }
+            const visible = hideZeroBalances
+              ? neurons.filter(
+                  (n) =>
+                    n.cached_neuron_stake_e8s - n.neuron_fees_e8s > BigInt(0)
+                )
+              : neurons;
+            const hasHidden =
+              hideZeroBalances && visible.length < neurons.length;
+
             return (
               <div key={group}>
                 <h3 className="bg-gray-100 text-xs text-gray-500 px-4 py-2 border-t border-b border-gray-300">
-                  {group}
+                  {group} ({visible.length}{" "}
+                  {pluralize("neuron", visible.length)}
+                  {hasHidden && `, ${neurons.length - visible.length} hidden`})
                 </h3>
                 <ul className="divide-y divide-gray-300">
-                  {neurons.map((neuron) => {
+                  {visible.map((neuron) => {
                     return (
                       <li key={neuron._id}>
                         <ListButton
