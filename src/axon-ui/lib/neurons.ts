@@ -68,7 +68,7 @@ export const calculateVotingPower = (neuron: Neuron) => {
             .toMillis()
         ) / 1000;
 
-      ageMultiplier = (1.25 * Math.min(ageSeconds, 31557600)) / 31557600;
+      ageMultiplier += (0.25 * Math.min(ageSeconds, 31557600)) / 31557600;
     }
 
     return (
