@@ -96,14 +96,11 @@ export function DisburseToNeuronForm({
           />
         </div>
 
-        <div>
-          <label>Dissolve Delay</label>
-          <DissolveDelayInput
-            value={dissolveDelay}
-            onChange={setDissolveDelay}
-            required
-          />
-        </div>
+        <DissolveDelayInput
+          value={dissolveDelay}
+          onChange={setDissolveDelay}
+          required
+        />
 
         <div>
           <div className="flex justify-between">

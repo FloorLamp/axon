@@ -34,14 +34,11 @@ export function IncreaseDissolveDelayForm({
 
   return (
     <div>
-      <div>
-        <label>Additional Dissolve Delay</label>
-        <DissolveDelayInput
-          value={dissolveDelay}
-          onChange={setDissolveDelay}
-          required
-        />
-      </div>
+      <DissolveDelayInput
+        value={dissolveDelay}
+        onChange={setDissolveDelay}
+        required
+      />
 
       {!!error && <ErrorAlert>{error}</ErrorAlert>}
     </div>

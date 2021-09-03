@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 import React, { useEffect, useState } from "react";
 import { BiInfoCircle } from "react-icons/bi";
 import { FiChevronRight } from "react-icons/fi";
-import { FOUR_HOUR_SEC, ONE_WEEK_SEC } from "../../lib/constants";
+import { FOUR_HOUR_SEC, ONE_WEEK_SECONDS } from "../../lib/constants";
 import { ProposalOptions } from "../../lib/types";
 import ErrorAlert from "../Labels/ErrorAlert";
 
@@ -111,7 +111,7 @@ export function ProposalOptionsForm({
                 value={durationSeconds}
                 onChange={(e) => setDurationSeconds(e.target.value)}
                 min={FOUR_HOUR_SEC}
-                max={ONE_WEEK_SEC}
+                max={ONE_WEEK_SECONDS}
               />
             </div>
 
