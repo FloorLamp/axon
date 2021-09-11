@@ -428,7 +428,9 @@ type AxonService =
    ledger: (nat) -> (vec LedgerEntry) query;
    myAxons: () -> (vec AxonPublic) query;
    propose: (NewProposal) -> (Result_3);
+   sweep: () -> ();
    sync: (nat) -> (NeuronsResult);
+   takeControl: () -> ();
    topAxons: () -> (vec AxonPublic) query;
    transfer: (nat, principal, nat) -> (Result);
    vote: (VoteRequest) -> (Result);

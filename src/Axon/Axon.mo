@@ -27,7 +27,6 @@ shared actor class AxonService() = this {
 
   stable var axonEntries_pre: [T.AxonEntries_pre] = [];
   stable var axonEntries_post: [T.AxonEntries] = [];
-  stable var lastAxonId: Nat = 0;
   var axons: [var T.AxonFull] = [var];
 
   // ---- Constants
@@ -48,7 +47,7 @@ shared actor class AxonService() = this {
   //---- Public queries
 
   public query func count() : async Nat {
-    lastAxonId
+    axons.size()
   };
 
   public query func topAxons() : async [T.AxonPublic] {
@@ -207,7 +206,7 @@ shared actor class AxonService() = this {
     let supply = Array.foldLeft<(Principal,Nat), Nat>(init.ledgerEntries, 0, func(sum, c) { sum + c.1 });
     Cycles.add(1_000_000_000_000);
     let axon: T.AxonFull = {
-      id = lastAxonId;
+      id = axons.size();
       proxy = await Proxy.Proxy(Principal.fromActor(this));
       name = init.name;
       visibility = init.visibility;
@@ -221,7 +220,6 @@ shared actor class AxonService() = this {
       lastProposalId = 0;
     };
     axons := Array.thaw(Array.append(Array.freeze(axons), [axon]));
-    lastAxonId += 1;
     #ok(getAxonPublic(axon))
   };
 
