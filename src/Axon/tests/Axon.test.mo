@@ -145,6 +145,29 @@ let suite = Suite.suite("AxonProposal", [
     M.equals(T.text("#Active(0)"))
   ),
 
+  Suite.test("quorum + percent: active 2",
+    debug_show(currentStatus(A._applyNewStatusWithTime(makeActiveProposal({
+      proposers = #Open;
+      proposeThreshold = 1;
+      acceptanceThreshold = #Percent({percent = 66_000_000; quorum = ?52_000_000});
+    }, [
+      {
+        principal = p1;
+        votingPower = 1;
+        vote = ?#Yes
+      }, {
+        principal = p2;
+        votingPower = 1;
+        vote = null
+      }, {
+        principal = p3;
+        votingPower = 1;
+        vote = null
+      }
+    ]), 42).status)),
+    M.equals(T.text("#Active(0)"))
+  ),
+
   Suite.test("quorum + percent: auto accept 2",
     debug_show(currentStatus(A._applyNewStatusWithTime(makeActiveProposal({
       proposers = #Open;

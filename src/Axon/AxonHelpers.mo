@@ -1,8 +1,11 @@
+import Arr "./Array";
 import Array "mo:base/Array";
-import Debug "mo:base/Debug";
 import Buffer "mo:base/Buffer";
+import Debug "mo:base/Debug";
 import Error "mo:base/Error";
+import Float "mo:base/Float";
 import HashMap "mo:base/HashMap";
+import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Nat64 "mo:base/Nat64";
@@ -11,11 +14,9 @@ import Prelude "mo:base/Prelude";
 import Prim "mo:prim";
 import Principal "mo:base/Principal";
 import Result "mo:base/Result";
+import T "./Types";
 import Time "mo:base/Time";
 import TrieSet "mo:base/TrieSet";
-
-import Arr "./Array";
-import T "./Types";
 
 module {
   public func _countVotes(ballots: [T.Ballot]): T.Votes {
@@ -167,7 +168,9 @@ module {
     s[s.size() - 1]
   };
 
-  func percentOf(percent: Nat, n: Nat): Nat { (percent * n) / 100_000_000 };
+  func percentOf(percent: Nat, n: Nat): Nat {
+    Int.abs(Float.toInt(Float.ceil(Float.fromInt(percent * n) / (100_000_000 : Float))))
+  };
 
   public func scaleByFraction(n: Nat, numerator: Nat, denominator: Nat): Nat {
     n * numerator / denominator
